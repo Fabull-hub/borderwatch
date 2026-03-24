@@ -1953,6 +1953,90 @@ renderSidebarSources();
 renderCatBars();
 renderHeatmap();
 renderSourcesGrid('all');
+
+
+// ── LIVE NEWS ENGINE ──────────────────────────────────────────────────────────
+let _liveArticles = [];
+let _isLoading = false;
+let _lastFetch = 0;
+const CACHE_TTL = 10 * 60 * 1000;
+
+function showSkeleton() {
+  const list = document.getElementById('article-list');
+  if (!list) return;
+  list.innerHTML = Array(6).fill(0).map(() => `<div class="article-card" style="pointer-events:none"><div>
+    <div style="width:80px;height:16px;background:var(--bg4);border-radius:3px;margin-bottom:10px;animation:shimmer 1.5s infinite"></div>
+    <div style="width:90%;height:14px;background:var(--bg4);border-radius:3px;margin-bottom:6px;animation:shimmer 1.5s infinite"></div>
+    <div style="width:70%;height:12px;background:var(--bg4);border-radius:3px;animation:shimmer 1.5s infinite"></div>
+  </div></div>`).join('');
+}
+
+async function fetchLiveNews(category, force) {
+  const now = Date.now();
+  if (!force && _liveArticles.length > 0 && (now - _lastFetch) < CACHE_TTL) {
+    renderLiveArticles(_liveArticles, category); return;
+  }
+  if (_isLoading) return;
+  _isLoading = true;
+  showSkeleton();
+  try {
+    const res = await fetch('/api/news?category=' + (category || 'all'));
+    if (!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    if (data.ok && data.articles && data.articles.length > 0) {
+      _liveArticles = data.articles;
+      _lastFetch = now;
+      const el = document.getElementById('stat-stories');
+      if (el) el.textContent = data.total || data.articles.length;
+      renderLiveArticles(data.articles, category);
+    } else { throw new Error('empty'); }
+  } catch(e) {
+    console.warn('BorderTrend API fallback:', e.message);
+    renderArticles(category || 'all');
+  } finally { _isLoading = false; }
+}
+
+function renderLiveArticles(articles, filter) {
+  const list = document.getElementById('article-list');
+  if (!list) return;
+  const filtered = (!filter || filter === 'all') ? articles : articles.filter(a => a.badge === filter);
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="padding:32px;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No articles found</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(a => `<a class="article-card" href="${a.url}" target="_blank" rel="noopener">
+    <div>
+      <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
+      <div class="article-headline">${a.headline}</div>
+      <div class="article-summary">${a.summary}</div>
+      <div class="article-footer"><span class="article-region">${a.region}</span><span>${a.source}</span><span>${a.time}</span></div>
+    </div>
+    <div class="article-time-bar ${a.timeClass}"></div>
+  </a>`).join('');
+}
+
+// Override the filterCategory function to use live API
+const _origFilter = filterCategory;
+filterCategory = function(cat) {
+  currentCategory = cat;
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+  if (event && event.target) event.target.classList.add('active');
+  fetchLiveNews(cat);
+  const sub = cat === 'all' ? 'Live Feed · All Categories' : 'Live Feed · ' + cat.charAt(0).toUpperCase() + cat.slice(1);
+  const subEl = document.getElementById('section-sub');
+  if (subEl) subEl.textContent = sub;
+};
+
+// Auto-refresh every 10 minutes
+setInterval(() => fetchLiveNews(currentCategory, true), CACHE_TTL);
+
+// Add shimmer keyframe
+const shimmerStyle = document.createElement('style');
+shimmerStyle.textContent = '@keyframes shimmer{0%,100%{opacity:.4}50%{opacity:.8}}';
+document.head.appendChild(shimmerStyle);
+
+// Boot — replace static articles with live ones
+fetchLiveNews('all');
 </script>
 </body>
 </html>
