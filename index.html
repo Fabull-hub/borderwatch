@@ -1181,9 +1181,41 @@
 <div class="ad-leaderboard-wrap">
   <div class="ad-leaderboard-inner">
     <div class="ad-label">Advertisement</div>
-    <div class="ad-slot-leaderboard" id="ad-leaderboard">
-      <div class="ad-slot-placeholder">
-        <div class="ad-slot-icon">&#9635;</div>
+    <div class="ad-slot-leaderboard" id="ad-leaderboard" style="cursor:pointer;overflow:hidden;border:none;">
+  <svg width="100%" height="90" viewBox="0 0 970 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#0a1628"/>
+        <stop offset="40%" style="stop-color:#0d2040"/>
+        <stop offset="100%" style="stop-color:#1a0a2e"/>
+      </linearGradient>
+      <linearGradient id="accent1" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#d4a843"/>
+        <stop offset="100%" style="stop-color:#f5c842"/>
+      </linearGradient>
+    </defs>
+    <rect width="970" height="90" fill="url(#lg1)"/>
+    <rect x="0" y="0" width="4" height="90" fill="url(#accent1)"/>
+    <!-- Shield icon -->
+    <path d="M52 18 L68 22 L68 40 Q68 52 52 58 Q36 52 36 40 L36 22 Z" fill="none" stroke="#d4a843" stroke-width="2"/>
+    <path d="M44 38 L50 44 L62 32" stroke="#d4a843" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- Brand name -->
+    <text x="84" y="36" font-family="Georgia, serif" font-size="22" font-weight="700" fill="#ffffff" letter-spacing="-0.5">TradeGuard</text>
+    <text x="84" y="36" font-family="Georgia, serif" font-size="22" font-weight="700" fill="url(#accent1)" letter-spacing="-0.5" dx="130">Pro</text>
+    <text x="84" y="54" font-family="Arial, sans-serif" font-size="11" fill="#8a9dbf" letter-spacing="0.08em" text-transform="uppercase">CUSTOMS COMPLIANCE &amp; TRADE INTELLIGENCE PLATFORM</text>
+    <!-- Divider -->
+    <rect x="380" y="20" width="1" height="50" fill="#1e3050"/>
+    <!-- Value prop -->
+    <text x="400" y="32" font-family="Arial, sans-serif" font-size="13" fill="#dde6f5" font-weight="500">Real-time HS Code Classification</text>
+    <text x="400" y="50" font-family="Arial, sans-serif" font-size="13" fill="#dde6f5" font-weight="500">Automated Compliance Screening</text>
+    <text x="400" y="68" font-family="Arial, sans-serif" font-size="13" fill="#dde6f5" font-weight="500">200+ Country Customs Database</text>
+    <!-- CTA -->
+    <rect x="760" y="22" width="170" height="46" rx="4" fill="url(#accent1)"/>
+    <text x="845" y="48" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#000" text-anchor="middle">Start Free Trial →</text>
+    <!-- Ad label -->
+    <text x="946" y="10" font-family="Arial, sans-serif" font-size="8" fill="#3a5a7a" text-anchor="end" letter-spacing="0.1em">ADVERTISEMENT</text>
+  </svg>
+</div>
         <div class="ad-slot-size">970 x 90 — Leaderboard / Billboard</div>
         <div class="ad-slot-cta" onclick="window.open('mailto:ads@borderwatch.io','_blank')">Advertise Here</div>
       </div>
@@ -1308,15 +1340,20 @@
       </div>
 
       <!-- AD ZONE 3: IN-FEED NATIVE AD (injected between articles) -->
-      <div class="ad-infeed" id="ad-infeed-1" onclick="window.open('mailto:ads@borderwatch.io','_blank')">
-        <div class="ad-infeed-visual">&#9635;</div>
-        <div>
-          <div class="ad-infeed-badge">Sponsored</div>
-          <div class="ad-infeed-headline">Your Brand Reaches Decision-Makers in Border Security &amp; Customs</div>
-          <div class="ad-infeed-body">BorderWatch serves investigators, customs officers, policy analysts, and journalists worldwide. Native placements available in all categories.</div>
-          <div class="ad-infeed-cta">Learn about advertising &#x2197;</div>
-        </div>
-      </div>
+      <div class="ad-infeed" id="ad-infeed-1" onclick="window.open('https://lexport.com','_blank')" style="cursor:pointer;border-left:3px solid #d4a843;">
+  <div class="ad-infeed-badge">SPONSORED</div>
+  <div class="ad-infeed-visual" style="width:72px;height:72px;background:linear-gradient(135deg,#0d2040,#1a3060);border:1px solid #2a4a7f;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 4 L32 9 L32 22 Q32 32 20 36 Q8 32 8 22 L8 9 Z" fill="none" stroke="#d4a843" stroke-width="1.5"/>
+      <text x="20" y="25" font-family="Georgia,serif" font-size="13" font-weight="700" fill="#d4a843" text-anchor="middle">Lex</text>
+    </svg>
+  </div>
+  <div>
+    <div class="ad-infeed-headline">LexPort — Trade Law &amp; Customs Compliance Advisory</div>
+    <div class="ad-infeed-body">Specialized legal counsel for import/export enforcement, sanctions compliance, and customs dispute resolution across 80+ jurisdictions.</div>
+    <div class="ad-infeed-cta">Get expert consultation → lexport.com</div>
+  </div>
+</div>
 
     </div>
 
@@ -1346,16 +1383,34 @@
       </div>
 
       <!-- AD ZONE 2A: SIDEBAR MEDIUM RECTANGLE 300x250 -->
-      <div class="ad-sidebar-block">
-        <div class="ad-label">Advertisement</div>
-        <div class="ad-slot-mrec" id="ad-sidebar-mrec">
-          <div class="ad-slot-placeholder" style="z-index:1">
-            <div class="ad-slot-icon">&#9635;</div>
-            <div class="ad-slot-size">300 x 250 — Medium Rectangle</div>
-            <div class="ad-slot-cta" onclick="window.open('mailto:ads@borderwatch.io','_blank')">Advertise Here</div>
-          </div>
-        </div>
+      <div class="ad-sidebar-block" style="padding:0;overflow:hidden;border:1px solid #1a3050;cursor:pointer;" onclick="window.open('https://cargoclear360.com','_blank')">
+  <div style="background:linear-gradient(160deg,#06101e 0%,#0a1828 55%,#060e1c 100%);padding:18px 16px 16px;display:flex;flex-direction:column;gap:10px;">
+    <p style="font-family:'DM Mono',monospace;font-size:8px;color:#3a5a7a;text-transform:uppercase;letter-spacing:0.18em;margin:0;">ADVERTISEMENT</p>
+    <!-- Logo row -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="8" width="28" height="20" rx="2" fill="none" stroke="#d4a843" stroke-width="1.5"/>
+        <rect x="7" y="3" width="18" height="7" rx="1" fill="none" stroke="#d4a843" stroke-width="1.5"/>
+        <line x1="10" y1="16" x2="22" y2="16" stroke="#d4a843" stroke-width="1.5"/>
+        <line x1="10" y1="21" x2="18" y2="21" stroke="#d4a843" stroke-width="1.5"/>
+      </svg>
+      <div>
+        <div style="font-family:Georgia,serif;font-size:17px;font-weight:700;color:#fff;line-height:1;">CargoClear<span style="color:#d4a843;">360</span></div>
+        <div style="font-family:Arial,sans-serif;font-size:9px;color:#8a9dbf;letter-spacing:0.1em;text-transform:uppercase;">Trade Compliance Platform</div>
       </div>
+    </div>
+    <div style="border-top:1px solid #1a2e48;padding-top:10px;display:flex;flex-direction:column;gap:7px;">
+      <div style="font-family:Arial,sans-serif;font-size:12px;color:#dde6f5;display:flex;align-items:flex-start;gap:7px;"><span style="color:#d4a843;margin-top:1px;flex-shrink:0;">◆</span>Automated HS Classification for 180+ countries</div>
+      <div style="font-family:Arial,sans-serif;font-size:12px;color:#dde6f5;display:flex;align-items:flex-start;gap:7px;"><span style="color:#d4a843;margin-top:1px;flex-shrink:0;">◆</span>Real-time sanctions &amp; denied party screening</div>
+      <div style="font-family:Arial,sans-serif;font-size:12px;color:#dde6f5;display:flex;align-items:flex-start;gap:7px;"><span style="color:#d4a843;margin-top:1px;flex-shrink:0;">◆</span>AI-powered cargo risk scoring engine</div>
+      <div style="font-family:Arial,sans-serif;font-size:12px;color:#dde6f5;display:flex;align-items:flex-start;gap:7px;"><span style="color:#d4a843;margin-top:1px;flex-shrink:0;">◆</span>Direct customs authority API integrations</div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;background:#111e30;border-radius:4px;padding:8px 12px;border:1px solid #1e3a5a;">
+      <span style="font-family:Arial,sans-serif;font-size:11px;color:#8a9dbf;">Trusted by 340+ brokers</span>
+      <span style="font-family:Arial,sans-serif;font-size:11px;font-weight:700;color:#d4a843;">Free Trial →</span>
+    </div>
+  </div>
+</div>
 
       <!-- ACTIVITY HEATMAP -->
       <div class="sidebar-block">
@@ -1392,11 +1447,15 @@
   </div>
 
   <!-- AD ZONE 4: SPONSORED SECTION STRIP -->
-  <div class="ad-sponsored-strip">
-    <div class="ad-sponsored-tag">Sponsored</div>
-    <div class="ad-sponsored-text">Sponsored Intelligence Report — Your company's research, analysis, or product announcement placed here, reaching BorderWatch's professional audience of 80,000+ monthly readers.</div>
-    <div class="ad-sponsored-logo">Your Brand</div>
-  </div>
+  <div class="ad-sponsored-strip" style="background:linear-gradient(90deg,#080e1a 0%,#0d1e3a 40%,#10182e 100%);border:1px solid #2a3a5a;border-radius:6px;padding:12px 16px;display:flex;align-items:center;gap:14px;margin-bottom:14px;cursor:pointer;" onclick="window.open('https://bordertech-summit.com','_blank')">
+  <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+    <rect x="2" y="2" width="32" height="32" rx="4" fill="#0d2040" stroke="#d4a843" stroke-width="1.5"/>
+    <text x="18" y="22" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#d4a843" text-anchor="middle">BT</text>
+  </svg>
+  <span class="ad-sponsored-tag" style="font-size:9px;background:#d4a843;color:#000;padding:3px 8px;border-radius:2px;font-weight:700;letter-spacing:0.16em;white-space:nowrap;">SPONSORED</span>
+  <span class="ad-sponsored-text" style="font-family:Arial,sans-serif;font-size:13px;color:#dde6f5;flex:1;"><strong style="color:#d4a843;">BorderTech Summit 2026</strong> — The premier conference for customs technology, trade compliance &amp; border security innovation. Miami Beach · Sep 14–17</span>
+  <span class="ad-sponsored-logo" style="font-family:'DM Mono',monospace;font-size:11px;color:#8a9dbf;border:1px solid #2a4a7a;padding:4px 12px;border-radius:3px;white-space:nowrap;">Register Now →</span>
+</div>
 
   <div class="three-col" id="three-col-grid">
     <!-- Populated by JS -->
@@ -1437,15 +1496,24 @@
   </div>
 
   <!-- AD ZONE 5: IN-FEED NATIVE AD 2 — before sources directory -->
-  <div class="ad-infeed" id="ad-infeed-2" onclick="window.open('mailto:ads@borderwatch.io','_blank')" style="margin-bottom:32px">
-    <div class="ad-infeed-visual">&#9635;</div>
-    <div>
-      <div class="ad-infeed-badge">Sponsored</div>
-      <div class="ad-infeed-headline">Compliance, Risk &amp; Trade Technology — Reach Buyers Actively Researching Solutions</div>
-      <div class="ad-infeed-body">Place your solution in front of compliance officers, freight forwarders, customs brokers, and government procurement teams at the moment they need it most.</div>
-      <div class="ad-infeed-cta">Contact our ad team &#x2197;</div>
-    </div>
+  <div class="ad-infeed" id="ad-infeed-2" onclick="window.open('https://sentinelai.io','_blank')" style="cursor:pointer;border-left:3px solid #3a7bd5;">
+  <div class="ad-infeed-badge">SPONSORED</div>
+  <div class="ad-infeed-visual" style="width:72px;height:72px;background:linear-gradient(135deg,#051a30,#0a2a4a);border:1px solid #1a4a7f;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+    <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="14" fill="none" stroke="#3a7bd5" stroke-width="1.5"/>
+      <circle cx="20" cy="20" r="6" fill="none" stroke="#3a7bd5" stroke-width="1.5"/>
+      <line x1="20" y1="6" x2="20" y2="14" stroke="#3a7bd5" stroke-width="1.5"/>
+      <line x1="20" y1="26" x2="20" y2="34" stroke="#3a7bd5" stroke-width="1.5"/>
+      <line x1="6" y1="20" x2="14" y2="20" stroke="#3a7bd5" stroke-width="1.5"/>
+      <line x1="26" y1="20" x2="34" y2="20" stroke="#3a7bd5" stroke-width="1.5"/>
+    </svg>
   </div>
+  <div>
+    <div class="ad-infeed-headline" style="padding-right:52px;">SentinelAI — Contraband Detection &amp; Risk Scoring Platform</div>
+    <div class="ad-infeed-body">AI-powered cargo screening and behavioral risk analytics trusted by 40+ customs administrations. Real-time threat intelligence integration.</div>
+    <div class="ad-infeed-cta" style="color:#3a7bd5;">Request a demo → sentinelai.io</div>
+  </div>
+</div>
 
 </main>
 
@@ -1453,13 +1521,31 @@
 <div class="ad-bottom-banner">
   <div class="ad-bottom-banner-inner">
     <div class="ad-label">Advertisement</div>
-    <div class="ad-slot-banner" id="ad-bottom-banner">
-      <div class="ad-slot-placeholder" style="z-index:1">
-        <div class="ad-slot-icon">&#9635;</div>
-        <div class="ad-slot-size">728 x 90 — Footer Leaderboard</div>
-        <div class="ad-slot-cta" onclick="window.open('mailto:ads@borderwatch.io','_blank')">Advertise Here</div>
-      </div>
-    </div>
+    <div class="ad-slot-banner" style="cursor:pointer;overflow:hidden;border:none;" onclick="window.open('https://compliancecloud.io','_blank')">
+  <svg width="100%" height="90" viewBox="0 0 728 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <linearGradient id="lg2" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style="stop-color:#060d1c"/>
+        <stop offset="50%" style="stop-color:#0c1a30"/>
+        <stop offset="100%" style="stop-color:#060d1c"/>
+      </linearGradient>
+    </defs>
+    <rect width="728" height="90" fill="url(#lg2)"/>
+    <rect x="0" y="0" width="728" height="2" fill="#3a7bd5" opacity="0.6"/>
+    <rect x="0" y="88" width="728" height="2" fill="#3a7bd5" opacity="0.6"/>
+    <!-- Icon -->
+    <circle cx="45" cy="45" r="22" fill="none" stroke="#3a7bd5" stroke-width="1.5"/>
+    <path d="M35 45 L42 52 L56 38" stroke="#3a7bd5" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- Brand -->
+    <text x="80" y="34" font-family="Georgia,serif" font-size="19" font-weight="700" fill="#ffffff">ComplianceCloud</text>
+    <text x="80" y="54" font-family="Arial,sans-serif" font-size="11" fill="#8a9dbf" letter-spacing="0.08em">AUTOMATED TRADE COMPLIANCE FOR CUSTOMS BROKERS &amp; FREIGHT FORWARDERS</text>
+    <text x="80" y="72" font-family="Arial,sans-serif" font-size="11" fill="#4a6a9a">Sanctions screening · Dual-use controls · AEO certification support · 60+ country coverage</text>
+    <!-- CTA -->
+    <rect x="572" y="25" width="136" height="40" rx="4" fill="none" stroke="#3a7bd5" stroke-width="1.5"/>
+    <text x="640" y="49" font-family="Arial,sans-serif" font-size="12" font-weight="600" fill="#3a7bd5" text-anchor="middle">Book a Demo →</text>
+    <text x="712" y="10" font-family="Arial,sans-serif" font-size="8" fill="#3a5a7a" text-anchor="end" letter-spacing="0.1em">ADVERTISEMENT</text>
+  </svg>
+</div>
   </div>
 </div>
 
