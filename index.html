@@ -835,6 +835,13 @@
     transition: opacity 0.2s;
   }
 
+  /* Shimmer skeleton animation */
+  @keyframes shimmer {
+    0% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.4; }
+  }
+
   /* ── ADVERTISEMENT ZONES ── */
 
   /* Shared ad label */
@@ -1602,7 +1609,88 @@ const TRANSLATIONS = {
   }
 };
 
-const ARTICLES = [
+// ─── LIVE NEWS ENGINE ─────────────────────────────────────────────────────────
+let _liveArticles = [];
+let _isLoading = false;
+let _lastFetch = 0;
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
+function showSkeleton() {
+  const list = document.getElementById('article-list');
+  list.innerHTML = Array(6).fill(0).map(() => `
+    <div class="article-card" style="pointer-events:none">
+      <div>
+        <div style="width:80px;height:16px;background:var(--bg4);border-radius:3px;margin-bottom:10px;animation:shimmer 1.5s infinite"></div>
+        <div style="width:90%;height:14px;background:var(--bg4);border-radius:3px;margin-bottom:6px;animation:shimmer 1.5s infinite"></div>
+        <div style="width:75%;height:14px;background:var(--bg4);border-radius:3px;margin-bottom:6px;animation:shimmer 1.5s infinite"></div>
+        <div style="width:60%;height:12px;background:var(--bg4);border-radius:3px;animation:shimmer 1.5s infinite"></div>
+      </div>
+    </div>`).join('');
+}
+
+function showApiError(fallbackFn) {
+  console.warn('BorderTrend: API unavailable, using fallback data');
+  fallbackFn();
+  document.getElementById('section-sub').textContent += ' · Cached data';
+}
+
+async function fetchLiveNews(category = 'all', force = false) {
+  const now = Date.now();
+  if (!force && _liveArticles.length > 0 && (now - _lastFetch) < CACHE_TTL) {
+    renderArticlesFromData(_liveArticles, category);
+    return;
+  }
+  if (_isLoading) return;
+  _isLoading = true;
+  showSkeleton();
+  try {
+    const url = `/api/news?category=${category}&_t=${Math.floor(now / CACHE_TTL)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    if (data.ok && data.articles?.length > 0) {
+      _liveArticles = data.articles;
+      _lastFetch = now;
+      document.getElementById('stat-stories').textContent = data.total || data.articles.length;
+      renderArticlesFromData(data.articles, category);
+    } else {
+      throw new Error('Empty response');
+    }
+  } catch (err) {
+    showApiError(() => renderArticlesFromData(ARTICLES_FALLBACK, category));
+  } finally {
+    _isLoading = false;
+  }
+}
+
+function renderArticlesFromData(articles, filter) {
+  const list = document.getElementById('article-list');
+  const filtered = filter === 'all' ? articles : articles.filter(a => a.badge === filter);
+  if (filtered.length === 0) {
+    list.innerHTML = `<div style="padding:32px;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No articles found for this category</div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(a => `
+    <a class="article-card" href="${a.url}" target="_blank" rel="noopener">
+      <div>
+        <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
+        <div class="article-headline">${a.headline}</div>
+        <div class="article-summary">${a.summary}</div>
+        <div class="article-footer">
+          <span class="article-region">${a.region}</span>
+          <span>${a.source}</span>
+          <span>${a.time}</span>
+        </div>
+      </div>
+      <div class="article-time-bar ${a.timeClass}"></div>
+    </a>`).join('');
+}
+
+// Auto-refresh every 10 minutes
+setInterval(() => fetchLiveNews(currentCategory, true), CACHE_TTL);
+
+// ─── FALLBACK STATIC ARTICLES (shown if API unavailable) ─────────────────────
+const ARTICLES_FALLBACK = [
   { badge: "cargo", badgeLabel: "CARGO", headline: "Scopolamine and methamphetamine found in textiles shipment at Felixstowe port, UK", summary: "Border Force officers using advanced X-ray scanners uncovered 340kg of narcotics packed within bales of clothing originating from Pakistan. Three suspects held under UK Misuse of Drugs Act.", source: "BBC News", sourceUrl: "https://www.bbc.com", region: "Europe", time: "45m ago", timeClass: "time-recent", url: "https://www.bbc.com/news" },
   { badge: "human", badgeLabel: "HUMAN SMUGGLING", headline: "IOM: 1,200 migrants rescued from three vessels off Libyan coast in 48-hour operation", summary: "The International Organization for Migration coordinated with Italy's Coast Guard and Maltese Maritime Rescue Coordination Centre, highlighting ongoing pressure on Central Mediterranean Route.", source: "IOM", sourceUrl: "https://www.iom.int", region: "Mediterranean", time: "1h 20m ago", timeClass: "time-recent", url: "https://www.iom.int" },
   { badge: "border", badgeLabel: "LAND BORDER", headline: "Mexico-Guatemala border patrol arrests surge 22% after Operation FRONTERA SUR reinforcement", summary: "Mexican immigration authority INM reports spike in interdictions along Chiapas and Tabasco states. Authorities cite Guatemalan collaboration and expanded biometric checkpoints.", source: "InSight Crime", sourceUrl: "https://insightcrime.org", region: "Latin America", time: "2h ago", timeClass: "time-recent", url: "https://insightcrime.org" },
@@ -1700,24 +1788,8 @@ function badgeClass(b) {
   return m[b] || 'badge-cargo';
 }
 
-function renderArticles(filter) {
-  const list = document.getElementById('article-list');
-  const filtered = filter === 'all' ? ARTICLES : ARTICLES.filter(a => a.badge === filter);
-  list.innerHTML = filtered.map(a => `
-    <a class="article-card" href="${a.url}" target="_blank" rel="noopener">
-      <div>
-        <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
-        <div class="article-headline">${a.headline}</div>
-        <div class="article-summary">${a.summary}</div>
-        <div class="article-footer">
-          <span class="article-region">${a.region}</span>
-          <span>${a.source}</span>
-          <span>${a.time}</span>
-        </div>
-      </div>
-      <div class="article-time-bar ${a.timeClass}"></div>
-    </a>
-  `).join('');
+function renderArticles(cat) {
+  fetchLiveNews(cat);
 }
 
 function renderThreeCol() {
@@ -1802,13 +1874,14 @@ function filterCategory(cat) {
 }
 
 function filterSearch(query) {
-  if (!query) { renderArticles(currentCategory); return; }
+  const articles = _liveArticles.length > 0 ? _liveArticles : ARTICLES_FALLBACK;
+  if (!query) { renderArticlesFromData(articles, currentCategory); return; }
   const q = query.toLowerCase();
-  const all = currentCategory === 'all' ? ARTICLES : ARTICLES.filter(a => a.badge === currentCategory);
-  const filtered = all.filter(a => a.headline.toLowerCase().includes(q) || a.summary.toLowerCase().includes(q) || a.source.toLowerCase().includes(q));
+  const pool = currentCategory === 'all' ? articles : articles.filter(a => a.badge === currentCategory);
+  const filtered = pool.filter(a => a.headline.toLowerCase().includes(q) || a.summary.toLowerCase().includes(q) || a.source.toLowerCase().includes(q));
   const list = document.getElementById('article-list');
   if (filtered.length === 0) {
-    list.innerHTML = '<div style="padding:32px;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No results for "' + query + '"</div>';
+    list.innerHTML = `<div style="padding:32px;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No results for "${query}"</div>`;
     return;
   }
   list.innerHTML = filtered.map(a => `
@@ -1820,8 +1893,7 @@ function filterSearch(query) {
         <div class="article-footer"><span class="article-region">${a.region}</span><span>${a.source}</span><span>${a.time}</span></div>
       </div>
       <div class="article-time-bar ${a.timeClass}"></div>
-    </a>
-  `).join('');
+    </a>`).join('');
 }
 
 function filterSources(filter, btn) {
