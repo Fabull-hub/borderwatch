@@ -1266,8 +1266,8 @@
     </div>
     <div class="stat-cell">
       <div class="stat-label">Sources Monitored</div>
-      <div class="stat-value">142</div>
-      <div class="stat-sub">▲ 11 countries</div>
+      <div class="stat-value" id="stat-sources">—</div>
+      <div class="stat-sub" id="stat-countries">Loading...</div>
     </div>
   </div>
 
@@ -1327,7 +1327,7 @@
       <div class="sidebar-block">
         <div class="sidebar-header">
           <span class="sidebar-title">Key Sources</span>
-          <span class="sidebar-count" id="source-count">142 tracked</span>
+          <span class="sidebar-count" id="source-count">— tracked</span>
         </div>
         <div id="source-list-sidebar">
           <!-- Populated by JS -->
@@ -1417,7 +1417,7 @@
     <div class="section-header">
       <div class="section-title">Sources Directory</div>
       <div class="section-rule"></div>
-      <div class="section-sub">Global Coverage · 142 Sources</div>
+      <div class="section-sub">Global Coverage · <span id="sources-dir-count">—</span> Sources</div>
     </div>
 
     <div class="sources-tabs" id="sources-tabs">
@@ -1468,7 +1468,7 @@
   <div class="footer-inner">
     <div class="footer-brand">
       <div class="footer-logo">Border<span>Watch</span></div>
-      <div class="footer-desc">BorderWatch aggregates open-source intelligence on smuggling trends, border security operations, and seizure data from 142+ verified sources worldwide. For law enforcement, researchers, journalists, and policy professionals.</div>
+      <div class="footer-desc">BorderWatch aggregates open-source intelligence on smuggling trends, border security operations, and seizure data from <span id="footer-source-count">—</span>+ verified sources worldwide. For law enforcement, researchers, journalists, and policy professionals.</div>
     </div>
     <div>
       <div class="footer-col-title">Categories</div>
@@ -1984,6 +1984,24 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
+// ─── DYNAMIC SOURCE COUNT ───────────────────────────────────────────────────
+function updateSourceCounts() {
+  const total = SOURCES.length;
+  const countries = [...new Set(SOURCES.map(s => s.region))].length;
+  ['stat-sources','source-count','sources-dir-count','footer-source-count'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (id === 'source-count') el.textContent = total + ' tracked';
+    else if (id === 'stat-sources') el.textContent = total;
+    else el.textContent = total;
+  });
+  const statCountries = document.getElementById('stat-countries');
+  if (statCountries) statCountries.textContent = '▲ ' + countries + ' regions covered';
+  // Also update sources directory tab count
+  const dirHeader = document.querySelector('.section-sub');
+  // Already handled by id above
+}
+
 // ─── INIT ────────────────────────────────────────────────────────────────────
 fetchLiveNews('all');
 renderThreeCol();
@@ -1991,6 +2009,7 @@ renderSidebarSources();
 renderCatBars();
 renderHeatmap();
 renderSourcesGrid('all');
+updateSourceCounts();
 </script>
 </body>
 </html>
