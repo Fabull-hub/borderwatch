@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BorderWatch — Global Smuggling & Border Security Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060b18;
+    --bg2: #0b1225;
+    --bg3: #101a30;
+    --bg4: #162038;
+    --border: rgba(100,140,220,0.1);
+    --border2: rgba(100,140,220,0.2);
+    --text: #dde6f5;
+    --text2: #8a9dbf;
+    --text3: #4a5a7a;
+    --accent: #d4a843;
+    --accent2: #b8892a;
+    --accent3: #8c6620;
+    --red: #c94c3a;
+    --blue: #3a7bd5;
+    --green: #3aad72;
+    --teal: #2a9d8f;
+    --tag-cargo: #2a4a7f;
+    --tag-airport: #5c2a6b;
+    --tag-border: #1a5c3a;
+    --tag-human: #7f2a2a;
+    --tag-seized: #4a3a00;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Source Serif 4', Georgia, serif;
+    --font-sans: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── TOP TICKER ── */
+  .ticker-wrap {
+    background: var(--accent);
+    overflow: hidden;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 100;
+  }
+  .ticker-label {
+    background: #000;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    padding: 0 14px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+    z-index: 2;
+    text-transform: uppercase;
+  }
+  .ticker-content {
+    display: flex;
+    animation: ticker 55s linear infinite;
+    gap: 0;
+  }
+  .ticker-content span {
+    font-family: var(--font-sans);
+    font-size: 11.5px;
+    font-weight: 500;
+    color: #000;
+    white-space: nowrap;
+    padding: 0 40px 0 0;
+  }
+  .ticker-content span::before {
+    content: '◆ ';
+    font-size: 8px;
+    margin-right: 6px;
+    opacity: 0.5;
+  }
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ── MASTHEAD ── */
+  .masthead {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border2);
+    padding: 28px 0 0;
+  }
+  .masthead-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .masthead-top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .logo-area { display: flex; flex-direction: column; gap: 2px; }
+  .logo {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .logo span { color: var(--accent); }
+  .tagline {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .masthead-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text2);
+    letter-spacing: 0.08em;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    background: #3aad72;
+    border-radius: 50%;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(58,173,114,0.5); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 5px rgba(58,173,114,0); }
+  }
+
+  /* Language selector */
+  .lang-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .lang-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-right: 4px;
+  }
+  .lang-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-sans);
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+  }
+  .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .lang-btn.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 600; }
+
+  /* ── NAV ── */
+  .nav-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-bar::-webkit-scrollbar { display: none; }
+  .nav-link {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text2);
+    text-decoration: none;
+    padding: 12px 16px;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    cursor: pointer;
+  }
+  .nav-link:hover { color: var(--text); }
+  .nav-link.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* search */
+  .search-box {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+  }
+  .search-input {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    width: 200px;
+    outline: none;
+    transition: border 0.15s;
+  }
+  .search-input::placeholder { color: var(--text3); }
+  .search-input:focus { border-color: var(--accent); }
+
+  /* ── MAIN LAYOUT ── */
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 28px 24px;
+  }
+
+  /* Market-style top strip */
+  .stats-strip {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-bottom: 28px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .stat-cell {
+    background: var(--bg2);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .stat-sub {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    color: var(--green);
+  }
+  .stat-sub.neg { color: var(--red); }
+
+  /* ── GRID LAYOUT ── */
+  .news-grid {
+    display: grid;
+    grid-template-columns: minmax(0,2.2fr) minmax(0,1fr);
+    gap: 28px;
+    align-items: start;
+  }
+
+  /* Hero story */
+  .hero-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 300px;
+  }
+  .hero-visual {
+    background: linear-gradient(135deg, #0d1f3a 0%, #1a0d0d 50%, #0d1a10 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    padding: 24px;
+  }
+  .hero-visual-art {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 0.3;
+  }
+  .hero-visual-label {
+    font-family: var(--font-mono);
+    font-size: 68px;
+    font-weight: 500;
+    color: rgba(212,168,67,0.15);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    letter-spacing: -0.04em;
+  }
+  .hero-content {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .hero-headline {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .hero-deck {
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.6;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+  .hero-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    color: var(--text3);
+  }
+  .source-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text2);
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .source-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Article cards */
+  .article-list { display: flex; flex-direction: column; gap: 1px; }
+  .article-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items: start;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    text-decoration: none;
+    margin-bottom: 8px;
+  }
+  .article-card:hover { background: var(--bg3); border-color: var(--border2); }
+  .article-badge {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+  }
+  .badge-cargo { background: var(--tag-cargo); color: #7aacf5; }
+  .badge-airport { background: var(--tag-airport); color: #c97de0; }
+  .badge-border { background: var(--tag-border); color: #6fd4a0; }
+  .badge-human { background: var(--tag-human); color: #f5897a; }
+  .badge-seized { background: var(--tag-seized); color: #f5c842; }
+  .badge-narco { background: #1a2a00; color: #a3e05a; }
+  .badge-weapons { background: #2a1a00; color: #f5a84a; }
+  .badge-wildlife { background: #002a1a; color: #4af5c4; }
+  .badge-maritime { background: #001a2a; color: #4ac4f5; }
+
+  .article-headline {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .article-summary {
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    color: var(--text2);
+    line-height: 1.5;
+    margin-bottom: 8px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .article-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    flex-wrap: wrap;
+  }
+  .article-region {
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 2px;
+    color: var(--text2);
+  }
+
+  /* timestamp indicator */
+  .article-time-bar {
+    width: 4px;
+    min-height: 80px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    background: var(--border);
+    align-self: stretch;
+  }
+  .time-recent { background: var(--red); }
+  .time-today { background: var(--accent3); }
+  .time-old { background: var(--border); }
+
+  /* ── SIDEBAR ── */
+  .sidebar { display: flex; flex-direction: column; gap: 20px; }
+  .sidebar-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+  .sidebar-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text2);
+  }
+  .sidebar-count {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  /* Sources list */
+  .source-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    transition: background 0.1s;
+    cursor: pointer;
+  }
+  .source-item:last-child { border-bottom: none; }
+  .source-item:hover { background: var(--bg3); }
+  .source-flag { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .source-info { flex: 1; min-width: 0; }
+  .source-name {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .source-type {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+  }
+  .source-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-official { background: var(--blue); }
+  .dot-media { background: var(--green); }
+  .dot-ngo { background: var(--accent); }
+  .dot-interpol { background: var(--red); }
+
+  /* Heat map sidebar */
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    padding: 14px;
+  }
+  .heatmap-cell {
+    aspect-ratio: 1;
+    border-radius: 2px;
+    background: var(--bg4);
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .heatmap-cell:hover { transform: scale(1.15); z-index: 2; }
+  .heat-1 { background: rgba(201,76,58,0.15); }
+  .heat-2 { background: rgba(201,76,58,0.3); }
+  .heat-3 { background: rgba(201,76,58,0.5); }
+  .heat-4 { background: rgba(201,76,58,0.7); }
+  .heat-5 { background: rgba(201,76,58,0.9); }
+
+  /* Category chart */
+  .cat-bars { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .cat-row { display: flex; flex-direction: column; gap: 4px; }
+  .cat-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-sans);
+    font-size: 11px;
+  }
+  .cat-label { color: var(--text2); }
+  .cat-pct { font-family: var(--font-mono); color: var(--text3); font-size: 10px; }
+  .cat-bar-bg {
+    height: 4px;
+    background: var(--bg4);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .cat-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+
+  /* ── SECTION DIVIDERS ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 28px 0 16px;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .section-rule {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* ── SECONDARY GRID ── */
+  .three-col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .mini-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    text-decoration: none;
+    display: block;
+  }
+  .mini-card:hover { border-color: var(--border2); }
+  .mini-card-tag { margin-bottom: 10px; }
+  .mini-headline {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .mini-summary {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .mini-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+  }
+
+  /* ── SOURCES DIRECTORY FULL ── */
+  .sources-section { margin-top: 32px; }
+  .sources-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .sources-tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { border-color: var(--border2); color: var(--text); }
+  .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 600; }
+
+  .sources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+  }
+  .src-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s;
+  }
+  .src-card:hover { border-color: var(--border2); }
+  .src-card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .src-card-flag { font-size: 18px; }
+  .src-card-name {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .src-card-desc {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .src-card-tags {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .src-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 2px;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 32px 24px;
+    margin-top: 60px;
+  }
+  .footer-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 32px;
+  }
+  .footer-brand { display: flex; flex-direction: column; gap: 12px; }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .footer-logo span { color: var(--accent); }
+  .footer-desc {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text3);
+    line-height: 1.6;
+    max-width: 280px;
+  }
+  .footer-col-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 14px;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .footer-links a {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text2);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-bottom {
+    max-width: 1400px;
+    margin: 24px auto 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .footer-copy {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .news-grid { grid-template-columns: 1fr; }
+    .three-col { grid-template-columns: repeat(2, 1fr); }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .stats-strip { grid-template-columns: repeat(3, 1fr); }
+    .hero-card { grid-template-columns: 1fr; }
+    .hero-visual { min-height: 140px; }
+  }
+  @media (max-width: 700px) {
+    .logo { font-size: 36px; }
+    .three-col { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); }
+    .masthead-top { flex-direction: column; align-items: flex-start; }
+    .masthead-meta { align-items: flex-start; }
+    .sources-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Translation overlay */
+  .translating {
+    opacity: 0.5;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+
+  /* ── ADVERTISEMENT ZONES ── */
+
+  /* Shared ad label */
+  .ad-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text3);
+    text-align: center;
+    margin-bottom: 5px;
+  }
+
+  /* 1. Leaderboard — 728×90 below masthead, full width */
+  .ad-leaderboard-wrap {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
+  }
+  .ad-leaderboard-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .ad-slot-leaderboard {
+    width: 100%;
+    max-width: 970px;
+    height: 90px;
+    background: var(--bg3);
+    border: 1px dashed var(--border2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .ad-slot-leaderboard::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.01) 8px, rgba(255,255,255,0.01) 16px);
+  }
+  .ad-slot-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    z-index: 1;
+  }
+  .ad-slot-icon {
+    font-size: 20px;
+    opacity: 0.2;
+  }
+  .ad-slot-size {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.1em;
+  }
+  .ad-slot-cta {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    color: var(--accent3);
+    border: 1px solid var(--accent3);
+    padding: 3px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-top: 2px;
+    transition: all 0.15s;
+  }
+  .ad-slot-cta:hover { background: var(--accent3); color: #000; }
+
+  /* 2. Sidebar ads — 300×250 medium rectangle and 160×600 skyscraper */
+  .ad-slot-mrec {
+    width: 100%;
+    height: 250px;
+    background: var(--bg3);
+    border: 1px dashed var(--border2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .ad-slot-mrec::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.01) 8px, rgba(255,255,255,0.01) 16px);
+  }
+  .ad-sidebar-block {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* 3. In-feed native ad */
+  .ad-infeed {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent3);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin: 4px 0 8px;
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 14px;
+    align-items: center;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    text-decoration: none;
+    position: relative;
+  }
+  .ad-infeed:hover { border-color: var(--border2); }
+  .ad-infeed-visual {
+    width: 72px;
+    height: 72px;
+    background: var(--bg4);
+    border: 1px dashed var(--border2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    opacity: 0.4;
+    flex-shrink: 0;
+  }
+  .ad-infeed-badge {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--bg4);
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+  .ad-infeed-headline {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    line-height: 1.3;
+    padding-right: 52px;
+  }
+  .ad-infeed-body {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.45;
+    margin-bottom: 6px;
+  }
+  .ad-infeed-cta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+
+  /* 4. Bottom banner (728×90 / responsive) */
+  .ad-bottom-banner {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 14px 0;
+    margin-top: 40px;
+  }
+  .ad-bottom-banner-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .ad-slot-banner {
+    width: 100%;
+    max-width: 728px;
+    height: 90px;
+    background: var(--bg3);
+    border: 1px dashed var(--border2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .ad-slot-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.01) 8px, rgba(255,255,255,0.01) 16px);
+  }
+
+  /* 5. Sponsored section header */
+  .ad-sponsored-strip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .ad-sponsored-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    background: var(--accent3);
+    color: #000;
+    padding: 3px 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+  .ad-sponsored-text {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text2);
+    flex: 1;
+  }
+  .ad-sponsored-logo {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 700px) {
+    .ad-slot-leaderboard { height: 60px; }
+    .ad-slot-banner { height: 60px; }
+    .ad-infeed { grid-template-columns: 1fr; }
+    .ad-infeed-visual { display: none; }
+  }
+
+  /* ── INLINE AD / PROMO strip (non-ad, just layout) ── */
+  .data-strip {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 24px 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .data-strip-icon {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    color: var(--accent);
+  }
+  .data-strip-text { flex: 1; min-width: 200px; }
+  .data-strip-title {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .data-strip-sub {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    color: var(--text3);
+  }
+  .data-strip-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- BREAKING NEWS TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-label">■ BREAKING</div>
+  <div style="overflow:hidden;flex:1">
+    <div class="ticker-content" id="ticker">
+      <span>Turkish coast guard intercepts vessel carrying 87 migrants in Aegean Sea</span>
+      <span>US CBP seizes 3.2 tonnes of fentanyl at San Diego port of entry — record haul</span>
+      <span>INTERPOL Operation Thunderball: 49 arrests across 11 African nations</span>
+      <span>Rotterdam port scanners detect $120M cocaine shipment hidden in banana cargo</span>
+      <span>IOM reports 45,000 crossings via Darién Gap in January 2026 alone</span>
+      <span>Dubai airport security nabs passenger with 14kg gold hidden in body belt</span>
+      <span>EU Frontex activates RAPID deployment at Moldova-Romania border</span>
+      <span>Myanmar jade smuggling networks linked to new military finance report — Global Witness</span>
+      <span>Hong Kong customs seizes endangered species worth HK$2.3M at express cargo terminal</span>
+      <span>WCO confirms global counterfeit goods seizures up 18% in 2025 vs prior year</span>
+      <!-- duplicate for seamless loop -->
+      <span>Turkish coast guard intercepts vessel carrying 87 migrants in Aegean Sea</span>
+      <span>US CBP seizes 3.2 tonnes of fentanyl at San Diego port of entry — record haul</span>
+      <span>INTERPOL Operation Thunderball: 49 arrests across 11 African nations</span>
+      <span>Rotterdam port scanners detect $120M cocaine shipment hidden in banana cargo</span>
+      <span>IOM reports 45,000 crossings via Darién Gap in January 2026 alone</span>
+      <span>Dubai airport security nabs passenger with 14kg gold hidden in body belt</span>
+      <span>EU Frontex activates RAPID deployment at Moldova-Romania border</span>
+      <span>Myanmar jade smuggling networks linked to new military finance report — Global Witness</span>
+      <span>Hong Kong customs seizes endangered species worth HK$2.3M at express cargo terminal</span>
+      <span>WCO confirms global counterfeit goods seizures up 18% in 2025 vs prior year</span>
+    </div>
+  </div>
+</div>
+
+<!-- AD ZONE 1: LEADERBOARD 970x90 -->
+<div class="ad-leaderboard-wrap">
+  <div class="ad-leaderboard-inner">
+    <div class="ad-label">Advertisement</div>
+    <div class="ad-slot-leaderboard" id="ad-leaderboard">
+      <div class="ad-slot-placeholder">
+        <div class="ad-slot-icon">&#9635;</div>
+        <div class="ad-slot-size">970 x 90 — Leaderboard / Billboard</div>
+        <div class="ad-slot-cta" onclick="window.open('mailto:ads@borderwatch.io','_blank')">Advertise Here</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="masthead-top">
+      <div class="logo-area">
+        <a class="logo" href="#">Border<span>Watch</span></a>
+        <div class="tagline">Global Smuggling &amp; Border Security Intelligence</div>
+      </div>
+      <div class="masthead-meta">
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          <span id="live-time">LIVE · Wed 18 Mar 2026 · 14:22 UTC</span>
+        </div>
+        <div class="lang-bar">
+          <span class="lang-label">Lang:</span>
+          <button class="lang-btn active" onclick="setLang('en')">EN</button>
+          <button class="lang-btn" onclick="setLang('es')">ES</button>
+          <button class="lang-btn" onclick="setLang('fr')">FR</button>
+          <button class="lang-btn" onclick="setLang('de')">DE</button>
+          <button class="lang-btn" onclick="setLang('pt')">PT</button>
+          <button class="lang-btn" onclick="setLang('ar')">AR</button>
+          <button class="lang-btn" onclick="setLang('zh')">ZH</button>
+          <button class="lang-btn" onclick="setLang('ru')">RU</button>
+          <button class="lang-btn" onclick="setLang('ja')">JA</button>
+          <button class="lang-btn" onclick="setLang('ko')">KO</button>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav-bar">
+      <a class="nav-link active" onclick="filterCategory('all')">All Coverage</a>
+      <a class="nav-link" onclick="filterCategory('cargo')">Cargo</a>
+      <a class="nav-link" onclick="filterCategory('airport')">Airport</a>
+      <a class="nav-link" onclick="filterCategory('border')">Land Border</a>
+      <a class="nav-link" onclick="filterCategory('human')">Human Smuggling</a>
+      <a class="nav-link" onclick="filterCategory('narco')">Narcotics</a>
+      <a class="nav-link" onclick="filterCategory('weapons')">Weapons</a>
+      <a class="nav-link" onclick="filterCategory('maritime')">Maritime</a>
+      <a class="nav-link" onclick="filterCategory('wildlife')">Wildlife Trafficking</a>
+      <a class="nav-link" onclick="filterCategory('seized')">Seizures</a>
+      <a class="nav-link" onclick="showSources()">Sources Directory</a>
+      <div class="search-box">
+        <input type="text" class="search-input" placeholder="Search smuggling news…" id="search-input" oninput="filterSearch(this.value)">
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="container">
+
+  <!-- STATS STRIP -->
+  <div class="stats-strip">
+    <div class="stat-cell">
+      <div class="stat-label">Stories Today</div>
+      <div class="stat-value" id="stat-stories">247</div>
+      <div class="stat-sub">▲ +34 vs yesterday</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Active Operations</div>
+      <div class="stat-value">18</div>
+      <div class="stat-sub">▲ 3 new launched</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Global Seizures (30d)</div>
+      <div class="stat-value">$4.2B</div>
+      <div class="stat-sub">▲ +12% vs prior month</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Alerts / Notices</div>
+      <div class="stat-value">6</div>
+      <div class="stat-sub neg">▼ 2 critical</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Sources Monitored</div>
+      <div class="stat-value">142</div>
+      <div class="stat-sub">▲ 11 countries</div>
+    </div>
+  </div>
+
+  <!-- TWO-COLUMN NEWS + SIDEBAR -->
+  <div class="news-grid" id="main-grid">
+
+    <!-- LEFT COLUMN: MAIN NEWS -->
+    <div>
+
+      <!-- HERO STORY -->
+      <div class="hero-card" id="hero-block">
+        <div class="hero-visual">
+          <div class="hero-visual-label">CARGO</div>
+        </div>
+        <div class="hero-content">
+          <div>
+            <div class="hero-tag">◆ LEAD STORY · MARITIME CARGO</div>
+            <div class="hero-headline" id="hero-headline">Record cocaine haul in Rotterdam: 8.5 tonnes seized hidden inside banana reefer containers from Ecuador</div>
+            <div class="hero-deck" id="hero-deck">Dutch customs and the Royal Marechaussee conducted the largest cocaine interception in European port history, working with Ecuadorian authorities and Europol under Operation Tropicana. The shipment — embedded in refrigerated fruit crates — is estimated at €600 million street value.</div>
+          </div>
+          <div class="hero-meta">
+            <a class="source-pill" href="https://www.bellingcat.com" target="_blank" rel="noopener">↗ Bellingcat</a>
+            <span id="hero-time" style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">2h ago · Netherlands</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION HEADER -->
+      <div class="section-header">
+        <div class="section-title" id="section-title">Latest Intelligence</div>
+        <div class="section-rule"></div>
+        <div class="section-sub" id="section-sub">Live Feed · All Categories</div>
+      </div>
+
+      <!-- ARTICLE LIST -->
+      <div class="article-list" id="article-list">
+        <!-- Dynamically populated -->
+      </div>
+
+      <!-- AD ZONE 3: IN-FEED NATIVE AD (injected between articles) -->
+      <div class="ad-infeed" id="ad-infeed-1" onclick="window.open('mailto:ads@borderwatch.io','_blank')">
+        <div class="ad-infeed-visual">&#9635;</div>
+        <div>
+          <div class="ad-infeed-badge">Sponsored</div>
+          <div class="ad-infeed-headline">Your Brand Reaches Decision-Makers in Border Security &amp; Customs</div>
+          <div class="ad-infeed-body">BorderWatch serves investigators, customs officers, policy analysts, and journalists worldwide. Native placements available in all categories.</div>
+          <div class="ad-infeed-cta">Learn about advertising &#x2197;</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="sidebar">
+
+      <!-- SOURCES BY REGION -->
+      <div class="sidebar-block">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Key Sources</span>
+          <span class="sidebar-count" id="source-count">142 tracked</span>
+        </div>
+        <div id="source-list-sidebar">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- CATEGORY BREAKDOWN -->
+      <div class="sidebar-block">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Story Breakdown</span>
+          <span class="sidebar-count">Last 30 days</span>
+        </div>
+        <div class="cat-bars" id="cat-bars">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- AD ZONE 2A: SIDEBAR MEDIUM RECTANGLE 300x250 -->
+      <div class="ad-sidebar-block">
+        <div class="ad-label">Advertisement</div>
+        <div class="ad-slot-mrec" id="ad-sidebar-mrec">
+          <div class="ad-slot-placeholder" style="z-index:1">
+            <div class="ad-slot-icon">&#9635;</div>
+            <div class="ad-slot-size">300 x 250 — Medium Rectangle</div>
+            <div class="ad-slot-cta" onclick="window.open('mailto:ads@borderwatch.io','_blank')">Advertise Here</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTIVITY HEATMAP -->
+      <div class="sidebar-block">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Alert Activity</span>
+          <span class="sidebar-count">90 days</span>
+        </div>
+        <div class="heatmap-grid" id="heatmap"></div>
+        <div style="display:flex;justify-content:space-between;padding:0 14px 12px;font-family:var(--font-mono);font-size:9px;color:var(--text3)">
+          <span>Low</span><span>High</span>
+        </div>
+      </div>
+
+      <!-- AD ZONE 2B: SIDEBAR HALF-PAGE 300x600 -->
+      <div class="ad-sidebar-block">
+        <div class="ad-label">Advertisement</div>
+        <div class="ad-slot-mrec" id="ad-sidebar-halfpage" style="height:300px">
+          <div class="ad-slot-placeholder" style="z-index:1">
+            <div class="ad-slot-icon">&#9635;</div>
+            <div class="ad-slot-size">300 x 600 — Half Page</div>
+            <div class="ad-slot-cta" onclick="window.open('mailto:ads@borderwatch.io','_blank')">Advertise Here</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /news-grid -->
+
+  <!-- SECONDARY STORIES ROW -->
+  <div class="section-header" style="margin-top:32px">
+    <div class="section-title">Regional Focus</div>
+    <div class="section-rule"></div>
+    <div class="section-sub">Americas · Asia-Pacific · Europe · Africa · Middle East</div>
+  </div>
+
+  <!-- AD ZONE 4: SPONSORED SECTION STRIP -->
+  <div class="ad-sponsored-strip">
+    <div class="ad-sponsored-tag">Sponsored</div>
+    <div class="ad-sponsored-text">Sponsored Intelligence Report — Your company's research, analysis, or product announcement placed here, reaching BorderWatch's professional audience of 80,000+ monthly readers.</div>
+    <div class="ad-sponsored-logo">Your Brand</div>
+  </div>
+
+  <div class="three-col" id="three-col-grid">
+    <!-- Populated by JS -->
+  </div>
+
+  <!-- DATA STRIP -->
+  <div class="data-strip">
+    <div class="data-strip-icon">⌖</div>
+    <div class="data-strip-text">
+      <div class="data-strip-title" id="strip-title">INTERPOL Notices Database — Smuggling-Related Red Notices Active Worldwide</div>
+      <div class="data-strip-sub" id="strip-sub">Track real-time interpol.int Diffusion Notices, Stolen Works of Art, and Trafficking alerts via the public I-24/7 portal.</div>
+    </div>
+    <button class="data-strip-btn" onclick="window.open('https://www.interpol.int/en/How-we-work/Notices/View-Red-Notices','_blank')">VIEW PORTAL ↗</button>
+  </div>
+
+  <!-- SOURCES DIRECTORY -->
+  <div class="sources-section" id="sources-section-anchor">
+    <div class="section-header">
+      <div class="section-title">Sources Directory</div>
+      <div class="section-rule"></div>
+      <div class="section-sub">Global Coverage · 142 Sources</div>
+    </div>
+
+    <div class="sources-tabs" id="sources-tabs">
+      <button class="tab-btn active" onclick="filterSources('all', this)">All</button>
+      <button class="tab-btn" onclick="filterSources('Official',this)">Official / Gov</button>
+      <button class="tab-btn" onclick="filterSources('Media',this)">News Media</button>
+      <button class="tab-btn" onclick="filterSources('NGO',this)">NGO / Research</button>
+      <button class="tab-btn" onclick="filterSources('Americas',this)">Americas</button>
+      <button class="tab-btn" onclick="filterSources('Europe',this)">Europe</button>
+      <button class="tab-btn" onclick="filterSources('Asia',this)">Asia-Pacific</button>
+      <button class="tab-btn" onclick="filterSources('Africa',this)">Africa &amp; ME</button>
+    </div>
+
+    <div class="sources-grid" id="sources-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- AD ZONE 5: IN-FEED NATIVE AD 2 — before sources directory -->
+  <div class="ad-infeed" id="ad-infeed-2" onclick="window.open('mailto:ads@borderwatch.io','_blank')" style="margin-bottom:32px">
+    <div class="ad-infeed-visual">&#9635;</div>
+    <div>
+      <div class="ad-infeed-badge">Sponsored</div>
+      <div class="ad-infeed-headline">Compliance, Risk &amp; Trade Technology — Reach Buyers Actively Researching Solutions</div>
+      <div class="ad-infeed-body">Place your solution in front of compliance officers, freight forwarders, customs brokers, and government procurement teams at the moment they need it most.</div>
+      <div class="ad-infeed-cta">Contact our ad team &#x2197;</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- AD ZONE 6: BOTTOM LEADERBOARD BANNER 728x90 -->
+<div class="ad-bottom-banner">
+  <div class="ad-bottom-banner-inner">
+    <div class="ad-label">Advertisement</div>
+    <div class="ad-slot-banner" id="ad-bottom-banner">
+      <div class="ad-slot-placeholder" style="z-index:1">
+        <div class="ad-slot-icon">&#9635;</div>
+        <div class="ad-slot-size">728 x 90 — Footer Leaderboard</div>
+        <div class="ad-slot-cta" onclick="window.open('mailto:ads@borderwatch.io','_blank')">Advertise Here</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">Border<span>Watch</span></div>
+      <div class="footer-desc">BorderWatch aggregates open-source intelligence on smuggling trends, border security operations, and seizure data from 142+ verified sources worldwide. For law enforcement, researchers, journalists, and policy professionals.</div>
+    </div>
+    <div>
+      <div class="footer-col-title">Categories</div>
+      <ul class="footer-links">
+        <li><a href="#">Cargo Smuggling</a></li>
+        <li><a href="#">Airport Security</a></li>
+        <li><a href="#">Land Border</a></li>
+        <li><a href="#">Human Smuggling</a></li>
+        <li><a href="#">Maritime Operations</a></li>
+        <li><a href="#">Wildlife Trafficking</a></li>
+        <li><a href="#">Weapons Trafficking</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Agencies</div>
+      <ul class="footer-links">
+        <li><a href="https://www.interpol.int" target="_blank" rel="noopener">INTERPOL</a></li>
+        <li><a href="https://www.europol.europa.eu" target="_blank" rel="noopener">Europol</a></li>
+        <li><a href="https://www.unodc.org" target="_blank" rel="noopener">UNODC</a></li>
+        <li><a href="https://www.cbp.gov" target="_blank" rel="noopener">US CBP</a></li>
+        <li><a href="https://www.wcoomd.org" target="_blank" rel="noopener">WCO</a></li>
+        <li><a href="https://frontex.europa.eu" target="_blank" rel="noopener">Frontex</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Resources</div>
+      <ul class="footer-links">
+        <li><a href="#">Alert Subscription</a></li>
+        <li><a href="#">Data Export</a></li>
+        <li><a href="#">API Access</a></li>
+        <li><a href="#">Research Reports</a></li>
+        <li><a href="#" style="color:var(--accent)">Advertise with Us</a></li>
+        <li><a href="#" style="color:var(--accent)">Media Kit &amp; Rates</a></li>
+        <li><a href="#">About BorderWatch</a></li>
+        <li><a href="#">Contact / Tips</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 BorderWatch Intelligence · Open-Source Aggregator · Not affiliated with any government agency</div>
+    <div class="footer-copy">Content sourced from public domain news feeds and official press releases · Use responsibly</div>
+  </div>
+</footer>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────
+
+const TRANSLATIONS = {
+  en: {
+    heroHeadline: "Record cocaine haul in Rotterdam: 8.5 tonnes seized hidden inside banana reefer containers from Ecuador",
+    heroDeck: "Dutch customs and the Royal Marechaussee conducted the largest cocaine interception in European port history, working with Ecuadorian authorities and Europol under Operation Tropicana. The shipment — embedded in refrigerated fruit crates — is estimated at €600 million street value.",
+    sectionTitle: "Latest Intelligence",
+    sectionSub: "Live Feed · All Categories",
+    stripTitle: "INTERPOL Notices Database — Smuggling-Related Red Notices Active Worldwide",
+    stripSub: "Track real-time interpol.int Diffusion Notices, Stolen Works of Art, and Trafficking alerts via the public I-24/7 portal.",
+    liveLabel: "LIVE"
+  },
+  es: {
+    heroHeadline: "Récord de cocaína en Rotterdam: 8,5 toneladas incautadas ocultas en contenedores frigoríficos de Ecuador",
+    heroDeck: "La aduana holandesa y la Real Marechaussee llevaron a cabo la mayor interceptación de cocaína en la historia de los puertos europeos, en colaboración con autoridades ecuatorianas y Europol bajo la Operación Tropicana.",
+    sectionTitle: "Inteligencia en Tiempo Real",
+    sectionSub: "Feed en vivo · Todas las categorías",
+    stripTitle: "Base de datos de avisos de INTERPOL — Avisos rojos relacionados con el contrabando activos en todo el mundo",
+    stripSub: "Rastrea avisos de difusión de interpol.int, obras de arte robadas y alertas de tráfico en tiempo real.",
+    liveLabel: "EN VIVO"
+  },
+  fr: {
+    heroHeadline: "Saisie record à Rotterdam : 8,5 tonnes de cocaïne cachées dans des conteneurs réfrigérés d'Équateur",
+    heroDeck: "Les douanes néerlandaises et la Marechaussee Royale ont mené la plus grande interception de cocaïne de l'histoire portuaire européenne, en coopération avec les autorités équatoriennes et Europol.",
+    sectionTitle: "Renseignements en direct",
+    sectionSub: "Fil en direct · Toutes catégories",
+    stripTitle: "Base de données INTERPOL — Notices rouges liées au trafic actives dans le monde entier",
+    stripSub: "Suivez les notices de diffusion d'interpol.int, les œuvres d'art volées et les alertes de trafic en temps réel.",
+    liveLabel: "EN DIRECT"
+  },
+  de: {
+    heroHeadline: "Rekordmenge in Rotterdam: 8,5 Tonnen Kokain in Bananenkontainern aus Ecuador entdeckt",
+    heroDeck: "Der niederländische Zoll und die Königliche Marechaussee führten die größte Kokainbeschlagnahme in der europäischen Hafengeschichte durch, in Zusammenarbeit mit ecuadorianischen Behörden und Europol.",
+    sectionTitle: "Aktuelle Meldungen",
+    sectionSub: "Live-Feed · Alle Kategorien",
+    stripTitle: "INTERPOL-Fahndungsdatenbank — Aktive Rote Bekanntmachungen weltweit",
+    stripSub: "Verfolgen Sie Diffusionshinweise, gestohlene Kunstwerke und Menschenhandels-Warnungen in Echtzeit.",
+    liveLabel: "LIVE"
+  },
+  pt: {
+    heroHeadline: "Recorde de cocaína em Roterdão: 8,5 toneladas apreendidas em contêineres frigoríficos do Equador",
+    heroDeck: "A alfândega holandesa e a Marechaussee Real realizaram a maior interceptação de cocaína da história portuária europeia, em cooperação com autoridades equatorianas e a Europol.",
+    sectionTitle: "Inteligência em Tempo Real",
+    sectionSub: "Feed ao vivo · Todas as categorias",
+    stripTitle: "Base de dados da INTERPOL — Difusões vermelhas ativas relacionadas ao contrabando",
+    stripSub: "Rastreie avisos de difusão em tempo real, obras de arte roubadas e alertas de tráfico no portal I-24/7.",
+    liveLabel: "AO VIVO"
+  },
+  ar: {
+    heroHeadline: "سجل جديد في روتردام: ضبط 8.5 طن من الكوكايين مخبأة في حاويات الموز المبردة",
+    heroDeck: "نفذت الجمارك الهولندية والشرطة الملكية أكبر عملية اعتراض للكوكايين في تاريخ الموانئ الأوروبية، بالتعاون مع السلطات الإكوادورية واليوروبول.",
+    sectionTitle: "أحدث المعلومات الاستخباراتية",
+    sectionSub: "بث مباشر · جميع الفئات",
+    stripTitle: "قاعدة بيانات نشرات الإنتربول — النشرات الحمراء المتعلقة بالتهريب",
+    stripSub: "تتبع نشرات الانتشار الفوري وتنبيهات الاتجار بالبشر عبر بوابة I-24/7.",
+    liveLabel: "مباشر"
+  },
+  zh: {
+    heroHeadline: "鹿特丹创纪录大宗缉毒：从厄瓜多尔冷藏香蕉集装箱中查获8.5吨可卡因",
+    heroDeck: "荷兰海关与皇家宪兵队创下欧洲港口史上最大可卡因查获记录，与厄瓜多尔当局及欧洲刑警组织联合开展"热带行动"。",
+    sectionTitle: "最新情报",
+    sectionSub: "实时动态 · 全部类别",
+    stripTitle: "国际刑警组织通报数据库 — 全球走私相关红色通缉令",
+    stripSub: "通过公共I-24/7门户实时追踪扩散通报、被盗文物和人口贩卖警报。",
+    liveLabel: "直播"
+  },
+  ru: {
+    heroHeadline: "Рекордный арест в Роттердаме: 8,5 тонн кокаина в рефрижераторных контейнерах из Эквадора",
+    heroDeck: "Таможенные органы Нидерландов и Королевская военная полиция провели крупнейшее в истории европейских портов изъятие кокаина совместно с Евгрополом и властями Эквадора.",
+    sectionTitle: "Последние разведданные",
+    sectionSub: "Прямой эфир · Все категории",
+    stripTitle: "База данных ИНТЕРПОЛ — Красные уведомления по делам о контрабанде",
+    stripSub: "Отслеживайте диффузионные уведомления, похищенные произведения искусства и оповещения о торговле людьми.",
+    liveLabel: "ПРЯМОЙ ЭФИР"
+  },
+  ja: {
+    heroHeadline: "ロッテルダムで記録的な押収：エクアドル産バナナ冷蔵コンテナから8.5トンのコカインを発見",
+    heroDeck: "オランダ税関と王立近衛兵が欧州港湾史上最大のコカイン押収を実施。エクアドル当局とユーロポールと協力しトロピカーナ作戦を展開した。",
+    sectionTitle: "最新情報",
+    sectionSub: "ライブフィード · 全カテゴリ",
+    stripTitle: "INTERPOLデータベース — 密輸関連の赤手配書（世界）",
+    stripSub: "I-24/7公開ポータルでリアルタイムの拡散通知、盗難美術品、人身売買アラートを追跡。",
+    liveLabel: "ライブ"
+  },
+  ko: {
+    heroHeadline: "로테르담 역대 최대 압수: 에콰도르산 냉장 바나나 컨테이너서 8.5톤 코카인 발견",
+    heroDeck: "네덜란드 세관과 왕립 헌병대가 유럽 항구 역사상 최대 코카인 압수 작전을 전개했다. 에콰도르 당국 및 유로폴과 공조한 '트로피카나 작전'이다.",
+    sectionTitle: "최신 인텔리전스",
+    sectionSub: "실시간 피드 · 전체 카테고리",
+    stripTitle: "INTERPOL 공지 데이터베이스 — 전 세계 밀수 관련 적색 공지",
+    stripSub: "I-24/7 공개 포털을 통해 실시간 확산 공지, 도난 예술품 및 인신매매 경보를 추적하세요.",
+    liveLabel: "라이브"
+  }
+};
+
+const ARTICLES = [
+  { badge: "cargo", badgeLabel: "CARGO", headline: "Scopolamine and methamphetamine found in textiles shipment at Felixstowe port, UK", summary: "Border Force officers using advanced X-ray scanners uncovered 340kg of narcotics packed within bales of clothing originating from Pakistan. Three suspects held under UK Misuse of Drugs Act.", source: "BBC News", sourceUrl: "https://www.bbc.com", region: "Europe", time: "45m ago", timeClass: "time-recent", url: "https://www.bbc.com/news" },
+  { badge: "human", badgeLabel: "HUMAN SMUGGLING", headline: "IOM: 1,200 migrants rescued from three vessels off Libyan coast in 48-hour operation", summary: "The International Organization for Migration coordinated with Italy's Coast Guard and Maltese Maritime Rescue Coordination Centre, highlighting ongoing pressure on Central Mediterranean Route.", source: "IOM", sourceUrl: "https://www.iom.int", region: "Mediterranean", time: "1h 20m ago", timeClass: "time-recent", url: "https://www.iom.int" },
+  { badge: "border", badgeLabel: "LAND BORDER", headline: "Mexico-Guatemala border patrol arrests surge 22% after Operation FRONTERA SUR reinforcement", summary: "Mexican immigration authority INM reports spike in interdictions along Chiapas and Tabasco states. Authorities cite Guatemalan collaboration and expanded biometric checkpoints.", source: "InSight Crime", sourceUrl: "https://insightcrime.org", region: "Latin America", time: "2h ago", timeClass: "time-recent", url: "https://insightcrime.org" },
+  { badge: "airport", badgeLabel: "AIRPORT", headline: "Dubai Airport: passenger arrested with 4.2kg heroin concealed inside prosthetic leg cavity", summary: "Dubai Customs' new generation computed tomography scanners flagged anomalous density in the prosthetic device during routine screening. Passenger was transiting from Lahore to London Heathrow.", source: "Gulf News", sourceUrl: "https://gulfnews.com", region: "Middle East", time: "3h ago", timeClass: "time-today", url: "https://gulfnews.com" },
+  { badge: "seized", badgeLabel: "SEIZURES", headline: "Operation KAIROS: European multi-agency task force freezes €230M in illicit assets linked to Camorra", summary: "Europol and Italian Guardia di Finanza executed 87 search warrants across Naples, Hamburg, and Rotterdam. Luxury real estate, yachts, and cryptocurrency wallets among seized assets.", source: "Europol", sourceUrl: "https://www.europol.europa.eu", region: "Europe", time: "4h ago", timeClass: "time-today", url: "https://www.europol.europa.eu" },
+  { badge: "weapons", badgeLabel: "WEAPONS", headline: "ATF and CBP intercept 48 ghost guns, 6 kg meth at Texas-Mexico crossing — cartel links probed", summary: "Joint operation at the Laredo Port of Entry flagged a modified commercial truck using imaging. Authorities believe the cache is linked to the Cartel Jalisco Nueva Generación.", source: "ATF", sourceUrl: "https://www.atf.gov", region: "North America", time: "5h ago", timeClass: "time-today", url: "https://www.atf.gov" },
+  { badge: "wildlife", badgeLabel: "WILDLIFE TRAFFICKING", headline: "Hong Kong customs dismantles multi-million dollar ivory and rhino horn ring spanning 5 countries", summary: "Following an 18-month CITES-supported investigation, authorities seized 2.3 tonnes of processed ivory and 210kg of rhino horn, arresting 14 individuals. Kenya and South Africa assisted.", source: "CITES", sourceUrl: "https://cites.org", region: "Asia-Pacific", time: "7h ago", timeClass: "time-today", url: "https://cites.org" },
+  { badge: "maritime", badgeLabel: "MARITIME", headline: "US Coast Guard cutter seizes 4.8 tonnes of cocaine from narco-submarine off Pacific coast of Colombia", summary: "A semi-submersible vessel was intercepted 350 nautical miles southwest of the Colombian coastline during a routine patrol as part of Operation Unified Resolve.", source: "USCG", sourceUrl: "https://www.uscg.mil", region: "Americas", time: "9h ago", timeClass: "time-today", url: "https://www.uscg.mil" },
+  { badge: "narco", badgeLabel: "NARCOTICS", headline: "Myanmar's Shan State produces record output — UNODC Synthetic Drug Report 2026", summary: "The UN Office on Drugs and Crime estimates 2,800 tonnes of methamphetamine equivalent produced in the Golden Triangle in 2025, representing a 35% increase over the prior reporting period.", source: "UNODC", sourceUrl: "https://www.unodc.org", region: "Asia-Pacific", time: "11h ago", timeClass: "time-old", url: "https://www.unodc.org" },
+  { badge: "cargo", badgeLabel: "CARGO", headline: "Counterfeit luxury goods worth $80M intercepted at Shanghai customs in largest single operation", summary: "Chinese General Administration of Customs identified over 1.2 million fake luxury items including watches, handbags, and electronics destined for North American and European markets.", source: "GACC China", sourceUrl: "http://www.customs.gov.cn", region: "Asia-Pacific", time: "12h ago", timeClass: "time-old", url: "http://www.customs.gov.cn" },
+  { badge: "border", badgeLabel: "LAND BORDER", headline: "Greece-Turkey border: Frontex RAPID deployment extended following record irregular crossing month", summary: "Frontex confirmed an extension of its joint border operation after February 2026 recorded 28,000 attempts at the Evros land border — a 60% surge compared to the prior year.", source: "Frontex", sourceUrl: "https://frontex.europa.eu", region: "Europe", time: "14h ago", timeClass: "time-old", url: "https://frontex.europa.eu" },
+  { badge: "human", badgeLabel: "HUMAN SMUGGLING", headline: "Darién Gap: record pace of crossings in 2026 as criminal networks adapt — IOM warning", summary: "IOM reports unprecedented throughput via the treacherous jungle route between Colombia and Panama, driven by organized criminal groups charging up to $500 per person.", source: "IOM", sourceUrl: "https://www.iom.int", region: "Latin America", time: "16h ago", timeClass: "time-old", url: "https://www.iom.int" },
+];
+
+const REGIONAL_STORIES = [
+  { badge: "narco", badgeLabel: "NARCOTICS · AMERICAS", headline: "Fentanyl lab with production capacity of 500kg/week dismantled in Sinaloa — DEA operation", summary: "Working alongside Mexico's SEMAR, the US Drug Enforcement Administration located and destroyed an industrial-scale clandestine laboratory. Equipment sourced from Chinese precursor suppliers.", source: "DEA", time: "8h ago", url: "https://www.dea.gov" },
+  { badge: "border", badgeLabel: "BORDER SECURITY · ASIA", headline: "India BSF seizes 35kg heroin, 50kg pseudoephedrine at Punjab border with Pakistan this week", summary: "Border Security Force weekly bulletin records high-tempo seizures along the Punjab frontier, with new tunneling techniques observed by smugglers in the Gurdaspur sector.", source: "BSF India", time: "10h ago", url: "https://bsf.gov.in" },
+  { badge: "seized", badgeLabel: "SEIZURES · AFRICA", headline: "South Africa NPA freezes R1.2 billion in assets tied to Durban port corruption and cargo fraud ring", summary: "The National Prosecuting Authority's Asset Forfeiture Unit executed court orders against a network of corrupt port officials, freight companies, and international handlers.", source: "NPA South Africa", time: "13h ago", url: "https://www.npa.gov.za" },
+  { badge: "cargo", badgeLabel: "CARGO · EUROPE", headline: "Belgian Customs AI scanner trial intercepts 11 suspicious containers in first month at Antwerp", summary: "A pilot deployment of machine-learning-assisted cargo scanners at the Port of Antwerp-Bruges identified anomalous density patterns undetected by human operators, yielding 11 positive finds.", source: "Belgian Customs", time: "1d ago", url: "https://finance.belgium.be" },
+  { badge: "human", badgeLabel: "HUMAN SMUGGLING · MENA", headline: "Libya coastal militia dismantled by LNA; 600 migrants freed from detention facility near Misrata", summary: "The Libyan National Army announced the operation after intelligence sharing with UNHCR and Italian authorities revealed the location of the network's primary holding point.", source: "UNHCR", time: "1d ago", url: "https://www.unhcr.org" },
+  { badge: "wildlife", badgeLabel: "WILDLIFE · AFRICA", headline: "TRAFFIC and Zambia Wildlife Authority uncover cross-border pangolin smuggling route into China", summary: "A 14-month undercover investigation traced live and dead pangolins through Zambia, Tanzania, and Kenya to final consolidation points at Nairobi air freight hubs.", source: "TRAFFIC", time: "2d ago", url: "https://www.traffic.org" },
+];
+
+const SOURCES = [
+  // OFFICIAL / GOV
+  { flag: "🌐", name: "INTERPOL", desc: "International Criminal Police Organization notices, red notices, operations", type: "Official", region: "Global", tags: ["all categories"], url: "https://www.interpol.int" },
+  { flag: "🇪🇺", name: "Europol", desc: "EU law enforcement intelligence, joint operations, operational updates", type: "Official", region: "Europe", tags: ["narco","cargo","human"], url: "https://www.europol.europa.eu" },
+  { flag: "🌐", name: "UNODC", desc: "UN Office on Drugs and Crime — global drug reports, trafficking data", type: "Official", region: "Global", tags: ["narco","human","weapons"], url: "https://www.unodc.org" },
+  { flag: "🇺🇸", name: "US CBP", desc: "Customs and Border Protection press releases, seizure data", type: "Official", region: "Americas", tags: ["cargo","border","airport"], url: "https://www.cbp.gov" },
+  { flag: "🇺🇸", name: "US DEA", desc: "Drug Enforcement Administration drug trafficking intelligence", type: "Official", region: "Americas", tags: ["narco","cargo"], url: "https://www.dea.gov" },
+  { flag: "🇺🇸", name: "ATF", desc: "Bureau of Alcohol, Tobacco, Firearms — weapons interdiction", type: "Official", region: "Americas", tags: ["weapons"], url: "https://www.atf.gov" },
+  { flag: "🇺🇸", name: "US Coast Guard", desc: "Maritime drug interdictions, SAR statistics, press releases", type: "Official", region: "Americas", tags: ["maritime","narco"], url: "https://www.uscg.mil" },
+  { flag: "🇪🇺", name: "Frontex", desc: "European Border and Coast Guard Agency irregular migration data", type: "Official", region: "Europe", tags: ["border","human","maritime"], url: "https://frontex.europa.eu" },
+  { flag: "🌐", name: "WCO", desc: "World Customs Organization — global customs news and seizures", type: "Official", region: "Global", tags: ["cargo","airport","seized"], url: "https://www.wcoomd.org" },
+  { flag: "🌐", name: "CITES", desc: "Convention on Int'l Trade in Endangered Species enforcement", type: "Official", region: "Global", tags: ["wildlife"], url: "https://cites.org" },
+  { flag: "🇬🇧", name: "UK Border Force", desc: "HMRC/Border Force press releases and seizure announcements", type: "Official", region: "Europe", tags: ["cargo","airport","border"], url: "https://www.gov.uk/government/organisations/border-force" },
+  { flag: "🇩🇪", name: "German Zollkriminalamt", desc: "German customs crime office — investigations and seizures", type: "Official", region: "Europe", tags: ["cargo","narco"], url: "https://www.zollkriminalamt.de" },
+  { flag: "🇦🇺", name: "Australian Border Force", desc: "ABF media releases, drug and contraband seizures", type: "Official", region: "Asia", tags: ["cargo","airport","maritime"], url: "https://www.abf.gov.au" },
+  { flag: "🇨🇦", name: "CBSA Canada", desc: "Canada Border Services Agency news releases", type: "Official", region: "Americas", tags: ["cargo","airport","border"], url: "https://www.cbsa-asfc.gc.ca" },
+  { flag: "🇮🇳", name: "India BSF", desc: "Border Security Force India — weekly operational bulletins", type: "Official", region: "Asia", tags: ["border","narco"], url: "https://bsf.gov.in" },
+  { flag: "🇯🇵", name: "Japan Customs", desc: "Japan Customs drug and contraband statistics", type: "Official", region: "Asia", tags: ["airport","cargo"], url: "https://www.customs.go.jp" },
+  { flag: "🇦🇪", name: "UAE Customs", desc: "Federal Customs Authority press releases, airport seizures", type: "Official", region: "Africa", tags: ["airport","cargo"], url: "https://www.fcauae.gov.ae" },
+  { flag: "🇲🇽", name: "Mexico SAT / Aduanas", desc: "Mexican customs authority seizure and enforcement releases", type: "Official", region: "Americas", tags: ["cargo","border","narco"], url: "https://www.sat.gob.mx" },
+  { flag: "🇧🇷", name: "Brazil Receita Federal", desc: "Brazilian Federal Revenue customs enforcement news", type: "Official", region: "Americas", tags: ["cargo","airport"], url: "https://www.gov.br/receitafederal" },
+  { flag: "🇨🇳", name: "China GACC", desc: "General Administration of Customs China — enforcement news", type: "Official", region: "Asia", tags: ["cargo","airport","wildlife"], url: "http://www.customs.gov.cn" },
+  { flag: "🇿🇦", name: "SAPS / NPA South Africa", desc: "South Africa Police Service and National Prosecuting Authority", type: "Official", region: "Africa", tags: ["seized","narco"], url: "https://www.saps.gov.za" },
+  { flag: "🇰🇪", name: "Kenya Revenue Authority", desc: "KRA customs enforcement — wildlife and narcotics seizures", type: "Official", region: "Africa", tags: ["wildlife","cargo"], url: "https://www.kra.go.ke" },
+  // MEDIA
+  { flag: "🌐", name: "Reuters", desc: "Global newswire covering border security and trafficking cases", type: "Media", region: "Global", tags: ["all"], url: "https://www.reuters.com" },
+  { flag: "🌐", name: "AP News", desc: "Associated Press border, customs, and smuggling coverage", type: "Media", region: "Global", tags: ["all"], url: "https://apnews.com" },
+  { flag: "🇬🇧", name: "BBC News", desc: "UK and international smuggling and border stories", type: "Media", region: "Europe", tags: ["human","cargo","border"], url: "https://www.bbc.com/news" },
+  { flag: "🇺🇸", name: "New York Times", desc: "Investigative and daily coverage of trafficking and border issues", type: "Media", region: "Americas", tags: ["human","narco"], url: "https://www.nytimes.com" },
+  { flag: "🇺🇸", name: "Wall Street Journal", desc: "Border policy, cartels, and trade-based money laundering", type: "Media", region: "Americas", tags: ["narco","cargo"], url: "https://www.wsj.com" },
+  { flag: "🇲🇽", name: "El Universal (MX)", desc: "Mexico's leading daily — cartel and border zone coverage", type: "Media", region: "Americas", tags: ["narco","border","human"], url: "https://www.eluniversal.com.mx" },
+  { flag: "🇧🇷", name: "Folha de S.Paulo", desc: "Brazilian coverage of narcotics trafficking and border security", type: "Media", region: "Americas", tags: ["narco","border"], url: "https://www.folha.uol.com.br" },
+  { flag: "🇪🇸", name: "El País", desc: "Spanish investigative coverage of drug routes and migration", type: "Media", region: "Europe", tags: ["narco","human"], url: "https://elpais.com" },
+  { flag: "🇮🇹", name: "Corriere della Sera", desc: "Italian coverage of organized crime and cargo fraud", type: "Media", region: "Europe", tags: ["cargo","seized"], url: "https://www.corriere.it" },
+  { flag: "🇩🇪", name: "Der Spiegel", desc: "German investigative journalism on trafficking networks", type: "Media", region: "Europe", tags: ["human","narco"], url: "https://www.spiegel.de" },
+  { flag: "🇫🇷", name: "Le Monde", desc: "France's paper of record — migration and smuggling coverage", type: "Media", region: "Europe", tags: ["human","border"], url: "https://www.lemonde.fr" },
+  { flag: "🇬🇧", name: "The Guardian", desc: "Investigative reports on human trafficking and drug routes", type: "Media", region: "Europe", tags: ["human","wildlife","narco"], url: "https://www.theguardian.com" },
+  { flag: "🇦🇪", name: "Gulf News", desc: "Airport and maritime smuggling coverage across GCC region", type: "Media", region: "Africa", tags: ["airport","cargo"], url: "https://gulfnews.com" },
+  { flag: "🇦🇪", name: "The National UAE", desc: "UAE and regional border security, drug seizure reports", type: "Media", region: "Africa", tags: ["airport","seized"], url: "https://www.thenationalnews.com" },
+  { flag: "🇸🇬", name: "Straits Times", desc: "Southeast Asia smuggling and customs intelligence coverage", type: "Media", region: "Asia", tags: ["maritime","cargo","wildlife"], url: "https://www.straitstimes.com" },
+  { flag: "🇭🇰", name: "South China Morning Post", desc: "Customs enforcement and wildlife trafficking in Greater China", type: "Media", region: "Asia", tags: ["cargo","wildlife","airport"], url: "https://www.scmp.com" },
+  { flag: "🇮🇳", name: "The Hindu", desc: "India border security and customs enforcement reporting", type: "Media", region: "Asia", tags: ["border","narco"], url: "https://www.thehindu.com" },
+  { flag: "🇿🇦", name: "Daily Maverick (SA)", desc: "South Africa investigative journalism — drug routes and ports", type: "Media", region: "Africa", tags: ["cargo","narco","seized"], url: "https://www.dailymaverick.co.za" },
+  { flag: "🇰🇪", name: "The East African", desc: "East Africa regional smuggling and wildlife trafficking", type: "Media", region: "Africa", tags: ["wildlife","border"], url: "https://www.theeastafrican.co.ke" },
+  { flag: "🇳🇬", name: "Punch Nigeria", desc: "Nigerian customs, oil bunkering, and drug bust coverage", type: "Media", region: "Africa", tags: ["cargo","narco"], url: "https://punchng.com" },
+  { flag: "🇷🇺", name: "TASS / RIA", desc: "Russian news agencies — border enforcement and seizures", type: "Media", region: "Europe", tags: ["border","narco"], url: "https://tass.com" },
+  // NGO / RESEARCH
+  { flag: "🌐", name: "ACLED", desc: "Armed Conflict Location & Event Data — border conflict tracking", type: "NGO", region: "Global", tags: ["border","weapons"], url: "https://acleddata.com" },
+  { flag: "🌐", name: "InSight Crime", desc: "Organized crime and drug trafficking analysis — Latin America focus", type: "NGO", region: "Americas", tags: ["narco","human","cargo"], url: "https://insightcrime.org" },
+  { flag: "🌐", name: "Global Initiative", desc: "Global Initiative Against Transnational Organized Crime", type: "NGO", region: "Global", tags: ["narco","human","weapons"], url: "https://globalinitiative.net" },
+  { flag: "🌐", name: "IOM", desc: "International Organization for Migration — displacement data", type: "NGO", region: "Global", tags: ["human","border"], url: "https://www.iom.int" },
+  { flag: "🌐", name: "UNHCR", desc: "UN Refugee Agency — irregular migration and protection", type: "NGO", region: "Global", tags: ["human","border"], url: "https://www.unhcr.org" },
+  { flag: "🌐", name: "Bellingcat", desc: "Open-source investigation of trafficking and smuggling networks", type: "NGO", region: "Global", tags: ["weapons","narco","human"], url: "https://www.bellingcat.com" },
+  { flag: "🌐", name: "C4ADS", desc: "Center for Advanced Defense Studies — illicit trade analysis", type: "NGO", region: "Global", tags: ["weapons","cargo","wildlife"], url: "https://c4ads.org" },
+  { flag: "🌐", name: "TRAFFIC", desc: "Wildlife Trade Monitoring Network — CITES partner", type: "NGO", region: "Global", tags: ["wildlife"], url: "https://www.traffic.org" },
+  { flag: "🌐", name: "Global Witness", desc: "Environmental crime and resource smuggling investigations", type: "NGO", region: "Global", tags: ["cargo","wildlife","seized"], url: "https://www.globalwitness.org" },
+  { flag: "🌐", name: "Transparency Int'l", desc: "Corruption enabling smuggling networks — policy analysis", type: "NGO", region: "Global", tags: ["seized","cargo"], url: "https://www.transparency.org" },
+  { flag: "🇺🇸", name: "Cato Institute", desc: "Drug war and border policy research and analysis", type: "NGO", region: "Americas", tags: ["border","narco"], url: "https://www.cato.org" },
+  { flag: "🇬🇧", name: "RUSI", desc: "Royal United Services Institute — illicit finance and trafficking", type: "NGO", region: "Europe", tags: ["weapons","narco","seized"], url: "https://rusi.org" },
+  { flag: "🌐", name: "OCCRP", desc: "Organized Crime and Corruption Reporting Project", type: "NGO", region: "Global", tags: ["narco","seized","cargo"], url: "https://www.occrp.org" },
+  { flag: "🌐", name: "Migration Policy Inst.", desc: "Border policy, migration flows, and enforcement analysis", type: "NGO", region: "Global", tags: ["human","border"], url: "https://www.migrationpolicy.org" },
+];
+
+// ─── RENDER ─────────────────────────────────────────────────────────────────
+
+let currentLang = 'en';
+let currentCategory = 'all';
+let currentSourceFilter = 'all';
+
+function badgeClass(b) {
+  const m = { cargo:'badge-cargo', airport:'badge-airport', border:'badge-border', human:'badge-human', seized:'badge-seized', narco:'badge-narco', weapons:'badge-weapons', wildlife:'badge-wildlife', maritime:'badge-maritime' };
+  return m[b] || 'badge-cargo';
+}
+
+function renderArticles(filter) {
+  const list = document.getElementById('article-list');
+  const filtered = filter === 'all' ? ARTICLES : ARTICLES.filter(a => a.badge === filter);
+  list.innerHTML = filtered.map(a => `
+    <a class="article-card" href="${a.url}" target="_blank" rel="noopener">
+      <div>
+        <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
+        <div class="article-headline">${a.headline}</div>
+        <div class="article-summary">${a.summary}</div>
+        <div class="article-footer">
+          <span class="article-region">${a.region}</span>
+          <span>${a.source}</span>
+          <span>${a.time}</span>
+        </div>
+      </div>
+      <div class="article-time-bar ${a.timeClass}"></div>
+    </a>
+  `).join('');
+}
+
+function renderThreeCol() {
+  const grid = document.getElementById('three-col-grid');
+  grid.innerHTML = REGIONAL_STORIES.map(s => `
+    <a class="mini-card" href="${s.url}" target="_blank" rel="noopener">
+      <div class="mini-card-tag"><span class="article-badge ${badgeClass(s.badge)}">${s.badgeLabel}</span></div>
+      <div class="mini-headline">${s.headline}</div>
+      <div class="mini-summary">${s.summary}</div>
+      <div class="mini-meta">${s.source} · ${s.time}</div>
+    </a>
+  `).join('');
+}
+
+function renderSidebarSources() {
+  const el = document.getElementById('source-list-sidebar');
+  const shown = SOURCES.filter(s => s.type === 'Official').slice(0, 12);
+  el.innerHTML = shown.map(s => `
+    <a class="source-item" href="${s.url}" target="_blank" rel="noopener">
+      <span class="source-flag">${s.flag}</span>
+      <div class="source-info">
+        <div class="source-name">${s.name}</div>
+        <div class="source-type">${s.type} · ${s.region}</div>
+      </div>
+      <div class="source-dot ${s.type === 'Official' ? 'dot-official' : s.type === 'Media' ? 'dot-media' : 'dot-ngo'}"></div>
+    </a>
+  `).join('');
+  document.getElementById('source-count').textContent = SOURCES.length + ' tracked';
+}
+
+function renderCatBars() {
+  const cats = [
+    { label: 'Narcotics / Drugs', pct: 28, color: '#3aad72' },
+    { label: 'Human Smuggling', pct: 22, color: '#d4a843' },
+    { label: 'Cargo & Trade Fraud', pct: 18, color: '#3a7bd5' },
+    { label: 'Airport Interdiction', pct: 12, color: '#c94c3a' },
+    { label: 'Wildlife Trafficking', pct: 9, color: '#2a9d8f' },
+    { label: 'Weapons', pct: 6, color: '#e07b39' },
+    { label: 'Maritime', pct: 5, color: '#9b4dca' },
+  ];
+  document.getElementById('cat-bars').innerHTML = cats.map(c => `
+    <div class="cat-row">
+      <div class="cat-meta">
+        <span class="cat-label">${c.label}</span>
+        <span class="cat-pct">${c.pct}%</span>
+      </div>
+      <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${c.pct}%;background:${c.color}"></div></div>
+    </div>
+  `).join('');
+}
+
+function renderHeatmap() {
+  const el = document.getElementById('heatmap');
+  const levels = [0,0,1,2,1,0,0,1,3,4,3,2,1,2,3,4,5,4,3,2,1,2,3,2,1,2,3,4,3,2,1,0,1,2,3,4,5,4,3,2,1,2,3,2,3,4,3,2,1,0,1,2,3,2,1,2,3,2,1,0,1,2,3,4,5,4,3,2,1,2,3,2,1,0,1,2,3,2,1,0,1,2,3,4,3,2,1,2,3,2];
+  el.innerHTML = levels.map(l => `<div class="heatmap-cell heat-${l}" title="Activity level: ${l}"></div>`).join('');
+}
+
+function renderSourcesGrid(filter) {
+  const filtered = filter === 'all' ? SOURCES : SOURCES.filter(s => s.type === filter || s.region === filter);
+  document.getElementById('sources-grid').innerHTML = filtered.map(s => `
+    <a class="src-card" href="${s.url}" target="_blank" rel="noopener">
+      <div class="src-card-top">
+        <span class="src-card-flag">${s.flag}</span>
+        <span class="src-card-name">${s.name}</span>
+        <div class="source-dot ${s.type === 'Official' ? 'dot-official' : s.type === 'Media' ? 'dot-media' : 'dot-ngo'}" style="margin-left:auto"></div>
+      </div>
+      <div class="src-card-desc">${s.desc}</div>
+      <div class="src-card-tags">${s.tags.slice(0,3).map(t=>`<span class="src-tag">${t}</span>`).join('')}<span class="src-tag">${s.region}</span></div>
+    </a>
+  `).join('');
+}
+
+// ─── ACTIONS ────────────────────────────────────────────────────────────────
+
+function filterCategory(cat) {
+  currentCategory = cat;
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+  event.target.classList.add('active');
+  renderArticles(cat);
+  const sub = cat === 'all' ? 'Live Feed · All Categories' : 'Live Feed · ' + cat.charAt(0).toUpperCase() + cat.slice(1);
+  document.getElementById('section-sub').textContent = sub;
+}
+
+function filterSearch(query) {
+  if (!query) { renderArticles(currentCategory); return; }
+  const q = query.toLowerCase();
+  const all = currentCategory === 'all' ? ARTICLES : ARTICLES.filter(a => a.badge === currentCategory);
+  const filtered = all.filter(a => a.headline.toLowerCase().includes(q) || a.summary.toLowerCase().includes(q) || a.source.toLowerCase().includes(q));
+  const list = document.getElementById('article-list');
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="padding:32px;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No results for "' + query + '"</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(a => `
+    <a class="article-card" href="${a.url}" target="_blank" rel="noopener">
+      <div>
+        <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
+        <div class="article-headline">${a.headline}</div>
+        <div class="article-summary">${a.summary}</div>
+        <div class="article-footer"><span class="article-region">${a.region}</span><span>${a.source}</span><span>${a.time}</span></div>
+      </div>
+      <div class="article-time-bar ${a.timeClass}"></div>
+    </a>
+  `).join('');
+}
+
+function filterSources(filter, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSourcesGrid(filter);
+}
+
+function showSources() {
+  document.getElementById('sources-section-anchor').scrollIntoView({ behavior: 'smooth' });
+}
+
+function setLang(lang) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  currentLang = lang;
+  const t = TRANSLATIONS[lang];
+  if (!t) return;
+
+  const heroBlock = document.getElementById('hero-block');
+  heroBlock.classList.add('translating');
+  setTimeout(() => {
+    document.getElementById('hero-headline').textContent = t.heroHeadline;
+    document.getElementById('hero-deck').textContent = t.heroDeck;
+    document.getElementById('section-title').textContent = t.sectionTitle;
+    document.getElementById('section-sub').textContent = t.sectionSub;
+    document.getElementById('strip-title').textContent = t.stripTitle;
+    document.getElementById('strip-sub').textContent = t.stripSub;
+    heroBlock.classList.remove('translating');
+  }, 300);
+
+  // RTL support for Arabic
+  document.body.style.direction = lang === 'ar' ? 'rtl' : 'ltr';
+}
+
+// ─── LIVE CLOCK ─────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d = days[now.getUTCDay()];
+  const mo = months[now.getUTCMonth()];
+  const date = now.getUTCDate();
+  const yr = now.getUTCFullYear();
+  const h = String(now.getUTCHours()).padStart(2,'0');
+  const m = String(now.getUTCMinutes()).padStart(2,'0');
+  const el = document.getElementById('live-time');
+  if (el) el.textContent = `LIVE · ${d} ${date} ${mo} ${yr} · ${h}:${m} UTC`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+renderArticles('all');
+renderThreeCol();
+renderSidebarSources();
+renderCatBars();
+renderHeatmap();
+renderSourcesGrid('all');
+</script>
+</body>
+</html>
