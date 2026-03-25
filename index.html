@@ -1812,7 +1812,7 @@ const TRANSLATIONS = {
 let _liveArticles = [];
 let _isLoading = false;
 let _lastFetch = 0;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
 function showSkeleton() {
   const list = document.getElementById('article-list');
@@ -1833,287 +1833,553 @@ function showApiError(fallbackFn) {
   document.getElementById('section-sub').textContent += ' · Cached data';
 }
 
-function renderLiveArticles(articles, category) {
-  var list = document.getElementById('article-list');
+function renderLiveArticles(articles, filter) {
+  const list = document.getElementById('article-list');
   if (!list) return;
-
-  var BADGE_LABELS = { seized:'SEIZURES', narco:'NARCOTICS', maritime:'MARITIME',
-    human:'HUMAN SMUGGLING', border:'LAND BORDER', cargo:'CARGO', airport:'AIRPORT',
-    wildlife:'WILDLIFE TRAFFICKING', weapons:'WEAPONS' };
-
-  // ── Article cards ──
-  var filtered = (category && category !== 'all')
-    ? articles.filter(function(a){ return a.badge === category; }) : articles;
-
-  if (!filtered.length) {
-    list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3);font-family:var(--font-mono);font-size:12px;">No articles found.</div>';
-  } else {
-    list.innerHTML = filtered.map(function(a) {
-      var badge = a.badge || 'seized';
-      var label = a.badgeLabel || BADGE_LABELS[badge] || badge.toUpperCase();
-      var headline = (a.headline||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      var summary = (a.summary||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').substring(0,200);
-      return '<a class="article-card" href="'+(a.url||'#')+'" target="_blank" rel="noopener">'
-        +'<div>'
-        +'<div class="article-badge badge-'+badge+'">'+label+'</div>'
-        +'<div class="article-headline">'+headline+'</div>'
-        +'<div class="article-summary">'+summary+(summary.length>=200?'&hellip;':'')+'</div>'
-        +'</div>'
-        +'<div class="article-meta">'
-        +'<span class="article-region">'+(a.region||'')+'</span>'
-        +'<span class="article-source">'+(a.source||'')+'</span>'
-        +'<span class="article-time '+(a.timeClass||'time-old')+'">'+(a.time||'')+'</span>'
-        +'</div></a>';
-    }).join('');
+  const filtered = (!filter || filter === 'all') ? articles : articles.filter(a => a.badge === filter);
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="padding:32px;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No live articles found for this category</div>';
+    return;
   }
-
-  // ── Sources sidebar (Key Sources) ──
-  var sourceSidebar = document.getElementById('source-list-sidebar');
-  var sourceCountEl = document.getElementById('source-count');
-  var statSources = document.getElementById('stat-sources');
-  if (sourceSidebar) {
-    var sources = {};
-    articles.forEach(function(a){ if(a.source) sources[a.source] = (sources[a.source]||0)+1; });
-    var sorted = Object.keys(sources).sort(function(a,b){ return sources[b]-sources[a]; });
-    if (sourceCountEl) sourceCountEl.textContent = sorted.length + ' tracked';
-    if (statSources) statSources.textContent = sorted.length;
-    sourceSidebar.innerHTML = sorted.map(function(s) {
-      return '<div class="source-item"><span class="source-name">'+s+'</span>'
-        +'<span class="source-count-badge">'+sources[s]+'</span></div>';
-    }).join('');
-  }
-
-  // ── Story breakdown bars ──
-  var catBars = document.getElementById('cat-bars');
-  if (catBars) {
-    var cats = {};
-    articles.forEach(function(a){ if(a.badge) cats[a.badge] = (cats[a.badge]||0)+1; });
-    var total = articles.length || 1;
-    catBars.innerHTML = Object.keys(cats).sort(function(a,b){return cats[b]-cats[a];}).map(function(c) {
-      var pct = Math.round(cats[c]/total*100);
-      var label = BADGE_LABELS[c] || c.toUpperCase();
-      return '<div class="cat-bar-row">'
-        +'<div class="cat-bar-label">'+label+'</div>'
-        +'<div class="cat-bar-track"><div class="cat-bar-fill badge-'+c+'" style="width:'+pct+'%"></div></div>'
-        +'<div class="cat-bar-pct">'+pct+'%</div>'
-        +'</div>';
-    }).join('');
-  }
-
-  // ── Sources Directory grid ──
-  var sourcesGrid = document.getElementById('sources-grid');
-  var sourcesDirCount = document.getElementById('sources-dir-count');
-  if (sourcesGrid) {
-    var RSS_SOURCE_META = {
-      'INTERPOL':          { flag:'🌐', type:'Official', region:'Global', desc:'International notices, red notices, operations' },
-      'UNODC':             { flag:'🌐', type:'Official', region:'Global', desc:'UN drug reports, trafficking data' },
-      'WCO':               { flag:'🌐', type:'Official', region:'Global', desc:'World Customs Organization updates' },
-      'Europol':           { flag:'🇪🇺', type:'Official', region:'Europe', desc:'EU law enforcement intelligence' },
-      'Frontex':           { flag:'🇪🇺', type:'Official', region:'Europe', desc:'EU border and coast guard agency' },
-      'CITES':             { flag:'🌐', type:'Official', region:'Global', desc:'Wildlife trade regulation notices' },
-      'IOM':               { flag:'🌐', type:'Official', region:'Global', desc:'International migration organisation' },
-      'OCCRP':             { flag:'🌐', type:'Investigative', region:'Global', desc:'Organised crime and corruption reporting' },
-      'Reuters World':     { flag:'🌐', type:'News Media', region:'Global', desc:'International news wire service' },
-      'Global Witness':    { flag:'🌐', type:'NGO', region:'Global', desc:'Natural resources and corruption' },
-      'TRAFFIC (Wildlife)':{ flag:'🌐', type:'NGO', region:'Global', desc:'Wildlife trade monitoring network' },
-      'InSight Crime':     { flag:'🌐', type:'Investigative', region:'Latin America', desc:'Latin American organised crime' },
-      'US CBP':            { flag:'🇺🇸', type:'Official', region:'Americas', desc:'US Customs and Border Protection' },
-      'DEA':               { flag:'🇺🇸', type:'Official', region:'Americas', desc:'Drug Enforcement Administration' },
-      'ATF':               { flag:'🇺🇸', type:'Official', region:'Americas', desc:'Bureau of Alcohol, Tobacco, Firearms' },
-      'ICE':               { flag:'🇺🇸', type:'Official', region:'Americas', desc:'Immigration and Customs Enforcement' },
-      'US DOJ':            { flag:'🇺🇸', type:'Official', region:'Americas', desc:'US Department of Justice' },
-      'FBI':               { flag:'🇺🇸', type:'Official', region:'Americas', desc:'Federal Bureau of Investigation' },
-      'US Coast Guard':    { flag:'🇺🇸', type:'Official', region:'Americas', desc:'Maritime law enforcement' },
-      'UK NCA':            { flag:'🇬🇧', type:'Official', region:'Europe', desc:'UK National Crime Agency' },
-      'UK Border Force':   { flag:'🇬🇧', type:'Official', region:'Europe', desc:'UK border security operations' },
-      'Australia ABF':     { flag:'🇦🇺', type:'Official', region:'Asia-Pacific', desc:'Australian Border Force' },
-      'Canada CBSA':       { flag:'🇨🇦', type:'Official', region:'Americas', desc:'Canada Border Services Agency' },
-      'FATF':              { flag:'🌐', type:'Official', region:'Global', desc:'Financial Action Task Force' },
-      'SIPRI':             { flag:'🌐', type:'NGO', region:'Global', desc:'Arms trade and conflict research' },
-    };
-    var allSources = Object.keys(RSS_SOURCE_META);
-    if (sourcesDirCount) sourcesDirCount.textContent = allSources.length + ' sources';
-    sourcesGrid.innerHTML = allSources.map(function(name) {
-      var m = RSS_SOURCE_META[name];
-      var articleCount = sources[name] || 0;
-      return '<div class="source-card">'
-        +'<div class="source-card-header">'
-        +'<span class="source-flag">'+m.flag+'</span>'
-        +'<span class="source-card-name">'+name+'</span>'
-        +(articleCount ? '<span class="source-live-dot"></span>' : '')
-        +'</div>'
-        +'<div class="source-card-type">'+m.type+' &middot; '+m.region+'</div>'
-        +'<div class="source-card-desc">'+m.desc+'</div>'
-        +'<div class="source-card-tags">'
-        +(articleCount ? '<span class="source-tag-live">'+articleCount+' live</span>' : '')
-        +'</div>'
-        +'</div>';
-    }).join('');
-  }
-
-  // ── Stats bar ──
-  var statCountries = document.getElementById('stat-countries');
-  if (statCountries) {
-    var regions = new Set(articles.map(function(a){return a.region;}));
-    statCountries.textContent = regions.size;
-  }
+  list.innerHTML = filtered.map(a => `<a class="article-card" href="${a.url}" target="_blank" rel="noopener">
+    <div>
+      <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
+      <div class="article-headline">${a.headline}</div>
+      <div class="article-summary">${a.summary}</div>
+      <div class="article-footer">
+        <span class="article-region">${a.region}</span>
+        <span>${a.source}</span>
+        <span>${a.time}</span>
+      </div>
+    </div>
+    <div class="article-time-bar ${a.timeClass}"></div>
+  </a>`).join('');
 }
 
 async function fetchLiveNews(category, force) {
-  var now = Date.now();
-  if (!force && window._liveArticles && window._liveArticles.length > 0 && (now - (window._lastFetch||0)) < CACHE_TTL) {
-    renderLiveArticles(window._liveArticles, category);
-    return;
+  const now = Date.now();
+  if (!force && _liveArticles.length > 0 && (now - _lastFetch) < CACHE_TTL) {
+    renderLiveArticles(_liveArticles, category); return;
   }
-  if (window._isLoading) return;
-  window._isLoading = true;
+  if (_isLoading) return;
+  _isLoading = true;
   showSkeleton();
   try {
-    var res = await fetch('/api/news?category=' + (category||'all') + '&_t=' + now);
+    const res = await fetch('/api/news?category=' + (category || 'all') + '&_t=' + now);
     if (!res.ok) throw new Error('API ' + res.status);
-    var data = await res.json();
+    const data = await res.json();
     if (data.ok && data.articles && data.articles.length > 0) {
-      window._liveArticles = data.articles;
-      window._lastFetch = now;
-      var statEl = document.getElementById('stat-stories');
+      _liveArticles = data.articles;
+      _lastFetch = now;
+
+      // ── Stories Today counter ──
+      const statEl = document.getElementById('stat-stories');
       if (statEl) statEl.textContent = data.total || data.articles.length;
+
+      // ── Auto hero rotation ──
       if (data.hero) {
-        var h = data.hero;
-        var elById = function(id) { return document.getElementById(id); };
-        if (elById('hero-headline')) elById('hero-headline').textContent = h.headline;
-        if (elById('hero-deck'))     elById('hero-deck').textContent     = h.deck;
-        if (elById('hero-link'))     elById('hero-link').href            = h.url;
-        if (elById('hero-source'))   elById('hero-source').textContent   = h.source;
-        if (elById('hero-time'))     elById('hero-time').textContent     = h.time + ' · ' + h.region;
-        if (elById('hero-badge')) {
-          elById('hero-badge').textContent = h.badgeLabel;
-          elById('hero-badge').className   = 'article-badge badge-' + h.badge;
+        const h = data.hero;
+        const el = id => document.getElementById(id);
+        if (el('hero-headline')) el('hero-headline').textContent = h.headline;
+        if (el('hero-deck'))     el('hero-deck').textContent     = h.deck;
+        if (el('hero-link'))     el('hero-link').href            = h.url;
+        if (el('hero-source'))   el('hero-source').textContent   = h.source;
+        if (el('hero-time'))     el('hero-time').textContent     = h.time + ' · ' + h.region;
+        if (el('hero-badge')) {
+          el('hero-badge').textContent  = h.badgeLabel;
+          el('hero-badge').className    = 'article-badge badge-' + h.badge;
         }
-        if (elById('hero-visual-label')) elById('hero-visual-label').textContent = h.badgeLabel;
+        if (el('hero-visual-label')) {
+          el('hero-visual-label').textContent = h.badgeLabel;
+        }
       }
+
       renderLiveArticles(data.articles, category);
       renderLatestAlerts(data.articles);
-    } else {
-      throw new Error('empty');
-    }
+      renderLatestAlerts(data.articles);
+    } else { throw new Error('empty'); }
   } catch(e) {
     console.warn('BorderTrend API fallback:', e.message);
-    showSkeleton();
-  } finally {
-    window._isLoading = false;
-  }
-
+    renderArticles(category || 'all');
+  } finally { _isLoading = false; }
 }
 
-// ── SEIZURE MAP ───────────────────────────────────────────────────────────────
-var _map = null;
-var _mapInitialised = false;
-var _mapMarkers = [];
+function renderArticlesFromData(articles, filter) {
+  const list = document.getElementById('article-list');
+  const filtered = filter === 'all' ? articles : articles.filter(a => a.badge === filter);
+  if (filtered.length === 0) {
+    list.innerHTML = `<div style="padding:32px;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No articles found for this category</div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(a => `
+    <a class="article-card" href="${a.url}" target="_blank" rel="noopener">
+      <div>
+        <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
+        <div class="article-headline">${a.headline}</div>
+        <div class="article-summary">${a.summary}</div>
+        <div class="article-footer">
+          <span class="article-region">${a.region}</span>
+          <span>${a.source}</span>
+          <span>${a.time}</span>
+        </div>
+      </div>
+      <div class="article-time-bar ${a.timeClass}"></div>
+    </a>`).join('');
+}
 
-var REGION_COORDS = {
+// Auto-refresh every 10 minutes
+setInterval(() => fetchLiveNews(currentCategory, true), CACHE_TTL);
+
+// ─── FALLBACK STATIC ARTICLES (shown if API unavailable) ─────────────────────
+const ARTICLES_FALLBACK = [
+  { badge: "cargo", badgeLabel: "CARGO", headline: "Scopolamine and methamphetamine found in textiles shipment at Felixstowe port, UK", summary: "Border Force officers using advanced X-ray scanners uncovered 340kg of narcotics packed within bales of clothing originating from Pakistan. Three suspects held under UK Misuse of Drugs Act.", source: "BBC News", sourceUrl: "https://www.bbc.com", region: "Europe", time: "45m ago", timeClass: "time-recent", url: "https://www.bbc.com/news" },
+  { badge: "human", badgeLabel: "HUMAN SMUGGLING", headline: "IOM: 1,200 migrants rescued from three vessels off Libyan coast in 48-hour operation", summary: "The International Organization for Migration coordinated with Italy's Coast Guard and Maltese Maritime Rescue Coordination Centre, highlighting ongoing pressure on Central Mediterranean Route.", source: "IOM", sourceUrl: "https://www.iom.int", region: "Mediterranean", time: "1h 20m ago", timeClass: "time-recent", url: "https://www.iom.int" },
+  { badge: "border", badgeLabel: "LAND BORDER", headline: "Mexico-Guatemala border patrol arrests surge 22% after Operation FRONTERA SUR reinforcement", summary: "Mexican immigration authority INM reports spike in interdictions along Chiapas and Tabasco states. Authorities cite Guatemalan collaboration and expanded biometric checkpoints.", source: "InSight Crime", sourceUrl: "https://insightcrime.org", region: "Latin America", time: "2h ago", timeClass: "time-recent", url: "https://insightcrime.org" },
+  { badge: "airport", badgeLabel: "AIRPORT", headline: "Dubai Airport: passenger arrested with 4.2kg heroin concealed inside prosthetic leg cavity", summary: "Dubai Customs' new generation computed tomography scanners flagged anomalous density in the prosthetic device during routine screening. Passenger was transiting from Lahore to London Heathrow.", source: "Gulf News", sourceUrl: "https://gulfnews.com", region: "Middle East", time: "3h ago", timeClass: "time-today", url: "https://gulfnews.com" },
+  { badge: "seized", badgeLabel: "SEIZURES", headline: "Operation KAIROS: European multi-agency task force freezes €230M in illicit assets linked to Camorra", summary: "Europol and Italian Guardia di Finanza executed 87 search warrants across Naples, Hamburg, and Rotterdam. Luxury real estate, yachts, and cryptocurrency wallets among seized assets.", source: "Europol", sourceUrl: "https://www.europol.europa.eu", region: "Europe", time: "4h ago", timeClass: "time-today", url: "https://www.europol.europa.eu" },
+  { badge: "weapons", badgeLabel: "WEAPONS", headline: "ATF and CBP intercept 48 ghost guns, 6 kg meth at Texas-Mexico crossing — cartel links probed", summary: "Joint operation at the Laredo Port of Entry flagged a modified commercial truck using imaging. Authorities believe the cache is linked to the Cartel Jalisco Nueva Generación.", source: "ATF", sourceUrl: "https://www.atf.gov", region: "North America", time: "5h ago", timeClass: "time-today", url: "https://www.atf.gov" },
+  { badge: "wildlife", badgeLabel: "WILDLIFE TRAFFICKING", headline: "Hong Kong customs dismantles multi-million dollar ivory and rhino horn ring spanning 5 countries", summary: "Following an 18-month CITES-supported investigation, authorities seized 2.3 tonnes of processed ivory and 210kg of rhino horn, arresting 14 individuals. Kenya and South Africa assisted.", source: "CITES", sourceUrl: "https://cites.org", region: "Asia-Pacific", time: "7h ago", timeClass: "time-today", url: "https://cites.org" },
+  { badge: "maritime", badgeLabel: "MARITIME", headline: "US Coast Guard cutter seizes 4.8 tonnes of cocaine from narco-submarine off Pacific coast of Colombia", summary: "A semi-submersible vessel was intercepted 350 nautical miles southwest of the Colombian coastline during a routine patrol as part of Operation Unified Resolve.", source: "USCG", sourceUrl: "https://www.uscg.mil", region: "Americas", time: "9h ago", timeClass: "time-today", url: "https://www.uscg.mil" },
+  { badge: "narco", badgeLabel: "NARCOTICS", headline: "Myanmar's Shan State produces record output — UNODC Synthetic Drug Report 2026", summary: "The UN Office on Drugs and Crime estimates 2,800 tonnes of methamphetamine equivalent produced in the Golden Triangle in 2025, representing a 35% increase over the prior reporting period.", source: "UNODC", sourceUrl: "https://www.unodc.org", region: "Asia-Pacific", time: "11h ago", timeClass: "time-old", url: "https://www.unodc.org" },
+  { badge: "cargo", badgeLabel: "CARGO", headline: "Counterfeit luxury goods worth $80M intercepted at Shanghai customs in largest single operation", summary: "Chinese General Administration of Customs identified over 1.2 million fake luxury items including watches, handbags, and electronics destined for North American and European markets.", source: "GACC China", sourceUrl: "http://www.customs.gov.cn", region: "Asia-Pacific", time: "12h ago", timeClass: "time-old", url: "http://www.customs.gov.cn" },
+  { badge: "border", badgeLabel: "LAND BORDER", headline: "Greece-Turkey border: Frontex RAPID deployment extended following record irregular crossing month", summary: "Frontex confirmed an extension of its joint border operation after February 2026 recorded 28,000 attempts at the Evros land border — a 60% surge compared to the prior year.", source: "Frontex", sourceUrl: "https://frontex.europa.eu", region: "Europe", time: "14h ago", timeClass: "time-old", url: "https://frontex.europa.eu" },
+  { badge: "human", badgeLabel: "HUMAN SMUGGLING", headline: "Darién Gap: record pace of crossings in 2026 as criminal networks adapt — IOM warning", summary: "IOM reports unprecedented throughput via the treacherous jungle route between Colombia and Panama, driven by organized criminal groups charging up to $500 per person.", source: "IOM", sourceUrl: "https://www.iom.int", region: "Latin America", time: "16h ago", timeClass: "time-old", url: "https://www.iom.int" },
+];
+
+const REGIONAL_STORIES = [
+  { badge: "narco", badgeLabel: "NARCOTICS · AMERICAS", headline: "Fentanyl lab with production capacity of 500kg/week dismantled in Sinaloa — DEA operation", summary: "Working alongside Mexico's SEMAR, the US Drug Enforcement Administration located and destroyed an industrial-scale clandestine laboratory. Equipment sourced from Chinese precursor suppliers.", source: "DEA", time: "8h ago", url: "https://www.dea.gov" },
+  { badge: "border", badgeLabel: "BORDER SECURITY · ASIA", headline: "India BSF seizes 35kg heroin, 50kg pseudoephedrine at Punjab border with Pakistan this week", summary: "Border Security Force weekly bulletin records high-tempo seizures along the Punjab frontier, with new tunneling techniques observed by smugglers in the Gurdaspur sector.", source: "BSF India", time: "10h ago", url: "https://bsf.gov.in" },
+  { badge: "seized", badgeLabel: "SEIZURES · AFRICA", headline: "South Africa NPA freezes R1.2 billion in assets tied to Durban port corruption and cargo fraud ring", summary: "The National Prosecuting Authority's Asset Forfeiture Unit executed court orders against a network of corrupt port officials, freight companies, and international handlers.", source: "NPA South Africa", time: "13h ago", url: "https://www.npa.gov.za" },
+  { badge: "cargo", badgeLabel: "CARGO · EUROPE", headline: "Belgian Customs AI scanner trial intercepts 11 suspicious containers in first month at Antwerp", summary: "A pilot deployment of machine-learning-assisted cargo scanners at the Port of Antwerp-Bruges identified anomalous density patterns undetected by human operators, yielding 11 positive finds.", source: "Belgian Customs", time: "1d ago", url: "https://finance.belgium.be" },
+  { badge: "human", badgeLabel: "HUMAN SMUGGLING · MENA", headline: "Libya coastal militia dismantled by LNA; 600 migrants freed from detention facility near Misrata", summary: "The Libyan National Army announced the operation after intelligence sharing with UNHCR and Italian authorities revealed the location of the network's primary holding point.", source: "UNHCR", time: "1d ago", url: "https://www.unhcr.org" },
+  { badge: "wildlife", badgeLabel: "WILDLIFE · AFRICA", headline: "TRAFFIC and Zambia Wildlife Authority uncover cross-border pangolin smuggling route into China", summary: "A 14-month undercover investigation traced live and dead pangolins through Zambia, Tanzania, and Kenya to final consolidation points at Nairobi air freight hubs.", source: "TRAFFIC", time: "2d ago", url: "https://www.traffic.org" },
+];
+
+const SOURCES = [
+  // OFFICIAL / GOV
+  { flag: "🌐", name: "INTERPOL", desc: "International Criminal Police Organization notices, red notices, operations", type: "Official", region: "Global", tags: ["all categories"], url: "https://www.interpol.int" },
+  { flag: "🇪🇺", name: "Europol", desc: "EU law enforcement intelligence, joint operations, operational updates", type: "Official", region: "Europe", tags: ["narco","cargo","human"], url: "https://www.europol.europa.eu" },
+  { flag: "🌐", name: "UNODC", desc: "UN Office on Drugs and Crime — global drug reports, trafficking data", type: "Official", region: "Global", tags: ["narco","human","weapons"], url: "https://www.unodc.org" },
+  { flag: "🇺🇸", name: "US CBP", desc: "Customs and Border Protection press releases, seizure data", type: "Official", region: "Americas", tags: ["cargo","border","airport"], url: "https://www.cbp.gov" },
+  { flag: "🇺🇸", name: "US DEA", desc: "Drug Enforcement Administration drug trafficking intelligence", type: "Official", region: "Americas", tags: ["narco","cargo"], url: "https://www.dea.gov" },
+  { flag: "🇺🇸", name: "ATF", desc: "Bureau of Alcohol, Tobacco, Firearms — weapons interdiction", type: "Official", region: "Americas", tags: ["weapons"], url: "https://www.atf.gov" },
+  { flag: "🇺🇸", name: "US Coast Guard", desc: "Maritime drug interdictions, SAR statistics, press releases", type: "Official", region: "Americas", tags: ["maritime","narco"], url: "https://www.uscg.mil" },
+  { flag: "🇪🇺", name: "Frontex", desc: "European Border and Coast Guard Agency irregular migration data", type: "Official", region: "Europe", tags: ["border","human","maritime"], url: "https://frontex.europa.eu" },
+  { flag: "🌐", name: "WCO", desc: "World Customs Organization — global customs news and seizures", type: "Official", region: "Global", tags: ["cargo","airport","seized"], url: "https://www.wcoomd.org" },
+  { flag: "🌐", name: "CITES", desc: "Convention on Int'l Trade in Endangered Species enforcement", type: "Official", region: "Global", tags: ["wildlife"], url: "https://cites.org" },
+  { flag: "🇬🇧", name: "UK Border Force", desc: "HMRC/Border Force press releases and seizure announcements", type: "Official", region: "Europe", tags: ["cargo","airport","border"], url: "https://www.gov.uk/government/organisations/border-force" },
+  { flag: "🇩🇪", name: "German Zollkriminalamt", desc: "German customs crime office — investigations and seizures", type: "Official", region: "Europe", tags: ["cargo","narco"], url: "https://www.zollkriminalamt.de" },
+  { flag: "🇦🇺", name: "Australian Border Force", desc: "ABF media releases, drug and contraband seizures", type: "Official", region: "Asia", tags: ["cargo","airport","maritime"], url: "https://www.abf.gov.au" },
+  { flag: "🇨🇦", name: "CBSA Canada", desc: "Canada Border Services Agency news releases", type: "Official", region: "Americas", tags: ["cargo","airport","border"], url: "https://www.cbsa-asfc.gc.ca" },
+  { flag: "🇮🇳", name: "India BSF", desc: "Border Security Force India — weekly operational bulletins", type: "Official", region: "Asia", tags: ["border","narco"], url: "https://bsf.gov.in" },
+  { flag: "🇯🇵", name: "Japan Customs", desc: "Japan Customs drug and contraband statistics", type: "Official", region: "Asia", tags: ["airport","cargo"], url: "https://www.customs.go.jp" },
+  { flag: "🇦🇪", name: "UAE Customs", desc: "Federal Customs Authority press releases, airport seizures", type: "Official", region: "Africa", tags: ["airport","cargo"], url: "https://www.fcauae.gov.ae" },
+  { flag: "🇲🇽", name: "Mexico SAT / Aduanas", desc: "Mexican customs authority seizure and enforcement releases", type: "Official", region: "Americas", tags: ["cargo","border","narco"], url: "https://www.sat.gob.mx" },
+  { flag: "🇧🇷", name: "Brazil Receita Federal", desc: "Brazilian Federal Revenue customs enforcement news", type: "Official", region: "Americas", tags: ["cargo","airport"], url: "https://www.gov.br/receitafederal" },
+  { flag: "🇨🇳", name: "China GACC", desc: "General Administration of Customs China — enforcement news", type: "Official", region: "Asia", tags: ["cargo","airport","wildlife"], url: "http://www.customs.gov.cn" },
+  { flag: "🇿🇦", name: "SAPS / NPA South Africa", desc: "South Africa Police Service and National Prosecuting Authority", type: "Official", region: "Africa", tags: ["seized","narco"], url: "https://www.saps.gov.za" },
+  { flag: "🇰🇪", name: "Kenya Revenue Authority", desc: "KRA customs enforcement — wildlife and narcotics seizures", type: "Official", region: "Africa", tags: ["wildlife","cargo"], url: "https://www.kra.go.ke" },
+  // MEDIA
+  { flag: "🌐", name: "Reuters", desc: "Global newswire covering border security and trafficking cases", type: "Media", region: "Global", tags: ["all"], url: "https://www.reuters.com" },
+  { flag: "🌐", name: "AP News", desc: "Associated Press border, customs, and smuggling coverage", type: "Media", region: "Global", tags: ["all"], url: "https://apnews.com" },
+  { flag: "🇬🇧", name: "BBC News", desc: "UK and international smuggling and border stories", type: "Media", region: "Europe", tags: ["human","cargo","border"], url: "https://www.bbc.com/news" },
+  { flag: "🇺🇸", name: "New York Times", desc: "Investigative and daily coverage of trafficking and border issues", type: "Media", region: "Americas", tags: ["human","narco"], url: "https://www.nytimes.com" },
+  { flag: "🇺🇸", name: "Wall Street Journal", desc: "Border policy, cartels, and trade-based money laundering", type: "Media", region: "Americas", tags: ["narco","cargo"], url: "https://www.wsj.com" },
+  { flag: "🇲🇽", name: "El Universal (MX)", desc: "Mexico's leading daily — cartel and border zone coverage", type: "Media", region: "Americas", tags: ["narco","border","human"], url: "https://www.eluniversal.com.mx" },
+  { flag: "🇧🇷", name: "Folha de S.Paulo", desc: "Brazilian coverage of narcotics trafficking and border security", type: "Media", region: "Americas", tags: ["narco","border"], url: "https://www.folha.uol.com.br" },
+  { flag: "🇪🇸", name: "El País", desc: "Spanish investigative coverage of drug routes and migration", type: "Media", region: "Europe", tags: ["narco","human"], url: "https://elpais.com" },
+  { flag: "🇮🇹", name: "Corriere della Sera", desc: "Italian coverage of organized crime and cargo fraud", type: "Media", region: "Europe", tags: ["cargo","seized"], url: "https://www.corriere.it" },
+  { flag: "🇩🇪", name: "Der Spiegel", desc: "German investigative journalism on trafficking networks", type: "Media", region: "Europe", tags: ["human","narco"], url: "https://www.spiegel.de" },
+  { flag: "🇫🇷", name: "Le Monde", desc: "France's paper of record — migration and smuggling coverage", type: "Media", region: "Europe", tags: ["human","border"], url: "https://www.lemonde.fr" },
+  { flag: "🇬🇧", name: "The Guardian", desc: "Investigative reports on human trafficking and drug routes", type: "Media", region: "Europe", tags: ["human","wildlife","narco"], url: "https://www.theguardian.com" },
+  { flag: "🇦🇪", name: "Gulf News", desc: "Airport and maritime smuggling coverage across GCC region", type: "Media", region: "Africa", tags: ["airport","cargo"], url: "https://gulfnews.com" },
+  { flag: "🇦🇪", name: "The National UAE", desc: "UAE and regional border security, drug seizure reports", type: "Media", region: "Africa", tags: ["airport","seized"], url: "https://www.thenationalnews.com" },
+  { flag: "🇸🇬", name: "Straits Times", desc: "Southeast Asia smuggling and customs intelligence coverage", type: "Media", region: "Asia", tags: ["maritime","cargo","wildlife"], url: "https://www.straitstimes.com" },
+  { flag: "🇭🇰", name: "South China Morning Post", desc: "Customs enforcement and wildlife trafficking in Greater China", type: "Media", region: "Asia", tags: ["cargo","wildlife","airport"], url: "https://www.scmp.com" },
+  { flag: "🇮🇳", name: "The Hindu", desc: "India border security and customs enforcement reporting", type: "Media", region: "Asia", tags: ["border","narco"], url: "https://www.thehindu.com" },
+  { flag: "🇿🇦", name: "Daily Maverick (SA)", desc: "South Africa investigative journalism — drug routes and ports", type: "Media", region: "Africa", tags: ["cargo","narco","seized"], url: "https://www.dailymaverick.co.za" },
+  { flag: "🇰🇪", name: "The East African", desc: "East Africa regional smuggling and wildlife trafficking", type: "Media", region: "Africa", tags: ["wildlife","border"], url: "https://www.theeastafrican.co.ke" },
+  { flag: "🇳🇬", name: "Punch Nigeria", desc: "Nigerian customs, oil bunkering, and drug bust coverage", type: "Media", region: "Africa", tags: ["cargo","narco"], url: "https://punchng.com" },
+  { flag: "🇷🇺", name: "TASS / RIA", desc: "Russian news agencies — border enforcement and seizures", type: "Media", region: "Europe", tags: ["border","narco"], url: "https://tass.com" },
+  // NGO / RESEARCH
+  { flag: "🌐", name: "ACLED", desc: "Armed Conflict Location & Event Data — border conflict tracking", type: "NGO", region: "Global", tags: ["border","weapons"], url: "https://acleddata.com" },
+  { flag: "🌐", name: "InSight Crime", desc: "Organized crime and drug trafficking analysis — Latin America focus", type: "NGO", region: "Americas", tags: ["narco","human","cargo"], url: "https://insightcrime.org" },
+  { flag: "🌐", name: "Global Initiative", desc: "Global Initiative Against Transnational Organized Crime", type: "NGO", region: "Global", tags: ["narco","human","weapons"], url: "https://globalinitiative.net" },
+  { flag: "🌐", name: "IOM", desc: "International Organization for Migration — displacement data", type: "NGO", region: "Global", tags: ["human","border"], url: "https://www.iom.int" },
+  { flag: "🌐", name: "UNHCR", desc: "UN Refugee Agency — irregular migration and protection", type: "NGO", region: "Global", tags: ["human","border"], url: "https://www.unhcr.org" },
+  { flag: "🌐", name: "Bellingcat", desc: "Open-source investigation of trafficking and smuggling networks", type: "NGO", region: "Global", tags: ["weapons","narco","human"], url: "https://www.bellingcat.com" },
+  { flag: "🌐", name: "C4ADS", desc: "Center for Advanced Defense Studies — illicit trade analysis", type: "NGO", region: "Global", tags: ["weapons","cargo","wildlife"], url: "https://c4ads.org" },
+  { flag: "🌐", name: "TRAFFIC", desc: "Wildlife Trade Monitoring Network — CITES partner", type: "NGO", region: "Global", tags: ["wildlife"], url: "https://www.traffic.org" },
+  { flag: "🌐", name: "Global Witness", desc: "Environmental crime and resource smuggling investigations", type: "NGO", region: "Global", tags: ["cargo","wildlife","seized"], url: "https://www.globalwitness.org" },
+  { flag: "🌐", name: "Transparency Int'l", desc: "Corruption enabling smuggling networks — policy analysis", type: "NGO", region: "Global", tags: ["seized","cargo"], url: "https://www.transparency.org" },
+  { flag: "🇺🇸", name: "Cato Institute", desc: "Drug war and border policy research and analysis", type: "NGO", region: "Americas", tags: ["border","narco"], url: "https://www.cato.org" },
+  { flag: "🇬🇧", name: "RUSI", desc: "Royal United Services Institute — illicit finance and trafficking", type: "NGO", region: "Europe", tags: ["weapons","narco","seized"], url: "https://rusi.org" },
+  { flag: "🌐", name: "OCCRP", desc: "Organized Crime and Corruption Reporting Project", type: "NGO", region: "Global", tags: ["narco","seized","cargo"], url: "https://www.occrp.org" },
+  { flag: "🌐", name: "Migration Policy Inst.", desc: "Border policy, migration flows, and enforcement analysis", type: "NGO", region: "Global", tags: ["human","border"], url: "https://www.migrationpolicy.org" },
+  // ââ FROM WSN DATABASE (Countries A-B) ââ
+  { flag: "ð¦ð«", name: "Afghanistan Customs", desc: "Afghan Customs â Ministry of Finance seizure updates (Dari/Pashto)", type: "Official", region: "Asia", tags: ["cargo","border"], url: "https://customs.mof.gov.af/category/news/" },
+  { flag: "ð¦ð±", name: "Albanian Customs (Dogana)", desc: "Administrata Doganore Shqiptare â official Albanian customs authority", type: "Official", region: "Europe", tags: ["cargo","seized"], url: "https://dogana.gov.al" },
+  { flag: "ð©ð¿", name: "Algeria Customs (Douane)", desc: "Direction GÃ©nÃ©rale des Douanes â Algerian customs press releases", type: "Official", region: "Africa", tags: ["cargo","seized"], url: "https://douane.gov.dz" },
+  { flag: "ð¦ð©", name: "Andorra Customs (Duana)", desc: "Official Andorran customs authority and trade directory", type: "Official", region: "Europe", tags: ["cargo","border"], url: "https://www.duana.ad" },
+  { flag: "ð¦ð´", name: "Angola ARCCLA", desc: "AgÃªncia Reguladora de CertificaÃ§Ã£o de Carga e LogÃ­stica â cargo news", type: "Official", region: "Africa", tags: ["cargo","seized"], url: "https://gov.ao" },
+  { flag: "ð¦ð¬", name: "Antigua & Barbuda Customs", desc: "Customs and Excise Division â enforcement and seizure news", type: "Official", region: "Americas", tags: ["cargo","airport"], url: "https://customs.gov.ag" },
+  { flag: "ð¦ð·", name: "Argentina AFIP/Customs", desc: "Servicios aduaneros y comercio exterior â Argentine customs enforcement", type: "Official", region: "Americas", tags: ["cargo","seized"], url: "https://www.argentina.gob.ar" },
+  { flag: "ð¦ð²", name: "Armenia State Revenue", desc: "State Revenue Committee â customs and border enforcement news", type: "Official", region: "Asia", tags: ["cargo","border"], url: "https://www.src.am/en" },
+  { flag: "ð¦ð¹", name: "Austria Customs (BMF)", desc: "Bundesministerium fÃ¼r Finanzen â Austrian customs authority updates", type: "Official", region: "Europe", tags: ["cargo","seized"], url: "https://www.bmf.gv.at" },
+  { flag: "ð¦ð¿", name: "Azerbaijan State Customs", desc: "Azerbaijan Republic State Customs Committee â border enforcement", type: "Official", region: "Asia", tags: ["cargo","border"], url: "https://customs.gov.az" },
+  { flag: "ð§ð¸", name: "Bahamas Customs", desc: "The Bahamas Customs Department â latest news and seizures", type: "Official", region: "Americas", tags: ["cargo","maritime"], url: "https://www.bahamascustoms.gov.bs" },
+  { flag: "ð§ð­", name: "Bahrain Customs", desc: "Bahrain Customs Affairs â border enforcement and seizure updates", type: "Official", region: "Africa", tags: ["cargo","airport"], url: "https://bahraincustoms.gov.bh/en/news" },
+  { flag: "ð§ð©", name: "Bangladesh Customs", desc: "National Board of Revenue Bangladesh â customs enforcement news", type: "Official", region: "Asia", tags: ["cargo","seized"], url: "https://www.nbr.gov.bd" },
+  { flag: "ð", name: "Intl Trade Administration", desc: "US ITA â trade enforcement, press releases and border trade news", type: "Official", region: "Global", tags: ["cargo","seized"], url: "https://www.trade.gov/press-releases" },
+];
+
+// ─── RENDER ─────────────────────────────────────────────────────────────────
+
+let currentLang = 'en';
+let currentCategory = 'all';
+let currentSourceFilter = 'all';
+
+function badgeClass(b) {
+  const m = { cargo:'badge-cargo', airport:'badge-airport', border:'badge-border', human:'badge-human', seized:'badge-seized', narco:'badge-narco', weapons:'badge-weapons', wildlife:'badge-wildlife', maritime:'badge-maritime' };
+  return m[b] || 'badge-cargo';
+}
+
+function renderArticles(cat) {
+  fetchLiveNews(cat);
+}
+
+function renderThreeCol() {
+  const grid = document.getElementById('three-col-grid');
+  grid.innerHTML = REGIONAL_STORIES.map(s => `
+    <a class="mini-card" href="${s.url}" target="_blank" rel="noopener">
+      <div class="mini-card-tag"><span class="article-badge ${badgeClass(s.badge)}">${s.badgeLabel}</span></div>
+      <div class="mini-headline">${s.headline}</div>
+      <div class="mini-summary">${s.summary}</div>
+      <div class="mini-meta">${s.source} · ${s.time}</div>
+    </a>
+  `).join('');
+}
+
+function renderSidebarSources() {
+  const el = document.getElementById('source-list-sidebar');
+  const shown = SOURCES.filter(s => s.type === 'Official').slice(0, 12);
+  el.innerHTML = shown.map(s => `
+    <a class="source-item" href="${s.url}" target="_blank" rel="noopener">
+      <span class="source-flag">${s.flag}</span>
+      <div class="source-info">
+        <div class="source-name">${s.name}</div>
+        <div class="source-type">${s.type} · ${s.region}</div>
+      </div>
+      <div class="source-dot ${s.type === 'Official' ? 'dot-official' : s.type === 'Media' ? 'dot-media' : 'dot-ngo'}"></div>
+    </a>
+  `).join('');
+  document.getElementById('source-count').textContent = SOURCES.length + ' tracked';
+}
+
+function renderCatBars() {
+  const cats = [
+    { label: 'Narcotics / Drugs', pct: 28, color: '#3aad72' },
+    { label: 'Human Smuggling', pct: 22, color: '#d4a843' },
+    { label: 'Cargo & Trade Fraud', pct: 18, color: '#3a7bd5' },
+    { label: 'Airport Interdiction', pct: 12, color: '#c94c3a' },
+    { label: 'Wildlife Trafficking', pct: 9, color: '#2a9d8f' },
+    { label: 'Weapons', pct: 6, color: '#e07b39' },
+    { label: 'Maritime', pct: 5, color: '#9b4dca' },
+  ];
+  document.getElementById('cat-bars').innerHTML = cats.map(c => `
+    <div class="cat-row">
+      <div class="cat-meta">
+        <span class="cat-label">${c.label}</span>
+        <span class="cat-pct">${c.pct}%</span>
+      </div>
+      <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${c.pct}%;background:${c.color}"></div></div>
+    </div>
+  `).join('');
+}
+
+function renderHeatmap() {
+  const el = document.getElementById('heatmap');
+  const levels = [0,0,1,2,1,0,0,1,3,4,3,2,1,2,3,4,5,4,3,2,1,2,3,2,1,2,3,4,3,2,1,0,1,2,3,4,5,4,3,2,1,2,3,2,3,4,3,2,1,0,1,2,3,2,1,2,3,2,1,0,1,2,3,4,5,4,3,2,1,2,3,2,1,0,1,2,3,2,1,0,1,2,3,4,3,2,1,2,3,2];
+  el.innerHTML = levels.map(l => `<div class="heatmap-cell heat-${l}" title="Activity level: ${l}"></div>`).join('');
+}
+
+function renderSourcesGrid(filter) {
+  const filtered = filter === 'all' ? SOURCES : SOURCES.filter(s => s.type === filter || s.region === filter);
+  document.getElementById('sources-grid').innerHTML = filtered.map(s => `
+    <a class="src-card" href="${s.url}" target="_blank" rel="noopener">
+      <div class="src-card-top">
+        <span class="src-card-flag">${s.flag}</span>
+        <span class="src-card-name">${s.name}</span>
+        <div class="source-dot ${s.type === 'Official' ? 'dot-official' : s.type === 'Media' ? 'dot-media' : 'dot-ngo'}" style="margin-left:auto"></div>
+      </div>
+      <div class="src-card-desc">${s.desc}</div>
+      <div class="src-card-tags">${s.tags.slice(0,3).map(t=>`<span class="src-tag">${t}</span>`).join('')}<span class="src-tag">${s.region}</span></div>
+    </a>
+  `).join('');
+}
+
+// ─── ACTIONS ────────────────────────────────────────────────────────────────
+
+function filterCategory(cat) {
+  currentCategory = cat;
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+  event.target.classList.add('active');
+  renderArticles(cat);
+  const sub = cat === 'all' ? 'Live Feed · All Categories' : 'Live Feed · ' + cat.charAt(0).toUpperCase() + cat.slice(1);
+  document.getElementById('section-sub').textContent = sub;
+}
+
+function filterSearch(query) {
+  const articles = _liveArticles.length > 0 ? _liveArticles : ARTICLES_FALLBACK;
+  if (!query) { renderArticlesFromData(articles, currentCategory); return; }
+  const q = query.toLowerCase();
+  const pool = currentCategory === 'all' ? articles : articles.filter(a => a.badge === currentCategory);
+  const filtered = pool.filter(a => a.headline.toLowerCase().includes(q) || a.summary.toLowerCase().includes(q) || a.source.toLowerCase().includes(q));
+  const list = document.getElementById('article-list');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div style="padding:32px;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No results for "${query}"</div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(a => `
+    <a class="article-card" href="${a.url}" target="_blank" rel="noopener">
+      <div>
+        <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
+        <div class="article-headline">${a.headline}</div>
+        <div class="article-summary">${a.summary}</div>
+        <div class="article-footer"><span class="article-region">${a.region}</span><span>${a.source}</span><span>${a.time}</span></div>
+      </div>
+      <div class="article-time-bar ${a.timeClass}"></div>
+    </a>`).join('');
+}
+
+function filterSources(filter, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSourcesGrid(filter);
+}
+
+function showSources() {
+  document.getElementById('sources-section-anchor').scrollIntoView({ behavior: 'smooth' });
+}
+
+function setLang(lang) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  currentLang = lang;
+  const t = TRANSLATIONS[lang];
+  if (!t) return;
+
+  const heroBlock = document.getElementById('hero-block');
+  heroBlock.classList.add('translating');
+  setTimeout(() => {
+    document.getElementById('hero-headline').textContent = t.heroHeadline;
+    document.getElementById('hero-deck').textContent = t.heroDeck;
+    document.getElementById('section-title').textContent = t.sectionTitle;
+    document.getElementById('section-sub').textContent = t.sectionSub;
+    document.getElementById('strip-title').textContent = t.stripTitle;
+    document.getElementById('strip-sub').textContent = t.stripSub;
+    heroBlock.classList.remove('translating');
+  }, 300);
+
+  // RTL support for Arabic
+  document.body.style.direction = lang === 'ar' ? 'rtl' : 'ltr';
+}
+
+// ─── LIVE CLOCK ─────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const d = days[now.getUTCDay()];
+  const mo = months[now.getUTCMonth()];
+  const date = now.getUTCDate();
+  const yr = now.getUTCFullYear();
+  const h = String(now.getUTCHours()).padStart(2,'0');
+  const m = String(now.getUTCMinutes()).padStart(2,'0');
+  const el = document.getElementById('live-time');
+  if (el) el.textContent = `LIVE · ${d} ${date} ${mo} ${yr} · ${h}:${m} UTC`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── DYNAMIC SOURCE COUNT ───────────────────────────────────────────────────
+function updateSourceCounts() {
+  const total = SOURCES.length;
+  const countries = [...new Set(SOURCES.map(s => s.region))].length;
+  ['stat-sources','source-count','sources-dir-count','footer-source-count'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (id === 'source-count') el.textContent = total + ' tracked';
+    else if (id === 'stat-sources') el.textContent = total;
+    else el.textContent = total;
+  });
+  const statCountries = document.getElementById('stat-countries');
+  if (statCountries) statCountries.textContent = '▲ ' + countries + ' regions covered';
+  // Also update sources directory tab count
+  const dirHeader = document.querySelector('.section-sub');
+  // Already handled by id above
+}
+
+
+// ── SEIZURE MAP ──────────────────────────────────────────────────────────────
+let _map = null;
+let _mapInitialised = false;
+let _mapMarkers = [];
+
+// Region → approximate lat/lon for geocoding articles by region field
+const REGION_COORDS = {
   'Global':        [20, 0],
   'North America': [38, -97],
-  'Americas':      [15, -80],
   'Latin America': [-10, -65],
   'Europe':        [50, 10],
   'Asia-Pacific':  [15, 105],
-  'Asia':          [30, 90],
   'Middle East':   [25, 45],
   'Africa':        [5, 20],
+  'Americas':      [15, -80],
   'Mediterranean': [37, 18],
-  'Oceania':       [-25, 135]
+  'Asia':          [30, 90],
+  'Oceania':       [-25, 135],
 };
 
-var BADGE_COLORS = {
-  seized:'#e74c3c', narco:'#e67e22', maritime:'#3a7bd5',
-  human:'#9b59b6', border:'#d4a843', cargo:'#d4a843', airport:'#d4a843',
-  wildlife:'#27ae60', weapons:'#c0392b'
+// Badge → marker color
+const BADGE_COLORS = {
+  seized:   '#e74c3c',
+  narco:    '#e67e22',
+  maritime: '#3a7bd5',
+  human:    '#9b59b6',
+  border:   '#d4a843',
+  cargo:    '#d4a843',
+  airport:  '#d4a843',
+  wildlife: '#27ae60',
+  weapons:  '#c0392b',
 };
 
 function makeMarkerIcon(badge) {
-  var color = BADGE_COLORS[badge] || '#d4a843';
+  const color = BADGE_COLORS[badge] || '#d4a843';
   return L.divIcon({
     className: '',
-    html: '<div style="width:12px;height:12px;border-radius:50%;background:' + color + ';border:2px solid rgba(255,255,255,0.3);box-shadow:0 0 8px ' + color + '88;"></div>',
+    html: `<div style="
+      width:12px;height:12px;border-radius:50%;
+      background:${color};
+      border:2px solid rgba(255,255,255,0.3);
+      box-shadow:0 0 8px ${color}88;
+    "></div>`,
     iconSize: [12, 12],
-    iconAnchor: [6, 6]
+    iconAnchor: [6, 6],
   });
 }
 
-function jitter(coord) { return coord + (Math.random() - 0.5) * 8; }
+function jitter(coord) {
+  // Spread markers in the same region slightly so they don't stack
+  return coord + (Math.random() - 0.5) * 8;
+}
 
 function initMap() {
   if (_mapInitialised) return;
   _mapInitialised = true;
-  _map = L.map('seizure-map', { center:[20,0], zoom:2, minZoom:2, maxZoom:8 });
+
+  _map = L.map('seizure-map', {
+    center: [20, 0],
+    zoom: 2,
+    minZoom: 2,
+    maxZoom: 8,
+    zoomControl: true,
+    attributionControl: true,
+  });
+
+  // Dark tile layer (CartoDB dark matter — no API key needed)
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
-    subdomains: 'abcd', maxZoom: 19
+    subdomains: 'abcd',
+    maxZoom: 19,
   }).addTo(_map);
 }
 
 function plotArticlesOnMap(articles) {
   if (!_map) return;
-  _mapMarkers.forEach(function(m) { _map.removeLayer(m); });
+
+  // Clear existing markers
+  _mapMarkers.forEach(m => _map.removeLayer(m));
   _mapMarkers = [];
-  var regionSet = {};
-  var plotted = 0;
-  articles.forEach(function(a) {
-    var base = REGION_COORDS[a.region];
+
+  const regionSet = new Set();
+  let plotted = 0;
+
+  articles.forEach(a => {
+    const base = REGION_COORDS[a.region];
     if (!base) return;
-    regionSet[a.region] = true;
-    var icon = makeMarkerIcon(a.badge);
-    var marker = L.marker([jitter(base[0]), jitter(base[1])], { icon: icon })
-      .bindPopup(
-        '<div class="map-popup-headline">' + (a.headline||'') + '</div>'
-        + '<div class="map-popup-meta">' + (a.badgeLabel||a.badge) + ' &middot; ' + a.source + ' &middot; ' + a.time + '</div>'
-        + '<a class="map-popup-link" href="' + a.url + '" target="_blank" rel="noopener">Read full story &rarr;</a>',
-        { maxWidth: 280 }
-      ).addTo(_map);
+    regionSet.add(a.region);
+    const lat = jitter(base[0]);
+    const lng = jitter(base[1]);
+    const icon = makeMarkerIcon(a.badge);
+
+    const marker = L.marker([lat, lng], { icon })
+      .bindPopup(`
+        <div class="map-popup-headline">${a.headline}</div>
+        <div class="map-popup-meta">${a.badgeLabel} &middot; ${a.source} &middot; ${a.time}</div>
+        <a class="map-popup-link" href="${a.url}" target="_blank" rel="noopener">Read full story &rarr;</a>
+      `, { maxWidth: 280 })
+      .addTo(_map);
+
     _mapMarkers.push(marker);
     plotted++;
   });
-  var pinCount = document.getElementById('map-pin-count');
-  var regionCount = document.getElementById('map-region-count');
-  var feedTime = document.getElementById('map-feed-time');
+
+  // Update stats
+  const pinCount = document.getElementById('map-pin-count');
+  const regionCount = document.getElementById('map-region-count');
+  const feedTime = document.getElementById('map-feed-time');
   if (pinCount) pinCount.textContent = plotted;
-  if (regionCount) regionCount.textContent = Object.keys(regionSet).length;
-  if (feedTime) feedTime.textContent = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',hour12:false}) + ' UTC';
+  if (regionCount) regionCount.textContent = regionSet.size;
+  if (feedTime) feedTime.textContent = new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false }) + ' UTC';
 }
 
 function showMap() {
-  document.querySelectorAll('.nav-link').forEach(function(el) { el.classList.remove('active'); });
-  var btn = document.getElementById('map-nav-btn');
-  if (btn) btn.classList.add('active');
-  var articleList = document.getElementById('article-list');
-  var mapPanel = document.getElementById('map-panel');
-  var sectionSub = document.getElementById('section-sub');
+  // Toggle nav active
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+  document.getElementById('map-nav-btn').classList.add('active');
+
+  // Show map panel, hide article list
+  const articleList = document.getElementById('article-list');
+  const mapPanel = document.getElementById('map-panel');
+  const sectionSub = document.getElementById('section-sub');
   if (articleList) articleList.style.display = 'none';
   if (mapPanel) { mapPanel.classList.add('active'); mapPanel.style.display = 'block'; }
   if (sectionSub) sectionSub.textContent = 'Live Incident Map · All Regions';
-  setTimeout(function() {
+
+  // Init map on first open (Leaflet needs the container to be visible)
+  setTimeout(() => {
     initMap();
-    var arts = window._liveArticles || [];
-    if (arts.length > 0) {
-      plotArticlesOnMap(arts);
+    if (_liveArticles.length > 0) {
+      plotArticlesOnMap(_liveArticles);
       _map.invalidateSize();
     } else {
+      // Fetch if no articles cached yet
       fetch('/api/news?category=all&_t=' + Date.now())
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (data.articles) { plotArticlesOnMap(data.articles); }
+        .then(r => r.json())
+        .then(data => {
+          if (data.articles) plotArticlesOnMap(data.articles);
           if (_map) _map.invalidateSize();
         });
     }
   }, 50);
 }
 
-// Nav tabs call filterCategory() directly via onclick — map panel hides via filterCategory wrapper below
+// Patch filterCategory to hide map when switching back to news
+const _origFilterCategory = filterCategory;
+filterCategory = function(cat) {
+  const mapPanel = document.getElementById('map-panel');
+  const articleList = document.getElementById('article-list');
+  if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
+  if (articleList) articleList.style.display = '';
+  _origFilterCategory(cat);
+};
 
-// ── LATEST ALERTS SIDEBAR ────────────────────────────────────────────────────
+
+// ── LATEST ALERTS SIDEBAR ─────────────────────────────────────────────────
 function renderLatestAlerts(articles) {
   var container = document.getElementById('latest-alerts');
-  var countEl = document.getElementById('alert-count');
+  var countEl   = document.getElementById('alert-count');
   if (!container) return;
   var PRIORITY = ['OCCRP','Europol','InSight Crime','US CBP','DEA','FBI',
     'UK NCA','INTERPOL','Frontex','US DOJ','US Coast Guard','Australia ABF'];
@@ -2126,68 +2392,39 @@ function renderLatestAlerts(articles) {
            + (PRIORITY.indexOf(a.source)>=0?20:0)
     });
   }).sort(function(a,b){return b.score-a.score;}).slice(0,6);
-  if (!scored.length) {
-    container.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);text-align:center;padding:12px 0;">No alerts yet</div>';
-    return;
-  }
+  if (!scored.length) { container.innerHTML = ''; return; }
   container.innerHTML = scored.map(function(a) {
     var color = COLORS[a.badge] || '#d4a843';
     var hl = (a.headline||'').substring(0,80) + ((a.headline||'').length>80?'…':'');
-    return '<a class="alert-item" href="' + a.url + '" target="_blank" rel="noopener">'
+    return '<a class="alert-item" href="'+(a.url||'#')+'" target="_blank" rel="noopener">'
       + '<div class="alert-badge-row">'
-      + '<div class="alert-dot" style="background:' + color + ';box-shadow:0 0 5px ' + color + '66;"></div>'
-      + '<span style="font-family:var(--font-mono);font-size:9px;color:' + color + ';letter-spacing:0.1em;text-transform:uppercase;">' + (a.badgeLabel||a.badge||'') + '</span>'
+      + '<div class="alert-dot" style="background:'+color+';box-shadow:0 0 5px '+color+'66;"></div>'
+      + '<span style="font-family:var(--font-mono);font-size:9px;color:'+color+';letter-spacing:0.1em;text-transform:uppercase;">'+(a.badgeLabel||a.badge||'')+'</span>'
       + '</div>'
-      + '<div class="alert-headline">' + hl + '</div>'
-      + '<div class="alert-meta">' + (a.source||'') + ' · ' + (a.time||'') + '</div>'
+      + '<div class="alert-headline">'+hl+'</div>'
+      + '<div class="alert-meta">'+(a.source||'')+' · '+(a.time||'')+'</div>'
       + '</a>';
   }).join('');
   if (countEl) countEl.textContent = scored.length + ' live';
 }
 
-// ── PAGE VISIBILITY: refresh when tab becomes active ──────────────────────────
+// ── EDGE / STALE BROWSER FIX ──────────────────────────────────────────────
 document.addEventListener('visibilitychange', function() {
   if (!document.hidden) {
     var age = Date.now() - (window._lastFetch || 0);
-    if (age > CACHE_TTL) fetchLiveNews(currentCategory, true);
+    if (age > CACHE_TTL) fetchLiveNews(currentCategory);
   }
 });
-
-// Hard reload every 30 min so Edge never gets stale
 setTimeout(function() { location.reload(); }, 30 * 60 * 1000);
 
-// ─── INIT ───────────────────────────────────────────────────────────────────
-
-var currentCategory = 'all';
-
-// filterCategory — called by nav tab onclick attributes
-function filterCategory(cat) {
-  currentCategory = cat;
-  var mapPanel = document.getElementById('map-panel');
-  var articleList = document.getElementById('article-list');
-  if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
-  if (articleList) articleList.style.display = '';
-  document.querySelectorAll('.nav-link').forEach(function(el) { el.classList.remove('active'); });
-  var allLinks = document.querySelectorAll('.nav-link');
-  for (var i = 0; i < allLinks.length; i++) {
-    var oc = allLinks[i].getAttribute('onclick') || '';
-    if (oc.indexOf("'" + cat + "'") !== -1) { allLinks[i].classList.add('active'); break; }
-  }
-  fetchLiveNews(cat, false);
-}
-
-// Boot on DOMContentLoaded so all functions are guaranteed defined
-document.addEventListener('DOMContentLoaded', function() {
-  fetchLiveNews('all', true);
-  setInterval(function() { fetchLiveNews(currentCategory, true); }, CACHE_TTL);
-  // Poll once after 3s to ensure Latest Alerts renders even if fetchLiveNews finished early
-  setTimeout(function() {
-    if (window._liveArticles && window._liveArticles.length > 0) {
-      renderLatestAlerts(window._liveArticles);
-    }
-  }, 3000);
-});
-
+// ─── INIT ────────────────────────────────────────────────────────────────────
+fetchLiveNews('all');
+renderThreeCol();
+renderSidebarSources();
+renderCatBars();
+renderHeatmap();
+renderSourcesGrid('all');
+updateSourceCounts();
 </script>
 </body>
 </html>
