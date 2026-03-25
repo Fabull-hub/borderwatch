@@ -266,7 +266,7 @@ function guessBadge(text) {
 async function fetchFeed(feed) {
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6000);
+    const timeout = setTimeout(() => controller.abort(), 4000); // 4s per feed
     const res = await fetch(feed.url, {
       signal: controller.signal,
       headers: { 'User-Agent': 'BorderTrend/1.0 (+https://bordertrend.com)' },
@@ -275,9 +275,19 @@ async function fetchFeed(feed) {
     if (!res.ok) return [];
     const xml = await res.text();
     return parseRSS(xml, feed);
-  } catch {
-    return [];
+  } catch { return []; }
+}
+
+// Fetch feeds in batches to stay within Vercel 15s limit
+async function fetchAllFeeds(feeds) {
+  const BATCH = 25; // 25 concurrent, ~4s each = well under 15s
+  const results = [];
+  for (let i = 0; i < feeds.length; i += BATCH) {
+    const batch = feeds.slice(i, i + BATCH);
+    const batchResults = await Promise.all(batch.map(fetchFeed));
+    results.push(...batchResults);
   }
+  return results;
 }
 
 async function fetchNewsAPI(apiKey) {
@@ -285,10 +295,10 @@ async function fetchNewsAPI(apiKey) {
   if (!apiKey) return articles;
   const queries = [
     { q: 'smuggling OR "border seizure" OR "customs bust" OR contraband', badge: 'seized' },
-    { q: '"drug seizure" OR "cocaine seized" OR fentanyl trafficking OR narcotics bust', badge: 'narco' },
+    { q: '"drug seizure" OR "cocaine seized" OR fentanyl trafficking OR "narcotics bust"', badge: 'narco' },
     { q: '"human trafficking" OR "migrant smuggling" OR "people smuggling"', badge: 'human' },
     { q: '"arms trafficking" OR "weapons seized" OR "gun smuggling"', badge: 'weapons' },
-    { q: '"wildlife trafficking" OR "ivory seizure" OR "pangolin" OR poaching', badge: 'wildlife' },
+    { q: '"wildlife trafficking" OR "ivory seizure" OR pangolin OR poaching', badge: 'wildlife' },
     { q: '"maritime seizure" OR "coast guard" drug OR "narco submarine"', badge: 'maritime' },
   ];
   const base = 'https://newsapi.org/v2/everything?language=en&sortBy=publishedAt&pageSize=10';
@@ -316,32 +326,35 @@ async function fetchNewsAPI(apiKey) {
   return results.flat();
 }
 
-// Pick the best hero story from premium investigative sources
+// Pick freshest article from premium investigative sources for hero
 function pickHero(articles) {
-  const HERO_SOURCES = ['OCCRP', 'Europol', 'InSight Crime', 'Reuters', 'US CBP',
-    'DEA', 'UK NCA', 'Australia ABF', 'Frontex', 'INTERPOL', 'UNODC',
-    'Global Witness', 'TRAFFIC (Wildlife)', 'US DOJ', 'FBI'];
-  // Filter to trusted sources with real summaries, from today or yesterday
-  const cutoff = Date.now() - 48 * 3600000;
-  const candidates = articles.filter(a =>
-    HERO_SOURCES.includes(a.source) &&
-    a.summary && a.summary.length > 60 &&
-    a.url && !a.url.includes('youtube') &&
-    new Date(a.publishedAt || 0).getTime() > cutoff
-  ).sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
-
+  const HERO_SOURCES = ['OCCRP','Europol','InSight Crime','Reuters World','Reuters US',
+    'US CBP','DEA','UK NCA','Australia ABF','Frontex','INTERPOL','UNODC',
+    'Global Witness','TRAFFIC (Wildlife)','US DOJ','FBI','US Coast Guard'];
+  const cutoff = Date.now() - 48 * 3600000; // last 48h
+  const candidates = articles
+    .filter(a =>
+      HERO_SOURCES.includes(a.source) &&
+      a.summary && a.summary.length > 60 &&
+      a.url &&
+      (a.timeClass === 'time-recent' || a.timeClass === 'time-today')
+    )
+    .sort((a, b) => {
+      // Prioritise time-recent over time-today
+      if (a.timeClass !== b.timeClass) return a.timeClass === 'time-recent' ? -1 : 1;
+      return 0;
+    });
   if (candidates.length === 0) return null;
-  const hero = candidates[0];
+  const h = candidates[0];
   return {
-    headline: hero.headline,
-    deck: hero.summary.replace(/<[^>]+>/g, '').substring(0, 320),
-    url: hero.url,
-    source: hero.source,
-    region: hero.region,
-    badge: hero.badge,
-    badgeLabel: hero.badgeLabel,
-    time: hero.time,
-    imageUrl: hero.imageUrl || null,
+    headline: h.headline,
+    deck: h.summary.replace(/<[^>]+>/g,'').substring(0, 320),
+    url: h.url,
+    source: h.source,
+    region: h.region,
+    badge: h.badge,
+    badgeLabel: h.badgeLabel,
+    time: h.time,
   };
 }
 
@@ -353,31 +366,31 @@ export default async function handler(req, res) {
   const { category = 'all', page = '1' } = req.query;
 
   try {
-    // Fetch RSS feeds and NewsAPI in parallel
+    // Run RSS feeds and NewsAPI in parallel, RSS in batches
     const [feedResults, newsApiArticles] = await Promise.all([
-      Promise.all(RSS_FEEDS.map(fetchFeed)),
+      fetchAllFeeds(RSS_FEEDS),
       fetchNewsAPI(process.env.NEWSAPI_KEY),
     ]);
 
     let articles = [...feedResults.flat(), ...newsApiArticles];
 
-    // Sort by recency
+    // Sort newest first
     const order = { 'time-recent': 0, 'time-today': 1, 'time-old': 2 };
     articles.sort((a, b) => (order[a.timeClass] ?? 2) - (order[b.timeClass] ?? 2));
 
-    // Deduplicate by headline
+    // Deduplicate
     const seen = new Set();
     articles = articles.filter(a => {
-      const key = a.headline.substring(0, 60).toLowerCase().replace(/s+/g, ' ').trim();
+      const key = a.headline.substring(0, 60).toLowerCase().replace(/\s+/g, ' ').trim();
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
     });
 
-    // Pick automatic hero story
+    // Auto hero
     const hero = pickHero(articles);
 
-    // Filter by category after hero selection
+    // Category filter
     const filtered = category !== 'all'
       ? articles.filter(a => a.badge === category)
       : articles;
