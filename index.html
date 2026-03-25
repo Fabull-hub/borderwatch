@@ -1823,27 +1823,60 @@ function showApiError(fallbackFn) {
   document.getElementById('section-sub').textContent += ' · Cached data';
 }
 
-function renderLiveArticles(articles, filter) {
-  const list = document.getElementById('article-list');
+function renderLiveArticles(articles, category) {
+  var list = document.getElementById('article-list');
   if (!list) return;
-  const filtered = (!filter || filter === 'all') ? articles : articles.filter(a => a.badge === filter);
-  if (filtered.length === 0) {
-    list.innerHTML = '<div style="padding:32px;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No live articles found for this category</div>';
+
+  var filtered = (category && category !== 'all')
+    ? articles.filter(function(a){ return a.badge === category; })
+    : articles;
+
+  if (!filtered.length) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3);font-family:var(--font-mono);font-size:12px;">No articles found for this category.</div>';
     return;
   }
-  list.innerHTML = filtered.map(a => `<a class="article-card" href="${a.url}" target="_blank" rel="noopener">
-    <div>
-      <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
-      <div class="article-headline">${a.headline}</div>
-      <div class="article-summary">${a.summary}</div>
-      <div class="article-footer">
-        <span class="article-region">${a.region}</span>
-        <span>${a.source}</span>
-        <span>${a.time}</span>
-      </div>
-    </div>
-    <div class="article-time-bar ${a.timeClass}"></div>
-  </a>`).join('');
+
+  var BADGE_LABELS = { seized:'SEIZURES', narco:'NARCOTICS', maritime:'MARITIME',
+    human:'HUMAN SMUGGLING', border:'LAND BORDER', cargo:'CARGO', airport:'AIRPORT',
+    wildlife:'WILDLIFE', weapons:'WEAPONS' };
+
+  list.innerHTML = filtered.map(function(a) {
+    var badge = a.badge || 'seized';
+    var label = a.badgeLabel || BADGE_LABELS[badge] || badge.toUpperCase();
+    var headline = (a.headline || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    var summary = (a.summary || '').replace(/</g,'&lt;').replace(/>/g,'&gt;').substring(0,200);
+    var source = (a.source || '').replace(/</g,'&lt;');
+    var time = a.time || '';
+    var region = a.region || '';
+    var timeClass = a.timeClass || 'time-old';
+
+    return '<a class="article-card" href="' + (a.url||'#') + '" target="_blank" rel="noopener">'
+      + '<div>'
+      + '<div class="article-badge badge-' + badge + '">' + label + '</div>'
+      + '<div class="article-headline">' + headline + '</div>'
+      + '<div class="article-summary">' + summary + (summary.length >= 200 ? '&hellip;' : '') + '</div>'
+      + '</div>'
+      + '<div class="article-meta">'
+      + '<span class="article-region">' + region + '</span>'
+      + '<span class="article-source">' + source + '</span>'
+      + '<span class="article-time ' + timeClass + '">' + time + '</span>'
+      + '</div>'
+      + '</a>';
+  }).join('');
+
+  // Update source sidebar
+  var sourceSidebar = document.getElementById('source-list-sidebar');
+  var sourceCount = document.getElementById('source-count');
+  if (sourceSidebar) {
+    var sources = {};
+    articles.forEach(function(a){ if(a.source) sources[a.source] = (sources[a.source]||0)+1; });
+    var sorted = Object.keys(sources).sort(function(a,b){ return sources[b]-sources[a]; });
+    if (sourceCount) sourceCount.textContent = sorted.length + ' tracked';
+    sourceSidebar.innerHTML = sorted.map(function(s) {
+      return '<div class="source-item"><span class="source-name">' + s + '</span>'
+        + '<span class="source-count-badge">' + sources[s] + '</span></div>';
+    }).join('');
+  }
 }
 
 async function fetchLiveNews(category, force) {
