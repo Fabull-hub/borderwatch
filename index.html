@@ -1168,6 +1168,14 @@
   /* Nav map tab */
   .nav-link[data-view="map"] { position:relative; }
   .map-pulse { display:inline-block; width:6px; height:6px; border-radius:50%; background:#3aad72; margin-left:5px; animation:pulse 2s infinite; vertical-align:middle; }
+
+  .alert-item { padding:8px 0; border-bottom:1px solid var(--bg4); cursor:pointer; text-decoration:none; display:block; }
+  .alert-item:last-child { border-bottom:none; }
+  .alert-item:hover .alert-headline { color:#d4a843; }
+  .alert-badge-row { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+  .alert-headline { font-family:var(--font-sans); font-size:12px; color:var(--text1); line-height:1.4; font-weight:500; transition:color 0.15s; }
+  .alert-meta { font-family:var(--font-mono); font-size:9px; color:var(--text3); margin-top:3px; letter-spacing:0.06em; }
+  .alert-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -1452,12 +1460,14 @@
       <!-- ACTIVITY HEATMAP -->
       <div class="sidebar-block">
         <div class="sidebar-header">
-          <span class="sidebar-title">Alert Activity</span>
-          <span class="sidebar-count">90 days</span>
+          <span class="sidebar-title">Latest Alerts</span>
+          <span class="sidebar-count" id="alert-count">Live</span>
         </div>
-        <div class="heatmap-grid" id="heatmap"></div>
-        <div style="display:flex;justify-content:space-between;padding:0 14px 12px;font-family:var(--font-mono);font-size:9px;color:var(--text3)">
-          <span>Low</span><span>High</span>
+        <div id="latest-alerts" style="display:flex;flex-direction:column;gap:8px;padding-top:6px;">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);text-align:center;padding:12px 0;">Loading alerts...</div>
+        </div>
+        <div style="padding-top:10px;border-top:1px solid var(--bg4);margin-top:6px;">
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;text-align:center;">Updates every 5 minutes</div>
         </div>
       </div>
 
@@ -1778,7 +1788,7 @@ const TRANSLATIONS = {
 let _liveArticles = [];
 let _isLoading = false;
 let _lastFetch = 0;
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 function showSkeleton() {
   const list = document.getElementById('article-list');
@@ -1861,6 +1871,7 @@ async function fetchLiveNews(category, force) {
       }
 
       renderLiveArticles(data.articles, category);
+      renderLatestAlerts(data.articles);
     } else { throw new Error('empty'); }
   } catch(e) {
     console.warn('BorderTrend API fallback:', e.message);
@@ -2319,7 +2330,49 @@ function showMap() {
       _map.invalidateSize();
     } else {
       // Fetch if no articles cached yet
-      fetch('/api/news?category=all&_t=' + Date.now())
+      fetch('/api/news?cat
+// ── LATEST ALERTS SIDEBAR ────────────────────────────────────────────────────
+function renderLatestAlerts(articles) {
+  const container = document.getElementById('latest-alerts');
+  const countEl = document.getElementById('alert-count');
+  if (!container) return;
+
+  // Pick top 6: prioritise time-recent, then time-today, from high-signal sources
+  const PRIORITY = ['OCCRP','Europol','InSight Crime','US CBP','DEA','FBI',
+    'UK NCA','INTERPOL','Frontex','US DOJ','US Coast Guard','Australia ABF'];
+  const scored = articles
+    .map(a => ({
+      ...a,
+      score: (a.timeClass === 'time-recent' ? 100 : a.timeClass === 'time-today' ? 50 : 0)
+           + (PRIORITY.includes(a.source) ? 20 : 0)
+    }))
+    .sort((a,b) => b.score - a.score)
+    .slice(0, 6);
+
+  if (scored.length === 0) {
+    container.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);text-align:center;padding:12px 0;">No alerts available</div>';
+    return;
+  }
+
+  const COLORS = { seized:'#e74c3c', narco:'#e67e22', maritime:'#3a7bd5',
+    human:'#9b59b6', border:'#d4a843', cargo:'#d4a843', airport:'#d4a843',
+    wildlife:'#27ae60', weapons:'#c0392b' };
+
+  container.innerHTML = scored.map(a => `
+    <a class="alert-item" href="${a.url}" target="_blank" rel="noopener">
+      <div class="alert-badge-row">
+        <div class="alert-dot" style="background:${COLORS[a.badge]||'#d4a843'};box-shadow:0 0 5px ${COLORS[a.badge]||'#d4a843'}66;"></div>
+        <span style="font-family:var(--font-mono);font-size:9px;color:${COLORS[a.badge]||'#d4a843'};letter-spacing:0.1em;text-transform:uppercase;">${a.badgeLabel}</span>
+      </div>
+      <div class="alert-headline">${a.headline.substring(0,80)}${a.headline.length>80?'…':''}</div>
+      <div class="alert-meta">${a.source} &middot; ${a.time}</div>
+    </a>
+  `).join('');
+
+  if (countEl) countEl.textContent = scored.length + ' live';
+}
+
+egory=all&_t=' + Date.now())
         .then(r => r.json())
         .then(data => {
           if (data.articles) plotArticlesOnMap(data.articles);
@@ -2338,6 +2391,18 @@ filterCategory = function(cat) {
   if (articleList) articleList.style.display = '';
   _origFilterCategory(cat);
 };
+
+
+// ── PAGE VISIBILITY: refresh when tab becomes active ──
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    const age = Date.now() - (_lastFetch || 0);
+    if (age > CACHE_TTL) fetchLiveNews(currentCategory, true);
+  }
+});
+
+// ── HARD RELOAD every 30 minutes to stay fresh ──
+setTimeout(() => location.reload(), 30 * 60 * 1000);
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 fetchLiveNews('all');
