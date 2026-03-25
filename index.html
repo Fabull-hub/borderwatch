@@ -1871,7 +1871,7 @@ async function fetchLiveNews(category, force) {
     }
   } catch(e) {
     console.warn('BorderTrend API fallback:', e.message);
-    renderArticles(category || 'all');
+    showSkeleton();
   } finally {
     window._isLoading = false;
   }
