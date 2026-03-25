@@ -1176,6 +1176,16 @@
   .alert-headline { font-family:var(--font-sans); font-size:12px; color:var(--text1); line-height:1.4; font-weight:500; transition:color 0.15s; }
   .alert-meta { font-family:var(--font-mono); font-size:9px; color:var(--text3); margin-top:3px; letter-spacing:0.06em; }
   .alert-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+  .source-card { background:var(--bg2); border:1px solid var(--bg4); border-radius:6px; padding:14px; display:flex; flex-direction:column; gap:6px; }
+  .source-card:hover { border-color:var(--accent2); }
+  .source-card-header { display:flex; align-items:center; gap:8px; }
+  .source-flag { font-size:16px; }
+  .source-card-name { font-family:var(--font-sans); font-size:13px; font-weight:600; color:var(--text1); flex:1; }
+  .source-live-dot { width:7px; height:7px; border-radius:50%; background:#3aad72; flex-shrink:0; }
+  .source-card-type { font-family:var(--font-mono); font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; }
+  .source-card-desc { font-family:var(--font-sans); font-size:11px; color:var(--text2); line-height:1.4; }
+  .source-tag-live { font-family:var(--font-mono); font-size:9px; color:#3aad72; background:rgba(58,173,114,0.12); border:1px solid rgba(58,173,114,0.3); border-radius:3px; padding:2px 6px; }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -1827,55 +1837,125 @@ function renderLiveArticles(articles, category) {
   var list = document.getElementById('article-list');
   if (!list) return;
 
-  var filtered = (category && category !== 'all')
-    ? articles.filter(function(a){ return a.badge === category; })
-    : articles;
-
-  if (!filtered.length) {
-    list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3);font-family:var(--font-mono);font-size:12px;">No articles found for this category.</div>';
-    return;
-  }
-
   var BADGE_LABELS = { seized:'SEIZURES', narco:'NARCOTICS', maritime:'MARITIME',
     human:'HUMAN SMUGGLING', border:'LAND BORDER', cargo:'CARGO', airport:'AIRPORT',
-    wildlife:'WILDLIFE', weapons:'WEAPONS' };
+    wildlife:'WILDLIFE TRAFFICKING', weapons:'WEAPONS' };
 
-  list.innerHTML = filtered.map(function(a) {
-    var badge = a.badge || 'seized';
-    var label = a.badgeLabel || BADGE_LABELS[badge] || badge.toUpperCase();
-    var headline = (a.headline || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    var summary = (a.summary || '').replace(/</g,'&lt;').replace(/>/g,'&gt;').substring(0,200);
-    var source = (a.source || '').replace(/</g,'&lt;');
-    var time = a.time || '';
-    var region = a.region || '';
-    var timeClass = a.timeClass || 'time-old';
+  // ── Article cards ──
+  var filtered = (category && category !== 'all')
+    ? articles.filter(function(a){ return a.badge === category; }) : articles;
 
-    return '<a class="article-card" href="' + (a.url||'#') + '" target="_blank" rel="noopener">'
-      + '<div>'
-      + '<div class="article-badge badge-' + badge + '">' + label + '</div>'
-      + '<div class="article-headline">' + headline + '</div>'
-      + '<div class="article-summary">' + summary + (summary.length >= 200 ? '&hellip;' : '') + '</div>'
-      + '</div>'
-      + '<div class="article-meta">'
-      + '<span class="article-region">' + region + '</span>'
-      + '<span class="article-source">' + source + '</span>'
-      + '<span class="article-time ' + timeClass + '">' + time + '</span>'
-      + '</div>'
-      + '</a>';
-  }).join('');
+  if (!filtered.length) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text3);font-family:var(--font-mono);font-size:12px;">No articles found.</div>';
+  } else {
+    list.innerHTML = filtered.map(function(a) {
+      var badge = a.badge || 'seized';
+      var label = a.badgeLabel || BADGE_LABELS[badge] || badge.toUpperCase();
+      var headline = (a.headline||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      var summary = (a.summary||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').substring(0,200);
+      return '<a class="article-card" href="'+(a.url||'#')+'" target="_blank" rel="noopener">'
+        +'<div>'
+        +'<div class="article-badge badge-'+badge+'">'+label+'</div>'
+        +'<div class="article-headline">'+headline+'</div>'
+        +'<div class="article-summary">'+summary+(summary.length>=200?'&hellip;':'')+'</div>'
+        +'</div>'
+        +'<div class="article-meta">'
+        +'<span class="article-region">'+(a.region||'')+'</span>'
+        +'<span class="article-source">'+(a.source||'')+'</span>'
+        +'<span class="article-time '+(a.timeClass||'time-old')+'">'+(a.time||'')+'</span>'
+        +'</div></a>';
+    }).join('');
+  }
 
-  // Update source sidebar
+  // ── Sources sidebar (Key Sources) ──
   var sourceSidebar = document.getElementById('source-list-sidebar');
-  var sourceCount = document.getElementById('source-count');
+  var sourceCountEl = document.getElementById('source-count');
+  var statSources = document.getElementById('stat-sources');
   if (sourceSidebar) {
     var sources = {};
     articles.forEach(function(a){ if(a.source) sources[a.source] = (sources[a.source]||0)+1; });
     var sorted = Object.keys(sources).sort(function(a,b){ return sources[b]-sources[a]; });
-    if (sourceCount) sourceCount.textContent = sorted.length + ' tracked';
+    if (sourceCountEl) sourceCountEl.textContent = sorted.length + ' tracked';
+    if (statSources) statSources.textContent = sorted.length;
     sourceSidebar.innerHTML = sorted.map(function(s) {
-      return '<div class="source-item"><span class="source-name">' + s + '</span>'
-        + '<span class="source-count-badge">' + sources[s] + '</span></div>';
+      return '<div class="source-item"><span class="source-name">'+s+'</span>'
+        +'<span class="source-count-badge">'+sources[s]+'</span></div>';
     }).join('');
+  }
+
+  // ── Story breakdown bars ──
+  var catBars = document.getElementById('cat-bars');
+  if (catBars) {
+    var cats = {};
+    articles.forEach(function(a){ if(a.badge) cats[a.badge] = (cats[a.badge]||0)+1; });
+    var total = articles.length || 1;
+    catBars.innerHTML = Object.keys(cats).sort(function(a,b){return cats[b]-cats[a];}).map(function(c) {
+      var pct = Math.round(cats[c]/total*100);
+      var label = BADGE_LABELS[c] || c.toUpperCase();
+      return '<div class="cat-bar-row">'
+        +'<div class="cat-bar-label">'+label+'</div>'
+        +'<div class="cat-bar-track"><div class="cat-bar-fill badge-'+c+'" style="width:'+pct+'%"></div></div>'
+        +'<div class="cat-bar-pct">'+pct+'%</div>'
+        +'</div>';
+    }).join('');
+  }
+
+  // ── Sources Directory grid ──
+  var sourcesGrid = document.getElementById('sources-grid');
+  var sourcesDirCount = document.getElementById('sources-dir-count');
+  if (sourcesGrid) {
+    var RSS_SOURCE_META = {
+      'INTERPOL':          { flag:'🌐', type:'Official', region:'Global', desc:'International notices, red notices, operations' },
+      'UNODC':             { flag:'🌐', type:'Official', region:'Global', desc:'UN drug reports, trafficking data' },
+      'WCO':               { flag:'🌐', type:'Official', region:'Global', desc:'World Customs Organization updates' },
+      'Europol':           { flag:'🇪🇺', type:'Official', region:'Europe', desc:'EU law enforcement intelligence' },
+      'Frontex':           { flag:'🇪🇺', type:'Official', region:'Europe', desc:'EU border and coast guard agency' },
+      'CITES':             { flag:'🌐', type:'Official', region:'Global', desc:'Wildlife trade regulation notices' },
+      'IOM':               { flag:'🌐', type:'Official', region:'Global', desc:'International migration organisation' },
+      'OCCRP':             { flag:'🌐', type:'Investigative', region:'Global', desc:'Organised crime and corruption reporting' },
+      'Reuters World':     { flag:'🌐', type:'News Media', region:'Global', desc:'International news wire service' },
+      'Global Witness':    { flag:'🌐', type:'NGO', region:'Global', desc:'Natural resources and corruption' },
+      'TRAFFIC (Wildlife)':{ flag:'🌐', type:'NGO', region:'Global', desc:'Wildlife trade monitoring network' },
+      'InSight Crime':     { flag:'🌐', type:'Investigative', region:'Latin America', desc:'Latin American organised crime' },
+      'US CBP':            { flag:'🇺🇸', type:'Official', region:'Americas', desc:'US Customs and Border Protection' },
+      'DEA':               { flag:'🇺🇸', type:'Official', region:'Americas', desc:'Drug Enforcement Administration' },
+      'ATF':               { flag:'🇺🇸', type:'Official', region:'Americas', desc:'Bureau of Alcohol, Tobacco, Firearms' },
+      'ICE':               { flag:'🇺🇸', type:'Official', region:'Americas', desc:'Immigration and Customs Enforcement' },
+      'US DOJ':            { flag:'🇺🇸', type:'Official', region:'Americas', desc:'US Department of Justice' },
+      'FBI':               { flag:'🇺🇸', type:'Official', region:'Americas', desc:'Federal Bureau of Investigation' },
+      'US Coast Guard':    { flag:'🇺🇸', type:'Official', region:'Americas', desc:'Maritime law enforcement' },
+      'UK NCA':            { flag:'🇬🇧', type:'Official', region:'Europe', desc:'UK National Crime Agency' },
+      'UK Border Force':   { flag:'🇬🇧', type:'Official', region:'Europe', desc:'UK border security operations' },
+      'Australia ABF':     { flag:'🇦🇺', type:'Official', region:'Asia-Pacific', desc:'Australian Border Force' },
+      'Canada CBSA':       { flag:'🇨🇦', type:'Official', region:'Americas', desc:'Canada Border Services Agency' },
+      'FATF':              { flag:'🌐', type:'Official', region:'Global', desc:'Financial Action Task Force' },
+      'SIPRI':             { flag:'🌐', type:'NGO', region:'Global', desc:'Arms trade and conflict research' },
+    };
+    var allSources = Object.keys(RSS_SOURCE_META);
+    if (sourcesDirCount) sourcesDirCount.textContent = allSources.length + ' sources';
+    sourcesGrid.innerHTML = allSources.map(function(name) {
+      var m = RSS_SOURCE_META[name];
+      var articleCount = sources[name] || 0;
+      return '<div class="source-card">'
+        +'<div class="source-card-header">'
+        +'<span class="source-flag">'+m.flag+'</span>'
+        +'<span class="source-card-name">'+name+'</span>'
+        +(articleCount ? '<span class="source-live-dot"></span>' : '')
+        +'</div>'
+        +'<div class="source-card-type">'+m.type+' &middot; '+m.region+'</div>'
+        +'<div class="source-card-desc">'+m.desc+'</div>'
+        +'<div class="source-card-tags">'
+        +(articleCount ? '<span class="source-tag-live">'+articleCount+' live</span>' : '')
+        +'</div>'
+        +'</div>';
+    }).join('');
+  }
+
+  // ── Stats bar ──
+  var statCountries = document.getElementById('stat-countries');
+  if (statCountries) {
+    var regions = new Set(articles.map(function(a){return a.region;}));
+    statCountries.textContent = regions.size;
   }
 }
 
