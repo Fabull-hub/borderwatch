@@ -1154,13 +1154,11 @@
     width: 100%;
     height: 520px;
     background: #060b18;
-    border-radius: 6px;
-    border: 1px solid #1e3a5a;
+    border-radius: 0 0 6px 6px;
+    border: none;
   }
   /* Apply navy tint ONLY to tile images — keeps markers vivid */
-  .leaflet-tile {
-    filter: hue-rotate(185deg) saturate(0.35) brightness(0.75) contrast(1.05);
-  }
+  .map-tiles { opacity: 0.9; }
 
   /* Keep labels readable */
   .map-legend { display:flex; flex-wrap:wrap; gap:10px; padding:10px 0; }
@@ -1246,6 +1244,82 @@
   .leaflet-control-zoom a { background: #0b1225 !important; color: #8a9dbf !important; border-color: #162038 !important; }
   .leaflet-control-zoom a:hover { background: #162038 !important; color: #fff !important; }
   .leaflet-attribution-flag { display: none !important; }
+
+  /* Map integration styles */
+  .map-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0 6px;
+    border-bottom: 1px solid #162038;
+    margin-bottom: 10px;
+  }
+  .map-stats {
+    display: flex;
+    gap: 24px;
+    padding: 10px 0 8px;
+    border-bottom: 1px solid #162038;
+    margin-bottom: 8px;
+  }
+  .map-stat span {
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 18px;
+    font-weight: 700;
+    color: #dde6f5;
+    display: block;
+  }
+  .map-stat {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: #4a5a7a;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .leaflet-control-zoom {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .leaflet-control-zoom a {
+    background: rgba(11,18,37,0.9) !important;
+    color: #8a9dbf !important;
+    border: 1px solid #162038 !important;
+    font-size: 16px !important;
+    line-height: 26px !important;
+    width: 28px !important;
+    height: 28px !important;
+  }
+  .leaflet-control-zoom a:hover {
+    background: #162038 !important;
+    color: #dde6f5 !important;
+  }
+  .leaflet-bottom .leaflet-control-attribution {
+    background: rgba(6,11,24,0.8) !important;
+    color: #4a5a7a !important;
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+  }
+  .leaflet-bottom .leaflet-control-attribution a {
+    color: #4a5a7a !important;
+  }
+  .map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 8px 0 4px;
+    border-top: 1px solid #162038;
+    margin-top: 8px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: #4a5a7a;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -2409,18 +2483,12 @@ function initMap() {
     attributionControl: true,
   });
 
-  // CartoDB dark matter — proven reliable, navy-toned
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter_no_labels/{z}/{x}/{y}{r}.png', {
+  // dark_matter gives navy-toned land masses that blend with the site palette
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19,
-  }).addTo(_map);
-
-  // Subtle border labels layer on top (city names, country borders only)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 19,
-    opacity: 0.6,
+    className: 'map-tiles',
   }).addTo(_map);
 }
 
