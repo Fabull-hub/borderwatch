@@ -1895,8 +1895,6 @@ async function fetchLiveNews(category, force) {
       }
 
       renderLiveArticles(data.articles, category);
-      renderLatestAlerts(data.articles);
-      renderLatestAlerts(data.articles);
     } else { throw new Error('empty'); }
   } catch(e) {
     console.warn('BorderTrend API fallback:', e.message);
@@ -2376,44 +2374,32 @@ filterCategory = function(cat) {
 };
 
 
-// ── LATEST ALERTS SIDEBAR ─────────────────────────────────────────────────
+// ── LATEST ALERTS SIDEBAR ──────────────────────────────────────────────────
 function renderLatestAlerts(articles) {
   var container = document.getElementById('latest-alerts');
-  var countEl   = document.getElementById('alert-count');
+  var countEl = document.getElementById('alert-count');
   if (!container) return;
-  var PRIORITY = ['OCCRP','Europol','InSight Crime','US CBP','DEA','FBI',
-    'UK NCA','INTERPOL','Frontex','US DOJ','US Coast Guard','Australia ABF'];
-  var COLORS = { seized:'#e74c3c', narco:'#e67e22', maritime:'#3a7bd5',
-    human:'#9b59b6', border:'#d4a843', cargo:'#d4a843', airport:'#d4a843',
-    wildlife:'#27ae60', weapons:'#c0392b' };
+  var PRIORITY = ['OCCRP','Europol','InSight Crime','US CBP','DEA','FBI','UK NCA','INTERPOL','Frontex','US DOJ','US Coast Guard','Australia ABF'];
+  var COLORS = { seized:'#e74c3c', narco:'#e67e22', maritime:'#3a7bd5', human:'#9b59b6', border:'#d4a843', cargo:'#d4a843', airport:'#d4a843', wildlife:'#27ae60', weapons:'#c0392b' };
   var scored = articles.map(function(a) {
-    return Object.assign({}, a, {
-      score: (a.timeClass==='time-recent'?100:a.timeClass==='time-today'?50:0)
-           + (PRIORITY.indexOf(a.source)>=0?20:0)
-    });
+    return Object.assign({}, a, { score: (a.timeClass==='time-recent'?100:a.timeClass==='time-today'?50:0) + (PRIORITY.indexOf(a.source)>=0?20:0) });
   }).sort(function(a,b){return b.score-a.score;}).slice(0,6);
   if (!scored.length) { container.innerHTML = ''; return; }
   container.innerHTML = scored.map(function(a) {
     var color = COLORS[a.badge] || '#d4a843';
     var hl = (a.headline||'').substring(0,80) + ((a.headline||'').length>80?'…':'');
     return '<a class="alert-item" href="'+(a.url||'#')+'" target="_blank" rel="noopener">'
-      + '<div class="alert-badge-row">'
-      + '<div class="alert-dot" style="background:'+color+';box-shadow:0 0 5px '+color+'66;"></div>'
-      + '<span style="font-family:var(--font-mono);font-size:9px;color:'+color+';letter-spacing:0.1em;text-transform:uppercase;">'+(a.badgeLabel||a.badge||'')+'</span>'
-      + '</div>'
+      + '<div class="alert-badge-row"><div class="alert-dot" style="background:'+color+';box-shadow:0 0 5px '+color+'66;"></div>'
+      + '<span style="font-family:var(--font-mono);font-size:9px;color:'+color+';letter-spacing:0.1em;text-transform:uppercase;">'+(a.badgeLabel||a.badge||'')+'</span></div>'
       + '<div class="alert-headline">'+hl+'</div>'
-      + '<div class="alert-meta">'+(a.source||'')+' · '+(a.time||'')+'</div>'
-      + '</a>';
+      + '<div class="alert-meta">'+(a.source||'')+' · '+(a.time||'')+'</div></a>';
   }).join('');
   if (countEl) countEl.textContent = scored.length + ' live';
 }
 
-// ── EDGE / STALE BROWSER FIX ──────────────────────────────────────────────
+// ── EDGE / STALE BROWSER FIX ───────────────────────────────────────────────
 document.addEventListener('visibilitychange', function() {
-  if (!document.hidden) {
-    var age = Date.now() - (window._lastFetch || 0);
-    if (age > CACHE_TTL) fetchLiveNews(currentCategory);
-  }
+  if (!document.hidden) { var age = Date.now() - (window._lastFetch||0); if (age > CACHE_TTL) fetchLiveNews(currentCategory); }
 });
 setTimeout(function() { location.reload(); }, 30 * 60 * 1000);
 
