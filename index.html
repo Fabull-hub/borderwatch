@@ -1186,6 +1186,15 @@
   .source-card-type { font-family:var(--font-mono); font-size:9px; color:var(--text3); text-transform:uppercase; letter-spacing:0.1em; }
   .source-card-desc { font-family:var(--font-sans); font-size:11px; color:var(--text2); line-height:1.4; }
   .source-tag-live { font-family:var(--font-mono); font-size:9px; color:#3aad72; background:rgba(58,173,114,0.12); border:1px solid rgba(58,173,114,0.3); border-radius:3px; padding:2px 6px; }
+
+  .source-card{background:var(--bg2);border:1px solid var(--bg4);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:5px;transition:border-color 0.15s;}
+  .source-card:hover{border-color:var(--accent2);}
+  .source-card-header{display:flex;align-items:center;gap:8px;}
+  .source-card-name{font-family:var(--font-sans);font-size:13px;font-weight:600;color:var(--text1);flex:1;}
+  .source-live-dot{width:7px;height:7px;border-radius:50%;background:#3aad72;flex-shrink:0;}
+  .source-card-type{font-family:var(--font-mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;}
+  .source-card-desc{font-family:var(--font-sans);font-size:11px;color:var(--text2);line-height:1.4;}
+  .source-tag-live{font-family:var(--font-mono);font-size:9px;color:#3aad72;background:rgba(58,173,114,0.12);border:1px solid rgba(58,173,114,0.3);border-radius:3px;padding:2px 6px;}
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -2095,25 +2104,69 @@ function renderCatBars() {
   `).join('');
 }
 
-function renderHeatmap() {
-  const el = document.getElementById('heatmap');
-  const levels = [0,0,1,2,1,0,0,1,3,4,3,2,1,2,3,4,5,4,3,2,1,2,3,2,1,2,3,4,3,2,1,0,1,2,3,4,5,4,3,2,1,2,3,2,3,4,3,2,1,0,1,2,3,2,1,2,3,2,1,0,1,2,3,4,5,4,3,2,1,2,3,2,1,0,1,2,3,2,1,0,1,2,3,4,3,2,1,2,3,2];
-  el.innerHTML = levels.map(l => `<div class="heatmap-cell heat-${l}" title="Activity level: ${l}"></div>`).join('');
-}
+function renderHeatmap() { /* heatmap replaced by Latest Alerts */ }
 
 function renderSourcesGrid(filter) {
-  const filtered = filter === 'all' ? SOURCES : SOURCES.filter(s => s.type === filter || s.region === filter);
-  document.getElementById('sources-grid').innerHTML = filtered.map(s => `
-    <a class="src-card" href="${s.url}" target="_blank" rel="noopener">
-      <div class="src-card-top">
-        <span class="src-card-flag">${s.flag}</span>
-        <span class="src-card-name">${s.name}</span>
-        <div class="source-dot ${s.type === 'Official' ? 'dot-official' : s.type === 'Media' ? 'dot-media' : 'dot-ngo'}" style="margin-left:auto"></div>
-      </div>
-      <div class="src-card-desc">${s.desc}</div>
-      <div class="src-card-tags">${s.tags.slice(0,3).map(t=>`<span class="src-tag">${t}</span>`).join('')}<span class="src-tag">${s.region}</span></div>
-    </a>
-  `).join('');
+  var grid = document.getElementById('sources-grid');
+  var countEl = document.getElementById('sources-dir-count');
+  if (!grid) return;
+
+  var SOURCES = [
+    { name:'INTERPOL',          flag:'🌐', type:'Official', region:'Global',        desc:'International notices, red notices, operations' },
+    { name:'UNODC',             flag:'🌐', type:'Official', region:'Global',        desc:'UN drug reports and trafficking data' },
+    { name:'WCO',               flag:'🌐', type:'Official', region:'Global',        desc:'World Customs Organization updates' },
+    { name:'Europol',           flag:'🇪🇺', type:'Official', region:'Europe',        desc:'EU law enforcement intelligence' },
+    { name:'Frontex',           flag:'🇪🇺', type:'Official', region:'Europe',        desc:'EU border and coast guard agency' },
+    { name:'CITES',             flag:'🌐', type:'Official', region:'Global',        desc:'Wildlife trade regulation notices' },
+    { name:'IOM',               flag:'🌐', type:'Official', region:'Global',        desc:'International migration organisation' },
+    { name:'OCCRP',             flag:'🌐', type:'Investigative', region:'Global',   desc:'Organised crime and corruption reporting' },
+    { name:'Reuters World',     flag:'🌐', type:'News Media', region:'Global',      desc:'International news wire service' },
+    { name:'Global Witness',    flag:'🌐', type:'NGO', region:'Global',             desc:'Natural resources and corruption' },
+    { name:'TRAFFIC (Wildlife)',flag:'🌐', type:'NGO', region:'Global',             desc:'Wildlife trade monitoring network' },
+    { name:'InSight Crime',     flag:'🌐', type:'Investigative', region:'Latin America', desc:'Latin American organised crime' },
+    { name:'US CBP',            flag:'🇺🇸', type:'Official', region:'Americas',       desc:'US Customs and Border Protection' },
+    { name:'DEA',               flag:'🇺🇸', type:'Official', region:'Americas',       desc:'Drug Enforcement Administration' },
+    { name:'ATF',               flag:'🇺🇸', type:'Official', region:'Americas',       desc:'Bureau of Alcohol, Tobacco, Firearms' },
+    { name:'ICE',               flag:'🇺🇸', type:'Official', region:'Americas',       desc:'Immigration and Customs Enforcement' },
+    { name:'US DOJ',            flag:'🇺🇸', type:'Official', region:'Americas',       desc:'US Department of Justice' },
+    { name:'FBI',               flag:'🇺🇸', type:'Official', region:'Americas',       desc:'Federal Bureau of Investigation' },
+    { name:'US Coast Guard',    flag:'🇺🇸', type:'Official', region:'Americas',       desc:'Maritime law enforcement' },
+    { name:'UK NCA',            flag:'🇬🇧', type:'Official', region:'Europe',         desc:'UK National Crime Agency' },
+    { name:'Australia ABF',     flag:'🇦🇺', type:'Official', region:'Asia-Pacific',   desc:'Australian Border Force' },
+    { name:'Canada CBSA',       flag:'🇨🇦', type:'Official', region:'Americas',       desc:'Canada Border Services Agency' },
+    { name:'FATF',              flag:'🌐', type:'Official', region:'Global',        desc:'Financial Action Task Force' },
+    { name:'SIPRI',             flag:'🌐', type:'NGO', region:'Global',             desc:'Arms trade and conflict research' },
+    { name:'IMO',               flag:'🌐', type:'Official', region:'Global',        desc:'International Maritime Organization' },
+  ];
+
+  var regionMap = { 'Official/Gov': ['Official'], 'News Media': ['News Media'], 'NGO / Research': ['NGO','Investigative'],
+    'Americas': null, 'Europe': null, 'Asia-Pacific': null, 'Africa & ME': null };
+
+  var filtered = filter && filter !== 'all' ? SOURCES.filter(function(s) {
+    if (filter === 'Official / Gov') return s.type === 'Official';
+    if (filter === 'News Media') return s.type === 'News Media';
+    if (filter === 'NGO / Research') return s.type === 'NGO' || s.type === 'Investigative';
+    return s.region.toLowerCase().includes(filter.toLowerCase());
+  }) : SOURCES;
+
+  // Count live articles per source
+  var liveCounts = {};
+  if (window._liveArticles) window._liveArticles.forEach(function(a){ if(a.source) liveCounts[a.source] = (liveCounts[a.source]||0)+1; });
+
+  if (countEl) countEl.textContent = filtered.length + ' sources';
+
+  grid.innerHTML = filtered.map(function(s) {
+    var count = liveCounts[s.name] || 0;
+    return '<div class="source-card">'
+      + '<div class="source-card-header"><span style="font-size:16px;">'+s.flag+'</span>'
+      + '<span class="source-card-name">'+s.name+'</span>'
+      + (count ? '<span class="source-live-dot"></span>' : '')
+      + '</div>'
+      + '<div class="source-card-type">'+s.type+' &middot; '+s.region+'</div>'
+      + '<div class="source-card-desc">'+s.desc+'</div>'
+      + (count ? '<div><span class="source-tag-live">'+count+' live</span></div>' : '')
+      + '</div>';
+  }).join('');
 }
 
 // ─── ACTIONS ────────────────────────────────────────────────────────────────
