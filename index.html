@@ -1150,7 +1150,14 @@
   /* ── MAP PANEL ─────────────────────────────────────────────────── */
   .map-panel { display:none; width:100%; }
   .map-panel.active { display:block; }
-  #seizure-map { width:100%; height:520px; background:#0b1225; border-radius:6px; border:1px solid #162038; }
+  #seizure-map {
+    width: 100%;
+    height: 520px;
+    background: #060b18;
+    border-radius: 6px;
+    border: 1px solid #162038;
+    filter: hue-rotate(200deg) saturate(0.4) brightness(0.85);
+  }
   .map-legend { display:flex; flex-wrap:wrap; gap:10px; padding:10px 0; }
   .legend-item { display:flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:10px; color:var(--text3); letter-spacing:0.08em; text-transform:uppercase; }
   .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
@@ -1219,6 +1226,21 @@
   .map-popup-link:hover { color:#d4a843; text-decoration:underline; }
   .leaflet-container a { color:#b8892a; }
   .leaflet-container { font-family:'DM Sans',sans-serif; background:#0b1225; }
+
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+    filter: hue-rotate(-200deg) saturate(2.5) brightness(1.18);
+    background: #0b1225 !important;
+    border: 1px solid #1e3050 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+    color: #dde6f5 !important;
+  }
+  .map-popup-headline { color: #fff; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; line-height: 1.4; margin-bottom: 5px; }
+  .map-popup-meta { color: #8a9dbf; font-family: 'DM Mono', monospace; font-size: 10px; margin-bottom: 8px; }
+  .map-popup-link { color: #d4a843; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; text-decoration: none; }
+  .leaflet-control-zoom a { background: #0b1225 !important; color: #8a9dbf !important; border-color: #162038 !important; }
+  .leaflet-control-zoom a:hover { background: #162038 !important; color: #fff !important; }
+  .leaflet-attribution-flag { display: none !important; }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -2377,11 +2399,18 @@ function initMap() {
     attributionControl: true,
   });
 
-  // Dark tile layer (CartoDB dark matter — no API key needed)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter_lite/{z}/{x}/{y}{r}.png', {
+  // CartoDB dark matter — proven reliable, navy-toned
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter_no_labels/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19,
+  }).addTo(_map);
+
+  // Subtle border labels layer on top (city names, country borders only)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 19,
+    opacity: 0.6,
   }).addTo(_map);
 }
 
