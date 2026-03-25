@@ -1150,7 +1150,7 @@
   /* ── MAP PANEL ─────────────────────────────────────────────────── */
   .map-panel { display:none; width:100%; }
   .map-panel.active { display:block; }
-  #seizure-map { width:100%; height:520px; background:#cfe8f7; border-radius:6px; border:1px solid #a0c8e8; }
+  #seizure-map { width:100%; height:520px; background:#0b1225; border-radius:6px; border:1px solid #162038; }
   .map-legend { display:flex; flex-wrap:wrap; gap:10px; padding:10px 0; }
   .legend-item { display:flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:10px; color:var(--text3); letter-spacing:0.08em; text-transform:uppercase; }
   .legend-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
@@ -1158,9 +1158,9 @@
   .map-popup-meta { font-family:var(--font-mono); font-size:10px; color:#8a9dbf; letter-spacing:0.06em; margin-bottom:8px; }
   .map-popup-link { font-family:var(--font-sans); font-size:11px; color:#d4a843; text-decoration:none; font-weight:600; }
   .map-popup-link:hover { text-decoration:underline; }
-  .leaflet-popup-content-wrapper { background:#ffffff; border:1px solid #1e3050; border-radius:6px; box-shadow:0 4px 20px rgba(0,0,0,0.5); }
+  .leaflet-popup-content-wrapper { background:#0e1a2e; border:1px solid #1e3050; border-radius:6px; box-shadow:0 4px 20px rgba(0,0,0,0.5); }
   .leaflet-popup-content { margin:12px 14px; max-width:260px; }
-  .leaflet-popup-tip { background:#ffffff; }
+  .leaflet-popup-tip { background:#0e1a2e; }
   .leaflet-container { font-family:var(--font-sans); }
   .map-stats { display:flex; gap:16px; padding:8px 0 12px; border-bottom:1px solid #1e3050; margin-bottom:12px; }
   .map-stat { font-family:var(--font-mono); font-size:10px; color:var(--text3); letter-spacing:0.1em; text-transform:uppercase; }
@@ -1195,6 +1195,30 @@
   .source-card-type{font-family:var(--font-mono);font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;}
   .source-card-desc{font-family:var(--font-sans);font-size:11px;color:var(--text2);line-height:1.4;}
   .source-tag-live{font-family:var(--font-mono);font-size:9px;color:#3aad72;background:rgba(58,173,114,0.12);border:1px solid rgba(58,173,114,0.3);border-radius:3px;padding:2px 6px;}
+
+  /* Map integration — navy palette to match site */
+  #map-panel { background: transparent; }
+  .map-stats { gap:24px; padding:10px 0 12px; border-bottom:1px solid #162038; margin-bottom:14px; }
+  .map-stat span { color:#e8edf5; font-size:18px; font-family:'DM Mono',monospace; font-weight:600; display:block; }
+  .map-stat { font-family:'DM Mono',monospace; font-size:9px; color:#4a6a9a; letter-spacing:0.12em; text-transform:uppercase; }
+  #seizure-map { border-radius:6px; border:1px solid #162038; }
+  /* Legend */
+  .map-legend { display:flex; flex-wrap:wrap; gap:12px; padding:12px 0 4px; border-top:1px solid #162038; margin-top:12px; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; font-size:9px; color:#4a6a9a; letter-spacing:0.1em; text-transform:uppercase; }
+  .legend-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  /* Leaflet controls — match dark theme */
+  .leaflet-bar a { background:#0e1a2e !important; color:#8a9dbf !important; border-color:#162038 !important; }
+  .leaflet-bar a:hover { background:#162038 !important; color:#e8edf5 !important; }
+  /* Popup */
+  .leaflet-popup-content-wrapper { background:#0e1a2e; border:1px solid #1e3050; border-radius:6px; box-shadow:0 4px 24px rgba(0,0,0,0.6); }
+  .leaflet-popup-tip { background:#0e1a2e; }
+  .leaflet-popup-content { margin:12px 14px; max-width:260px; }
+  .map-popup-headline { font-family:'DM Sans',sans-serif; font-size:13px; font-weight:600; color:#e8edf5; line-height:1.4; margin-bottom:6px; }
+  .map-popup-meta { font-family:'DM Mono',monospace; font-size:10px; color:#4a6a9a; letter-spacing:0.06em; margin-bottom:8px; }
+  .map-popup-link { font-family:'DM Sans',sans-serif; font-size:11px; color:#b8892a; text-decoration:none; font-weight:600; }
+  .map-popup-link:hover { color:#d4a843; text-decoration:underline; }
+  .leaflet-container a { color:#b8892a; }
+  .leaflet-container { font-family:'DM Sans',sans-serif; background:#0b1225; }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -2354,7 +2378,7 @@ function initMap() {
   });
 
   // Dark tile layer (CartoDB dark matter — no API key needed)
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter_lite/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19,
