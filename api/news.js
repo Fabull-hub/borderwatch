@@ -266,28 +266,25 @@ function guessBadge(text) {
 async function fetchFeed(feed) {
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000); // 4s per feed
+    const timer = setTimeout(() => controller.abort(), 2500);
     const res = await fetch(feed.url, {
       signal: controller.signal,
       headers: { 'User-Agent': 'BorderTrend/1.0 (+https://bordertrend.com)' },
     });
-    clearTimeout(timeout);
+    clearTimeout(timer);
     if (!res.ok) return [];
     const xml = await res.text();
     return parseRSS(xml, feed);
   } catch { return []; }
 }
 
-// Fetch feeds in batches to stay within Vercel 15s limit
+// Race all feeds in parallel against a hard 10s deadline
 async function fetchAllFeeds(feeds) {
-  const BATCH = 25; // 25 concurrent, ~4s each = well under 15s
-  const results = [];
-  for (let i = 0; i < feeds.length; i += BATCH) {
-    const batch = feeds.slice(i, i + BATCH);
-    const batchResults = await Promise.all(batch.map(fetchFeed));
-    results.push(...batchResults);
-  }
-  return results;
+  const deadline = new Promise(resolve =>
+    setTimeout(() => resolve([]), 10000)
+  );
+  const allFetches = Promise.all(feeds.map(fetchFeed)).then(r => r.flat());
+  return Promise.race([allFetches, deadline]);
 }
 
 async function fetchNewsAPI(apiKey) {
