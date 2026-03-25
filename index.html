@@ -1155,8 +1155,15 @@
     height: 520px;
     background: #060b18;
     border-radius: 6px;
-    border: 1px solid #162038;
-    filter: hue-rotate(200deg) saturate(0.4) brightness(0.85);
+    border: 1px solid #1e3a5a;
+  }
+  /* Apply navy tint ONLY to tile images — keeps markers vivid */
+  #seizure-map .leaflet-tile-pane img {
+    filter: hue-rotate(185deg) saturate(0.35) brightness(0.8) contrast(1.1);
+  }
+  /* Keep labels readable */
+  #seizure-map .leaflet-overlay-pane img {
+    filter: none;
   }
   .map-legend { display:flex; flex-wrap:wrap; gap:10px; padding:10px 0; }
   .legend-item { display:flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:10px; color:var(--text3); letter-spacing:0.08em; text-transform:uppercase; }
@@ -1227,14 +1234,14 @@
   .leaflet-container a { color:#b8892a; }
   .leaflet-container { font-family:'DM Sans',sans-serif; background:#0b1225; }
 
-  .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-    filter: hue-rotate(-200deg) saturate(2.5) brightness(1.18);
+    .leaflet-popup-content-wrapper {
     background: #0b1225 !important;
     border: 1px solid #1e3050 !important;
     border-radius: 6px !important;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6) !important;
     color: #dde6f5 !important;
   }
+  .leaflet-popup-tip { background: #0b1225 !important; }
   .map-popup-headline { color: #fff; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; line-height: 1.4; margin-bottom: 5px; }
   .map-popup-meta { color: #8a9dbf; font-family: 'DM Mono', monospace; font-size: 10px; margin-bottom: 8px; }
   .map-popup-link { color: #d4a843; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 600; text-decoration: none; }
@@ -2367,17 +2374,22 @@ const BADGE_COLORS = {
 };
 
 function makeMarkerIcon(badge) {
-  const color = BADGE_COLORS[badge] || '#d4a843';
+  var COLORS = {
+    seized: '#ff4444', narco: '#ff8c00', maritime: '#4a9eff',
+    human: '#cc66ff', border: '#ffd700', cargo: '#ffd700',
+    airport: '#ffd700', wildlife: '#44dd66', weapons: '#ff2222'
+  };
+  var color = COLORS[badge] || '#ffd700';
   return L.divIcon({
     className: '',
-    html: `<div style="
-      width:12px;height:12px;border-radius:50%;
-      background:${color};
-      border:2px solid rgba(255,255,255,0.3);
-      box-shadow:0 0 8px ${color}88;
-    "></div>`,
-    iconSize: [12, 12],
-    iconAnchor: [6, 6],
+    html: '<div style="'
+      + 'width:14px;height:14px;border-radius:50%;'
+      + 'background:' + color + ';'
+      + 'border:2px solid rgba(255,255,255,0.5);'
+      + 'box-shadow:0 0 10px ' + color + ',0 0 4px ' + color + ';'
+      + '"></div>',
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
   });
 }
 
