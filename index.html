@@ -1158,7 +1158,9 @@
     border: none;
   }
   /* Apply navy tint ONLY to tile images — keeps markers vivid */
-  .map-tiles { opacity: 0.9; }
+  .map-tiles {
+  filter: invert(100%) hue-rotate(195deg) saturate(0.5) brightness(0.65) contrast(1.1);
+}
 
   /* Keep labels readable */
   .map-legend { display:flex; flex-wrap:wrap; gap:10px; padding:10px 0; }
@@ -2483,11 +2485,10 @@ function initMap() {
     attributionControl: true,
   });
 
-  // dark_matter gives navy-toned land masses that blend with the site palette
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_matter/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
+  L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png', {
+    attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>',
     subdomains: 'abcd',
-    maxZoom: 19,
+    maxZoom: 20,
     className: 'map-tiles',
   }).addTo(_map);
 }
