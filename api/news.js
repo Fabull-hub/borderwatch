@@ -283,30 +283,66 @@ async function fetchFeed(feed) {
 async function fetchNewsAPI(apiKey) {
   const articles = [];
   if (!apiKey) return articles;
-  const query = 'smuggling OR "border seizure" OR trafficking OR "customs bust" OR contraband OR "drug seizure" OR "arms trafficking"';
-  const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&language=en&sortBy=publishedAt&pageSize=30&apiKey=${apiKey}`;
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.articles) {
-      for (const a of data.articles) {
-        const badge = guessBadge(a.title + ' ' + (a.description || ''));
-        articles.push({
-          headline: a.title,
-          summary: a.description || '',
-          url: a.url,
-          source: a.source?.name || 'News',
-          region: 'Global',
-          badge,
-          badgeLabel: BADGE_MAP[badge] || 'NEWS',
-          time: formatTime(new Date(a.publishedAt)),
-          timeClass: (Date.now() - new Date(a.publishedAt)) < 3600000 ? 'time-recent' :
-                     (Date.now() - new Date(a.publishedAt)) < 86400000 ? 'time-today' : 'time-old',
-        });
-      }
-    }
-  } catch {}
-  return articles;
+  const queries = [
+    { q: 'smuggling OR "border seizure" OR "customs bust" OR contraband', badge: 'seized' },
+    { q: '"drug seizure" OR "cocaine seized" OR fentanyl trafficking OR narcotics bust', badge: 'narco' },
+    { q: '"human trafficking" OR "migrant smuggling" OR "people smuggling"', badge: 'human' },
+    { q: '"arms trafficking" OR "weapons seized" OR "gun smuggling"', badge: 'weapons' },
+    { q: '"wildlife trafficking" OR "ivory seizure" OR "pangolin" OR poaching', badge: 'wildlife' },
+    { q: '"maritime seizure" OR "coast guard" drug OR "narco submarine"', badge: 'maritime' },
+  ];
+  const base = 'https://newsapi.org/v2/everything?language=en&sortBy=publishedAt&pageSize=10';
+  const results = await Promise.all(queries.map(async ({ q, badge }) => {
+    try {
+      const res = await fetch(`${base}&q=${encodeURIComponent(q)}&apiKey=${apiKey}`);
+      const data = await res.json();
+      if (!data.articles) return [];
+      return data.articles.map(a => ({
+        headline: a.title,
+        summary: a.description || '',
+        url: a.url,
+        source: a.source?.name || 'News',
+        region: 'Global',
+        badge,
+        badgeLabel: BADGE_MAP[badge] || 'NEWS',
+        time: formatTime(new Date(a.publishedAt)),
+        timeClass: (Date.now() - new Date(a.publishedAt)) < 3600000 ? 'time-recent' :
+                   (Date.now() - new Date(a.publishedAt)) < 86400000 ? 'time-today' : 'time-old',
+        publishedAt: a.publishedAt,
+        imageUrl: a.urlToImage || null,
+      }));
+    } catch { return []; }
+  }));
+  return results.flat();
+}
+
+// Pick the best hero story from premium investigative sources
+function pickHero(articles) {
+  const HERO_SOURCES = ['OCCRP', 'Europol', 'InSight Crime', 'Reuters', 'US CBP',
+    'DEA', 'UK NCA', 'Australia ABF', 'Frontex', 'INTERPOL', 'UNODC',
+    'Global Witness', 'TRAFFIC (Wildlife)', 'US DOJ', 'FBI'];
+  // Filter to trusted sources with real summaries, from today or yesterday
+  const cutoff = Date.now() - 48 * 3600000;
+  const candidates = articles.filter(a =>
+    HERO_SOURCES.includes(a.source) &&
+    a.summary && a.summary.length > 60 &&
+    a.url && !a.url.includes('youtube') &&
+    new Date(a.publishedAt || 0).getTime() > cutoff
+  ).sort((a, b) => new Date(b.publishedAt || 0) - new Date(a.publishedAt || 0));
+
+  if (candidates.length === 0) return null;
+  const hero = candidates[0];
+  return {
+    headline: hero.headline,
+    deck: hero.summary.replace(/<[^>]+>/g, '').substring(0, 320),
+    url: hero.url,
+    source: hero.source,
+    region: hero.region,
+    badge: hero.badge,
+    badgeLabel: hero.badgeLabel,
+    time: hero.time,
+    imageUrl: hero.imageUrl || null,
+  };
 }
 
 export default async function handler(req, res) {
@@ -317,35 +353,46 @@ export default async function handler(req, res) {
   const { category = 'all', page = '1' } = req.query;
 
   try {
-    const feedResults = await Promise.all(RSS_FEEDS.map(fetchFeed));
-    let articles = feedResults.flat();
+    // Fetch RSS feeds and NewsAPI in parallel
+    const [feedResults, newsApiArticles] = await Promise.all([
+      Promise.all(RSS_FEEDS.map(fetchFeed)),
+      fetchNewsAPI(process.env.NEWSAPI_KEY),
+    ]);
 
-    const newsApiArticles = await fetchNewsAPI(process.env.NEWSAPI_KEY);
-    articles = [...articles, ...newsApiArticles];
+    let articles = [...feedResults.flat(), ...newsApiArticles];
 
-    if (category !== 'all') {
-      articles = articles.filter(a => a.badge === category);
-    }
-
+    // Sort by recency
     const order = { 'time-recent': 0, 'time-today': 1, 'time-old': 2 };
     articles.sort((a, b) => (order[a.timeClass] ?? 2) - (order[b.timeClass] ?? 2));
 
+    // Deduplicate by headline
     const seen = new Set();
     articles = articles.filter(a => {
-      const key = a.headline.substring(0, 60).toLowerCase().replace(/\s+/g, ' ').trim();
+      const key = a.headline.substring(0, 60).toLowerCase().replace(/s+/g, ' ').trim();
       if (seen.has(key)) return false;
       seen.add(key);
       return true;
     });
 
+    // Pick automatic hero story
+    const hero = pickHero(articles);
+
+    // Filter by category after hero selection
+    const filtered = category !== 'all'
+      ? articles.filter(a => a.badge === category)
+      : articles;
+
     const pageNum = parseInt(page, 10) || 1;
     const perPage = 20;
-    const total = articles.length;
-    const paginated = articles.slice((pageNum - 1) * perPage, pageNum * perPage);
+    const paginated = filtered.slice((pageNum - 1) * perPage, pageNum * perPage);
 
     res.status(200).json({
-      ok: true, total, page: pageNum, perPage,
+      ok: true,
+      total: filtered.length,
+      page: pageNum,
+      perPage,
       articles: paginated,
+      hero,
       feedCount: RSS_FEEDS.length,
       fetchedAt: new Date().toISOString(),
     });
