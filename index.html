@@ -2173,11 +2173,26 @@ function renderSourcesGrid(filter) {
 
 function filterCategory(cat) {
   currentCategory = cat;
-  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-  event.target.classList.add('active');
-  renderArticles(cat);
-  const sub = cat === 'all' ? 'Live Feed · All Categories' : 'Live Feed · ' + cat.charAt(0).toUpperCase() + cat.slice(1);
-  document.getElementById('section-sub').textContent = sub;
+  // Update active nav tab
+  document.querySelectorAll('.nav-link').forEach(function(el) { el.classList.remove('active'); });
+  var links = document.querySelectorAll('.nav-link');
+  for (var i=0; i<links.length; i++) {
+    var oc = links[i].getAttribute('onclick') || '';
+    if (oc.indexOf("'"+cat+"'") !== -1) { links[i].classList.add('active'); break; }
+  }
+  // Hide map panel, show articles
+  var mapPanel = document.getElementById('map-panel');
+  var articleList = document.getElementById('article-list');
+  if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
+  if (articleList) articleList.style.display = '';
+  var sectionSub = document.getElementById('section-sub');
+  if (sectionSub) sectionSub.textContent = 'Live Feed · All Categories';
+  // Render filtered articles
+  if (window._liveData && window._liveData.articles) {
+    renderLiveArticles(window._liveData, cat);
+  } else {
+    fetchLiveNews(cat);
+  }
 }
 
 function filterSearch(query) {
@@ -2386,33 +2401,33 @@ function plotArticlesOnMap(articles) {
 }
 
 function showMap() {
-  // Toggle nav active
-  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-  document.getElementById('map-nav-btn').classList.add('active');
+  // Update nav active state
+  document.querySelectorAll('.nav-link').forEach(function(el) { el.classList.remove('active'); });
+  var btn = document.getElementById('map-nav-btn');
+  if (btn) btn.classList.add('active');
 
-  // Show map panel, hide article list
-  const articleList = document.getElementById('article-list');
-  const mapPanel = document.getElementById('map-panel');
-  const sectionSub = document.getElementById('section-sub');
-  if (articleList) articleList.style.display = 'none';
+  // Show map panel — keep article list visible below it
+  var mapPanel = document.getElementById('map-panel');
+  var sectionSub = document.getElementById('section-sub');
   if (mapPanel) { mapPanel.classList.add('active'); mapPanel.style.display = 'block'; }
   if (sectionSub) sectionSub.textContent = 'Live Incident Map · All Regions';
 
-  // Init map on first open (Leaflet needs the container to be visible)
-  setTimeout(() => {
+  // Initialise and plot
+  setTimeout(function() {
     initMap();
-    if (_liveArticles.length > 0) {
-      plotArticlesOnMap(_liveArticles);
-      _map.invalidateSize();
+    if (window._liveData && window._liveData.articles) {
+      plotArticlesOnMap(window._liveData.articles);
+    } else if (window._liveArticles && window._liveArticles.length > 0) {
+      plotArticlesOnMap(window._liveArticles);
     } else {
-      // Fetch if no articles cached yet
       fetch('/api/news?category=all&_t=' + Date.now())
-        .then(r => r.json())
-        .then(data => {
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
           if (data.articles) plotArticlesOnMap(data.articles);
           if (_map) _map.invalidateSize();
         });
     }
+    if (_map) _map.invalidateSize();
   }, 50);
 }
 
