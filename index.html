@@ -1833,26 +1833,49 @@ function renderLiveArticles(articles, filter) {
 }
 
 async function fetchLiveNews(category, force) {
-  const now = Date.now();
-  if (!force && _liveArticles.length > 0 && (now - _lastFetch) < CACHE_TTL) {
-    renderLiveArticles(_liveArticles, category); return;
+  var now = Date.now();
+  if (!force && window._liveArticles && window._liveArticles.length > 0 && (now - (window._lastFetch||0)) < CACHE_TTL) {
+    renderLiveArticles(window._liveArticles, category);
+    return;
   }
-  if (_isLoading) return;
-  _isLoading = true;
+  if (window._isLoading) return;
+  window._isLoading = true;
   showSkeleton();
   try {
-    const res = await fetch('/api/news?category=all&_t=' + Date.now())
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (data.ok && data.articles) {
-            window._liveArticles = data.articles;
-            window._lastFetch = Date.now();
-            renderLiveArticles(data.articles, currentCategory);
-            renderLatestAlerts(data.articles);
-          }
-        });
+    var res = await fetch('/api/news?category=' + (category||'all') + '&_t=' + now);
+    if (!res.ok) throw new Error('API ' + res.status);
+    var data = await res.json();
+    if (data.ok && data.articles && data.articles.length > 0) {
+      window._liveArticles = data.articles;
+      window._lastFetch = now;
+      var statEl = document.getElementById('stat-stories');
+      if (statEl) statEl.textContent = data.total || data.articles.length;
+      if (data.hero) {
+        var h = data.hero;
+        var elById = function(id) { return document.getElementById(id); };
+        if (elById('hero-headline')) elById('hero-headline').textContent = h.headline;
+        if (elById('hero-deck'))     elById('hero-deck').textContent     = h.deck;
+        if (elById('hero-link'))     elById('hero-link').href            = h.url;
+        if (elById('hero-source'))   elById('hero-source').textContent   = h.source;
+        if (elById('hero-time'))     elById('hero-time').textContent     = h.time + ' · ' + h.region;
+        if (elById('hero-badge')) {
+          elById('hero-badge').textContent = h.badgeLabel;
+          elById('hero-badge').className   = 'article-badge badge-' + h.badge;
+        }
+        if (elById('hero-visual-label')) elById('hero-visual-label').textContent = h.badgeLabel;
+      }
+      renderLiveArticles(data.articles, category);
+      renderLatestAlerts(data.articles);
+    } else {
+      throw new Error('empty');
     }
+  } catch(e) {
+    console.warn('BorderTrend API fallback:', e.message);
+    renderArticles(category || 'all');
   } finally {
+    window._isLoading = false;
+  }
+} finally {
     window._isLoading = false;
   }
 }
