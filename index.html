@@ -2029,33 +2029,31 @@ document.addEventListener('visibilitychange', function() {
 // Hard reload every 30 min so Edge never gets stale
 setTimeout(function() { location.reload(); }, 30 * 60 * 1000);
 
-// ─── INIT ────────────────────────────────────────────────────────────────────
+// ─── INIT ───────────────────────────────────────────────────────────────────
 
 var currentCategory = 'all';
 
 // filterCategory — called by nav tab onclick attributes
 function filterCategory(cat) {
   currentCategory = cat;
-  // Hide map, show article list
   var mapPanel = document.getElementById('map-panel');
   var articleList = document.getElementById('article-list');
   if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
   if (articleList) articleList.style.display = '';
-  // Update active nav tab
   document.querySelectorAll('.nav-link').forEach(function(el) { el.classList.remove('active'); });
-  var clicked = Array.from(document.querySelectorAll('.nav-link')).find(function(el) {
-    return el.getAttribute('onclick') && el.getAttribute('onclick').includes("'" + cat + "'");
-  });
-  if (clicked) clicked.classList.add('active');
-  // Fetch or render
+  var allLinks = document.querySelectorAll('.nav-link');
+  for (var i = 0; i < allLinks.length; i++) {
+    var oc = allLinks[i].getAttribute('onclick') || '';
+    if (oc.indexOf("'" + cat + "'") !== -1) { allLinks[i].classList.add('active'); break; }
+  }
   fetchLiveNews(cat, false);
 }
 
-// Boot — initial fetch on page load
-fetchLiveNews('all', true);
-
-// Auto-refresh every 5 minutes
-setInterval(function() { fetchLiveNews(currentCategory, true); }, CACHE_TTL);
+// Boot on DOMContentLoaded so all functions are guaranteed defined
+document.addEventListener('DOMContentLoaded', function() {
+  fetchLiveNews('all', true);
+  setInterval(function() { fetchLiveNews(currentCategory, true); }, CACHE_TTL);
+});
 
 </script>
 </body>
