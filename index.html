@@ -1981,14 +1981,7 @@ function showMap() {
   }, 50);
 }
 
-var _origFilterCategory = filterCategory;
-filterCategory = function(cat) {
-  var mapPanel = document.getElementById('map-panel');
-  var articleList = document.getElementById('article-list');
-  if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
-  if (articleList) articleList.style.display = '';
-  _origFilterCategory(cat);
-};
+// Nav tabs call filterCategory() directly via onclick — map panel hides via filterCategory wrapper below
 
 // ── LATEST ALERTS SIDEBAR ────────────────────────────────────────────────────
 function renderLatestAlerts(articles) {
@@ -2037,6 +2030,34 @@ document.addEventListener('visibilitychange', function() {
 setTimeout(function() { location.reload(); }, 30 * 60 * 1000);
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
+
+var currentCategory = 'all';
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// filterCategory — called by nav tab onclick attributes
+function filterCategory(cat) {
+  currentCategory = cat;
+  // Hide map, show article list
+  var mapPanel = document.getElementById('map-panel');
+  var articleList = document.getElementById('article-list');
+  if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
+  if (articleList) articleList.style.display = '';
+  // Update active nav tab
+  document.querySelectorAll('.nav-link').forEach(function(el) { el.classList.remove('active'); });
+  var clicked = Array.from(document.querySelectorAll('.nav-link')).find(function(el) {
+    return el.getAttribute('onclick') && el.getAttribute('onclick').includes("'" + cat + "'");
+  });
+  if (clicked) clicked.classList.add('active');
+  // Fetch or render
+  fetchLiveNews(cat, false);
+}
+
+// Boot — initial fetch on page load
+fetchLiveNews('all', true);
+
+// Auto-refresh every 5 minutes
+setInterval(function() { fetchLiveNews(currentCategory, true); }, CACHE_TTL);
+
 </script>
 </body>
 </html>
