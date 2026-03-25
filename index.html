@@ -1297,18 +1297,25 @@
 
       <!-- HERO STORY -->
       <div class="hero-card" id="hero-block">
-        <div class="hero-visual">
-          <div class="hero-visual-label">CARGO</div>
+        <div class="hero-visual" id="hero-visual">
+          <div class="hero-visual-label" id="hero-visual-label">CARGO</div>
         </div>
         <div class="hero-content">
           <div>
-            <div class="hero-tag">◆ LEAD STORY · MARITIME CARGO</div>
-            <div class="hero-headline" id="hero-headline">Record cocaine haul in Rotterdam: 8.5 tonnes seized hidden inside banana reefer containers from Ecuador</div>
+            <div class="hero-tag" id="hero-tag">
+              <span class="article-badge badge-seized" id="hero-badge">SEIZURES</span>
+              LEAD STORY
+            </div>
+            <a class="hero-link" id="hero-link" href="https://www.bellingcat.com/news/2024/07/11/record-cocaine-haul-in-rotterdam/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;display:block;">
+              <div class="hero-headline" id="hero-headline">Record cocaine haul in Rotterdam: 8.5 tonnes seized hidden inside banana reefer containers from Ecuador</div>
+            </a>
             <div class="hero-deck" id="hero-deck">Dutch customs and the Royal Marechaussee conducted the largest cocaine interception in European port history, working with Ecuadorian authorities and Europol under Operation Tropicana. The shipment — embedded in refrigerated fruit crates — is estimated at €600 million street value.</div>
           </div>
           <div class="hero-meta">
-            <a class="source-pill" href="https://www.bellingcat.com" target="_blank" rel="noopener">↗ Bellingcat</a>
-            <span id="hero-time" style="font-family:var(--font-mono);font-size:10px;color:var(--text3)">2h ago · Netherlands</span>
+            <a class="source-pill" id="hero-source-link" href="https://www.bellingcat.com" target="_blank" rel="noopener">
+              <span>&#8599;</span> <span id="hero-source">Bellingcat</span>
+            </a>
+            <span class="hero-time" id="hero-time">2h ago &middot; Netherlands</span>
           </div>
         </div>
       </div>
@@ -1771,33 +1778,50 @@ function renderLiveArticles(articles, filter) {
   </a>`).join('');
 }
 
-async function fetchLiveNews(category = 'all', force = false) {
+async function fetchLiveNews(category, force) {
   const now = Date.now();
   if (!force && _liveArticles.length > 0 && (now - _lastFetch) < CACHE_TTL) {
-    renderArticlesFromData(_liveArticles, category);
-    return;
+    renderLiveArticles(_liveArticles, category); return;
   }
   if (_isLoading) return;
   _isLoading = true;
   showSkeleton();
   try {
-    const url = `/api/news?category=${category}&_t=${Math.floor(now / CACHE_TTL)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('API error ' + res.status);
+    const res = await fetch('/api/news?category=' + (category || 'all') + '&_t=' + now);
+    if (!res.ok) throw new Error('API ' + res.status);
     const data = await res.json();
-    if (data.ok && data.articles?.length > 0) {
+    if (data.ok && data.articles && data.articles.length > 0) {
       _liveArticles = data.articles;
       _lastFetch = now;
-      document.getElementById('stat-stories').textContent = data.total || data.articles.length;
-      renderArticlesFromData(data.articles, category);
-    } else {
-      throw new Error('Empty response');
-    }
-  } catch (err) {
-    showApiError(() => renderArticlesFromData(ARTICLES_FALLBACK, category));
-  } finally {
-    _isLoading = false;
-  }
+
+      // ── Stories Today counter ──
+      const statEl = document.getElementById('stat-stories');
+      if (statEl) statEl.textContent = data.total || data.articles.length;
+
+      // ── Auto hero rotation ──
+      if (data.hero) {
+        const h = data.hero;
+        const el = id => document.getElementById(id);
+        if (el('hero-headline')) el('hero-headline').textContent = h.headline;
+        if (el('hero-deck'))     el('hero-deck').textContent     = h.deck;
+        if (el('hero-link'))     el('hero-link').href            = h.url;
+        if (el('hero-source'))   el('hero-source').textContent   = h.source;
+        if (el('hero-time'))     el('hero-time').textContent     = h.time + ' · ' + h.region;
+        if (el('hero-badge')) {
+          el('hero-badge').textContent  = h.badgeLabel;
+          el('hero-badge').className    = 'article-badge badge-' + h.badge;
+        }
+        if (el('hero-visual-label')) {
+          el('hero-visual-label').textContent = h.badgeLabel;
+        }
+      }
+
+      renderLiveArticles(data.articles, category);
+    } else { throw new Error('empty'); }
+  } catch(e) {
+    console.warn('BorderTrend API fallback:', e.message);
+    renderArticles(category || 'all');
+  } finally { _isLoading = false; }
 }
 
 function renderArticlesFromData(articles, filter) {
