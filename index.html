@@ -1464,7 +1464,21 @@
           <span class="sidebar-count" id="alert-count">Live</span>
         </div>
         <div id="latest-alerts" style="display:flex;flex-direction:column;gap:8px;padding-top:6px;">
-          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text3);text-align:center;padding:12px 0;">Loading alerts...</div>
+          <div class="alert-item" style="pointer-events:none;">
+            <div style="height:8px;background:var(--bg4);border-radius:3px;width:60%;margin-bottom:6px;"></div>
+            <div style="height:11px;background:var(--bg4);border-radius:3px;width:95%;margin-bottom:4px;"></div>
+            <div style="height:8px;background:var(--bg4);border-radius:3px;width:45%;"></div>
+          </div>
+          <div class="alert-item" style="pointer-events:none;">
+            <div style="height:8px;background:var(--bg4);border-radius:3px;width:50%;margin-bottom:6px;"></div>
+            <div style="height:11px;background:var(--bg4);border-radius:3px;width:90%;margin-bottom:4px;"></div>
+            <div style="height:8px;background:var(--bg4);border-radius:3px;width:40%;"></div>
+          </div>
+          <div class="alert-item" style="pointer-events:none;">
+            <div style="height:8px;background:var(--bg4);border-radius:3px;width:55%;margin-bottom:6px;"></div>
+            <div style="height:11px;background:var(--bg4);border-radius:3px;width:85%;margin-bottom:4px;"></div>
+            <div style="height:8px;background:var(--bg4);border-radius:3px;width:35%;"></div>
+          </div>
         </div>
         <div style="padding-top:10px;border-top:1px solid var(--bg4);margin-top:6px;">
           <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;text-align:center;">Updates every 5 minutes</div>
@@ -2053,7 +2067,13 @@ function filterCategory(cat) {
 document.addEventListener('DOMContentLoaded', function() {
   fetchLiveNews('all', true);
   setInterval(function() { fetchLiveNews(currentCategory, true); }, CACHE_TTL);
-});
+  // Poll once after 3s to ensure Latest Alerts renders even if fetchLiveNews finished early
+  setTimeout(function() {
+    if (window._liveArticles && window._liveArticles.length > 0) {
+      renderLatestAlerts(window._liveArticles);
+    }
+  }, 3000);
+}));
 
 </script>
 </body>
