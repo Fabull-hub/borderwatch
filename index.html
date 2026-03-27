@@ -2028,6 +2028,8 @@ async function fetchLiveNews(category, force) {
         }
       }
 
+      window._liveArticles = data.articles;
+      window._lastFetch = Date.now();
       renderLiveArticles(data.articles, category);
     } else { throw new Error('empty'); }
   } catch(e) {
@@ -2314,7 +2316,7 @@ function filterCategory(cat) {
   if (sectionSub) sectionSub.textContent = 'Live Feed · All Categories';
   // Render filtered articles
   if (window._liveData && window._liveData.articles) {
-    renderLiveArticles(window._liveData, cat);
+    renderLiveArticles(window._liveArticles, cat);
   } else {
     fetchLiveNews(cat);
   }
