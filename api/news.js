@@ -2,71 +2,59 @@
 // bordertrend.com | Auto-deploys on Vercel
 
 const RSS_FEEDS = [
+  // ── SEIZED / INVESTIGATIONS ───────────────────────────────────────────
+  { url: 'https://www.europol.europa.eu/rss.xml',                         source: 'Europol',              region: 'Europe',        badge: 'seized' },
+  { url: 'https://www.occrp.org/en/feed',                                 source: 'OCCRP',               region: 'Global',        badge: 'seized' },
+  { url: 'https://www.interpol.int/rss/News-and-media/News',              source: 'INTERPOL',            region: 'Global',        badge: 'seized' },
+  { url: 'https://insightcrime.org/feed/',                                source: 'InSight Crime',        region: 'Latin America', badge: 'narco'  },
+  { url: 'https://www.globalinitiative.net/feed/',                        source: 'Global Initiative',   region: 'Global',        badge: 'seized' },
+  { url: 'https://www.unodc.org/rss/unodc_news_en.xml',                  source: 'UNODC',               region: 'Global',        badge: 'narco'  },
+  { url: 'https://www.ice.gov/rss',                                       source: 'ICE',                 region: 'Americas',      badge: 'border' },
 
-  // ── GLOBAL INTELLIGENCE (fastest, most reliable) ─────────────────────────
-  { url: 'https://www.interpol.int/rss/News-and-media/News', source: 'INTERPOL', region: 'Global', badge: 'seized' },
-  { url: 'https://www.unodc.org/rss/unodc_news_en.xml', source: 'UNODC', region: 'Global', badge: 'narco' },
-  { url: 'https://www.wcoomd.org/en/media/newsroom/rss.ashx', source: 'WCO', region: 'Global', badge: 'cargo' },
-  { url: 'https://www.europol.europa.eu/rss.xml', source: 'Europol', region: 'Europe', badge: 'seized' },
-  { url: 'https://frontex.europa.eu/rss', source: 'Frontex', region: 'Europe', badge: 'border' },
-  { url: 'https://cites.org/eng/news/rss.xml', source: 'CITES', region: 'Global', badge: 'wildlife' },
-  { url: 'https://www.iom.int/rss.xml', source: 'IOM', region: 'Global', badge: 'human' },
+  // ── CARGO / TRADE ────────────────────────────────────────────────────
+  { url: 'https://www.wcoomd.org/en/media/newsroom/rss.ashx',            source: 'WCO',                 region: 'Global',        badge: 'cargo'  },
+  { url: 'https://www.cbp.gov/rss.xml',                                  source: 'US CBP',              region: 'Americas',      badge: 'cargo'  },
+  { url: 'https://www.freightwaves.com/news/feed',                       source: 'FreightWaves',        region: 'Global',        badge: 'cargo'  },
+  { url: 'https://www.logisticsmgmt.com/rss/news',                      source: 'Logistics Mgmt',      region: 'Global',        badge: 'cargo'  },
+  { url: 'https://www.supplychaindive.com/feeds/news/',                 source: 'Supply Chain Dive',   region: 'Global',        badge: 'cargo'  },
 
-  // ── INVESTIGATIVE JOURNALISM ─────────────────────────────────────────────
-  { url: 'https://www.occrp.org/en/feed', source: 'OCCRP', region: 'Global', badge: 'seized' },
-  { url: 'https://feeds.reuters.com/reuters/worldNews', source: 'Reuters World', region: 'Global', badge: 'border' },
-  { url: 'https://www.globalwitness.org/en/feed/', source: 'Global Witness', region: 'Global', badge: 'cargo' },
-  { url: 'https://www.traffic.org/feed/', source: 'TRAFFIC (Wildlife)', region: 'Global', badge: 'wildlife' },
-  { url: 'https://insightcrime.org/feed/', source: 'InSight Crime', region: 'Latin America', badge: 'narco' },
-  { url: 'https://www.globalinitiative.net/feed/', source: 'Global Initiative Against Organized Crime', region: 'Global', badge: 'seized' },
+  // ── AIRPORT ──────────────────────────────────────────────────────────
+  { url: 'https://www.tsa.gov/news-releases/feed',                      source: 'TSA',                 region: 'Americas',      badge: 'airport'},
+  { url: 'https://www.airport-technology.com/feed/',                    source: 'Airport Technology',  region: 'Global',        badge: 'airport'},
+  { url: 'https://aviationsourcenews.com/feed/',                        source: 'Aviation Source',     region: 'Global',        badge: 'airport'},
+  { url: 'https://www.avsec.com/feed',                                  source: 'AVSEC',               region: 'Global',        badge: 'airport'},
 
-  // ── US OFFICIAL ───────────────────────────────────────────────────────────
-  { url: 'https://www.cbp.gov/newsroom/rss', source: 'US CBP', region: 'North America', badge: 'border' },
-  { url: 'https://www.dea.gov/rss.xml', source: 'DEA', region: 'North America', badge: 'narco' },
-  { url: 'https://www.atf.gov/rss.xml', source: 'ATF', region: 'North America', badge: 'weapons' },
-  { url: 'https://www.ice.gov/rss.xml', source: 'ICE', region: 'North America', badge: 'border' },
-  { url: 'https://www.justice.gov/feeds/opa/justice-news.xml', source: 'US DOJ', region: 'North America', badge: 'seized' },
-  { url: 'https://www.fbi.gov/feeds/fbi-in-the-news/rss.xml', source: 'FBI', region: 'North America', badge: 'seized' },
-  { url: 'https://www.uscg.mil/rss/news/', source: 'US Coast Guard', region: 'North America', badge: 'maritime' },
-  { url: 'https://www.dhs.gov/dhs-news-releases-rss', source: 'DHS', region: 'North America', badge: 'border' },
+  // ── LAND BORDER ──────────────────────────────────────────────────────
+  { url: 'https://frontex.europa.eu/rss',                               source: 'Frontex',             region: 'Europe',        badge: 'border' },
+  { url: 'https://www.borderreport.com/feed/',                          source: 'Border Report',       region: 'Americas',      badge: 'border' },
+  { url: 'https://www.borderlandbeat.com/feeds/posts/default',         source: 'Borderland Beat',     region: 'Latin America', badge: 'border' },
 
-  // ── UK & COMMONWEALTH ────────────────────────────────────────────────────
-  { url: 'https://www.nationalcrimeagency.gov.uk/news/rss', source: 'UK NCA', region: 'Europe', badge: 'seized' },
-  { url: 'https://www.gov.uk/government/organisations/border-force.atom', source: 'UK Border Force', region: 'Europe', badge: 'border' },
-  { url: 'https://www.abf.gov.au/about-us/news-media/media-releases/rss', source: 'Australia ABF', region: 'Asia-Pacific', badge: 'border' },
-  { url: 'https://www.cbsa-asfc.gc.ca/media/rss-eng.xml', source: 'Canada CBSA', region: 'North America', badge: 'border' },
+  // ── HUMAN SMUGGLING ──────────────────────────────────────────────────
+  { url: 'https://www.iom.int/rss.xml',                                 source: 'IOM',                 region: 'Global',        badge: 'human'  },
+  { url: 'https://www.refworld.org/rss/news.xml',                       source: 'Refworld',            region: 'Global',        badge: 'human'  },
+  { url: 'https://mixedmigration.org/feed/',                            source: 'Mixed Migration',     region: 'Global',        badge: 'human'  },
+  { url: 'https://www.antislavery.org/feed/',                           source: 'Anti-Slavery Intl',   region: 'Global',        badge: 'human'  },
 
-  // ── EUROPE ────────────────────────────────────────────────────────────────
-  { url: 'https://www.zoll.de/SiteGlobals/Functions/RSSFeed/DE/RSSNewsfeed_Presse.xml', source: 'German Customs (Zoll)', region: 'Europe', badge: 'border' },
-  { url: 'https://www.douane.gouv.fr/rss.xml', source: 'French Customs', region: 'Europe', badge: 'border' },
-  { url: 'https://www.adm.gov.it/portale/rss', source: 'Italian Customs (ADM)', region: 'Europe', badge: 'border' },
+  // ── NARCOTICS ─────────────────────────────────────────────────────────
+  { url: 'https://www.dea.gov/rss.xml',                                 source: 'DEA',                 region: 'Americas',      badge: 'narco'  },
+  { url: 'https://www.emcdda.europa.eu/rss/news_en',                   source: 'EMCDDA',              region: 'Europe',        badge: 'narco'  },
+  { url: 'https://www.talkingdrugs.org/feed',                          source: 'Talking Drugs',       region: 'Global',        badge: 'narco'  },
 
-  // ── LATIN AMERICA ─────────────────────────────────────────────────────────
-  { url: 'https://www.inl.state.gov/rss/', source: 'US INL', region: 'Latin America', badge: 'narco' },
-  { url: 'https://insightcrime.org/category/news/rss', source: 'InSight Crime Narcotics', region: 'Latin America', badge: 'narco' },
+  // ── WEAPONS ──────────────────────────────────────────────────────────
+  { url: 'https://www.sipri.org/rss.xml',                               source: 'SIPRI',               region: 'Global',        badge: 'weapons'},
+  { url: 'https://smallarmssurvey.org/feed',                            source: 'Small Arms Survey',   region: 'Global',        badge: 'weapons'},
+  { url: 'https://www.atf.gov/press-releases/rss.xml',                 source: 'ATF',                 region: 'Americas',      badge: 'weapons'},
 
-  // ── ASIA-PACIFIC ──────────────────────────────────────────────────────────
-  { url: 'https://www.customs.gov.sg/news-and-media/press-releases/rss', source: 'Singapore Customs', region: 'Asia-Pacific', badge: 'cargo' },
-  { url: 'https://www.customs.go.jp/english/rss.xml', source: 'Japan Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  // ── MARITIME ─────────────────────────────────────────────────────────
+  { url: 'https://www.imo.org/en/MediaCentre/PressBriefings/rss',      source: 'IMO',                 region: 'Global',        badge: 'maritime'},
+  { url: 'https://gcaptain.com/feed/',                                  source: 'gCaptain',            region: 'Global',        badge: 'maritime'},
+  { url: 'https://www.maritime-executive.com/rss',                     source: 'Maritime Executive',  region: 'Global',        badge: 'maritime'},
+  { url: 'https://www.icc-ccs.org/index.php/1158-latest-news?format=feed&type=rss', source: 'ICC-CCS Piracy', region: 'Global', badge: 'maritime'},
 
-  // ── MIDDLE EAST ───────────────────────────────────────────────────────────
-  { url: 'https://zatca.gov.sa/en/MediaCenter/News/Pages/rss.aspx', source: 'Saudi Customs (ZATCA)', region: 'Middle East', badge: 'cargo' },
-
-  // ── AFRICA ────────────────────────────────────────────────────────────────
-  { url: 'https://www.sars.gov.za/rss/media-releases.xml', source: 'South Africa SARS', region: 'Africa', badge: 'border' },
-  { url: 'https://www.revenue.go.ke/rss', source: 'Kenya Revenue Authority', region: 'Africa', badge: 'border' },
-
-  // ── FINANCIAL CRIMES ─────────────────────────────────────────────────────
-  { url: 'https://www.transparency.org/en/rss', source: 'Transparency International', region: 'Global', badge: 'seized' },
-  { url: 'https://www.fatf-gafi.org/en/publications/rss.xml', source: 'FATF', region: 'Global', badge: 'seized' },
-
-  // ── WEAPONS & HUMAN ──────────────────────────────────────────────────────
-  { url: 'https://www.sipri.org/rss/news', source: 'SIPRI', region: 'Global', badge: 'weapons' },
-  { url: 'https://www.unodc.org/rss/unodc_human_trafficking_en.xml', source: 'UNODC Human Trafficking', region: 'Global', badge: 'human' },
-  { url: 'https://www.unodc.org/rss/unodc_drugs_en.xml', source: 'UNODC Drugs', region: 'Global', badge: 'narco' },
-
-  // ── MARITIME ─────────────────────────────────────────────────────────────
-  { url: 'https://www.imo.org/en/MediaCentre/Pages/rss.aspx', source: 'IMO', region: 'Global', badge: 'maritime' },
+  // ── WILDLIFE ─────────────────────────────────────────────────────────
+  { url: 'https://cites.org/eng/news/rss.xml',                         source: 'CITES',               region: 'Global',        badge: 'wildlife'},
+  { url: 'https://www.traffic.org/feed/',                               source: 'TRAFFIC',             region: 'Global',        badge: 'wildlife'},
+  { url: 'https://www.wwf.org.uk/rss.xml',                             source: 'WWF',                 region: 'Global',        badge: 'wildlife'},
 ];
 
 const BADGE_MAP = {
@@ -135,7 +123,7 @@ function guessBadge(text) {
 async function fetchFeed(feed) {
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 2500);
+    const timer = setTimeout(() => controller.abort(), 4000);
     const res = await fetch(feed.url, {
       signal: controller.signal,
       headers: { 'User-Agent': 'BorderTrend/1.0 (+https://bordertrend.com)' },
@@ -156,40 +144,44 @@ async function fetchAllFeeds(feeds) {
   return Promise.race([allFetches, deadline]);
 }
 
-async function fetchNewsAPI(apiKey) {
-  const articles = [];
-  if (!apiKey) return articles;
+async function fetchNewsAPI(key) {
   const queries = [
-    { q: 'smuggling OR "border seizure" OR "customs bust" OR contraband', badge: 'seized' },
-    { q: '"drug seizure" OR "cocaine seized" OR fentanyl trafficking OR "narcotics bust"', badge: 'narco' },
-    { q: '"human trafficking" OR "migrant smuggling" OR "people smuggling"', badge: 'human' },
-    { q: '"arms trafficking" OR "weapons seized" OR "gun smuggling"', badge: 'weapons' },
-    { q: '"wildlife trafficking" OR "ivory seizure" OR pangolin OR poaching', badge: 'wildlife' },
-    { q: '"maritime seizure" OR "coast guard" drug OR "narco submarine"', badge: 'maritime' },
+    { q: 'drug seizure OR narcotics smuggling OR fentanyl trafficking',      badge: 'narco',    label: 'NARCOTICS',         region: 'Global'  },
+    { q: 'border seizure OR customs bust OR smuggling arrested',             badge: 'seized',   label: 'SEIZURES',          region: 'Global'  },
+    { q: 'cargo fraud OR trade smuggling OR container seized customs',       badge: 'cargo',    label: 'CARGO',             region: 'Global'  },
+    { q: 'airport security OR airport drugs seized OR airport smuggling',    badge: 'airport',  label: 'AIRPORT',           region: 'Global'  },
+    { q: 'human trafficking OR migrant smuggling OR people smuggling',       badge: 'human',    label: 'HUMAN SMUGGLING',   region: 'Global'  },
+    { q: 'weapons smuggling OR arms trafficking OR illegal firearms seized', badge: 'weapons',  label: 'WEAPONS',           region: 'Global'  },
+    { q: 'maritime smuggling OR coast guard seizure OR drug boat intercepted', badge: 'maritime', label: 'MARITIME',        region: 'Global'  },
+    { q: 'wildlife trafficking OR illegal wildlife trade OR poaching bust',  badge: 'wildlife', label: 'WILDLIFE TRAFFICKING', region: 'Global'},
+    { q: 'land border seizure OR checkpoint drugs OR border patrol arrest',  badge: 'border',   label: 'LAND BORDER',       region: 'Global'  },
   ];
-  const base = 'https://newsapi.org/v2/everything?language=en&sortBy=publishedAt&pageSize=10';
-  const results = await Promise.all(queries.map(async ({ q, badge }) => {
+
+  const articles = [];
+  await Promise.all(queries.map(async (q) => {
     try {
-      const res = await fetch(`${base}&q=${encodeURIComponent(q)}&apiKey=${apiKey}`);
+      const url = 'https://newsapi.org/v2/everything?q=' + encodeURIComponent(q.q)
+        + '&language=en&sortBy=publishedAt&pageSize=5&apiKey=' + key;
+      const res = await fetch(url);
       const data = await res.json();
-      if (!data.articles) return [];
-      return data.articles.map(a => ({
-        headline: a.title,
-        summary: a.description || '',
-        url: a.url,
-        source: a.source?.name || 'News',
-        region: 'Global',
-        badge,
-        badgeLabel: BADGE_MAP[badge] || 'NEWS',
-        time: formatTime(new Date(a.publishedAt)),
-        timeClass: (Date.now() - new Date(a.publishedAt)) < 3600000 ? 'time-recent' :
-                   (Date.now() - new Date(a.publishedAt)) < 86400000 ? 'time-today' : 'time-old',
-        publishedAt: a.publishedAt,
-        imageUrl: a.urlToImage || null,
-      }));
-    } catch { return []; }
+      if (!data.articles) return;
+      data.articles.forEach(a => {
+        if (!a.title || a.title === '[Removed]') return;
+        articles.push({
+          url: a.url,
+          headline: a.title,
+          summary: a.description || '',
+          source: a.source.name || 'NewsAPI',
+          time: formatTime(a.publishedAt),
+          timeClass: 'time-today',
+          region: q.region,
+          badge: q.badge,
+          badgeLabel: q.label,
+        });
+      });
+    } catch(e) {}
   }));
-  return results.flat();
+  return articles;
 }
 
 // Pick freshest article from premium investigative sources for hero
