@@ -1158,9 +1158,7 @@
     border: none;
   }
   /* Apply navy tint ONLY to tile images — keeps markers vivid */
-  .map-tiles {
-  filter: invert(100%) hue-rotate(195deg) saturate(0.5) brightness(0.65) contrast(1.1);
-}
+  .map-tiles { filter: invert(100%) hue-rotate(165deg) saturate(0.5) brightness(0.7) contrast(1.15); }
 
   /* Keep labels readable */
   .map-legend { display:flex; flex-wrap:wrap; gap:10px; padding:10px 0; }
@@ -2475,20 +2473,11 @@ function jitter(coord) {
 function initMap() {
   if (_mapInitialised) return;
   _mapInitialised = true;
-
-  _map = L.map('seizure-map', {
-    center: [20, 0],
-    zoom: 2,
-    minZoom: 2,
-    maxZoom: 8,
-    zoomControl: true,
-    attributionControl: true,
-  });
-
-  L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png', {
-    attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>',
+  _map = L.map('seizure-map', { center:[20,0], zoom:2, minZoom:2, maxZoom:8 });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
     subdomains: 'abcd',
-    maxZoom: 20,
+    maxZoom: 19,
     className: 'map-tiles',
   }).addTo(_map);
 }
