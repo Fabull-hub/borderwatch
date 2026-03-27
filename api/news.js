@@ -146,37 +146,32 @@ async function fetchAllFeeds(feeds) {
 
 async function fetchNewsAPI(key) {
   const queries = [
-    { q: 'drug seizure OR narcotics smuggling OR fentanyl trafficking',      badge: 'narco',    label: 'NARCOTICS',         region: 'Global'  },
-    { q: 'border seizure OR customs bust OR smuggling arrested',             badge: 'seized',   label: 'SEIZURES',          region: 'Global'  },
-    { q: 'cargo fraud OR trade smuggling OR container seized customs',       badge: 'cargo',    label: 'CARGO',             region: 'Global'  },
-    { q: 'airport security OR airport drugs seized OR airport smuggling',    badge: 'airport',  label: 'AIRPORT',           region: 'Global'  },
-    { q: 'human trafficking OR migrant smuggling OR people smuggling',       badge: 'human',    label: 'HUMAN SMUGGLING',   region: 'Global'  },
-    { q: 'weapons smuggling OR arms trafficking OR illegal firearms seized', badge: 'weapons',  label: 'WEAPONS',           region: 'Global'  },
-    { q: 'maritime smuggling OR coast guard seizure OR drug boat intercepted', badge: 'maritime', label: 'MARITIME',        region: 'Global'  },
-    { q: 'wildlife trafficking OR illegal wildlife trade OR poaching bust',  badge: 'wildlife', label: 'WILDLIFE TRAFFICKING', region: 'Global'},
-    { q: 'land border seizure OR checkpoint drugs OR border patrol arrest',  badge: 'border',   label: 'LAND BORDER',       region: 'Global'  },
+    { q: 'drug smuggling seized police',              badge: 'narco',    label: 'NARCOTICS',          region: 'Global' },
+    { q: 'border seizure customs arrested',           badge: 'seized',   label: 'SEIZURES',           region: 'Global' },
+    { q: 'cargo theft container fraud customs',       badge: 'cargo',    label: 'CARGO',              region: 'Global' },
+    { q: 'airport security screener drugs found',     badge: 'airport',  label: 'AIRPORT',            region: 'Global' },
+    { q: 'trafficking migrants smuggled arrested',    badge: 'human',    label: 'HUMAN SMUGGLING',    region: 'Global' },
+    { q: 'firearms seized illegal guns police',       badge: 'weapons',  label: 'WEAPONS',            region: 'Global' },
+    { q: 'coast guard vessel drugs intercepted sea',  badge: 'maritime', label: 'MARITIME',           region: 'Global' },
+    { q: 'poaching wildlife animals seized customs',  badge: 'wildlife', label: 'WILDLIFE TRAFFICKING',region: 'Global' },
+    { q: 'border crossing patrol checkpoint drugs',   badge: 'border',   label: 'LAND BORDER',        region: 'Global' },
   ];
-
   const articles = [];
   await Promise.all(queries.map(async (q) => {
     try {
-      const url = 'https://newsapi.org/v2/everything?q=' + encodeURIComponent(q.q)
-        + '&language=en&sortBy=publishedAt&pageSize=5&apiKey=' + key;
-      const res = await fetch(url);
+      const res = await fetch(
+        'https://newsapi.org/v2/everything?q=' + encodeURIComponent(q.q) +
+        '&language=en&sortBy=publishedAt&pageSize=6&apiKey=' + key
+      );
       const data = await res.json();
       if (!data.articles) return;
       data.articles.forEach(a => {
         if (!a.title || a.title === '[Removed]') return;
         articles.push({
-          url: a.url,
-          headline: a.title,
-          summary: a.description || '',
-          source: a.source.name || 'NewsAPI',
-          time: formatTime(a.publishedAt),
-          timeClass: 'time-today',
-          region: q.region,
-          badge: q.badge,
-          badgeLabel: q.label,
+          url: a.url, headline: a.title, summary: a.description || '',
+          source: a.source.name || 'NewsAPI', time: formatTime(a.publishedAt),
+          timeClass: 'time-today', region: q.region,
+          badge: q.badge, badgeLabel: q.label,
         });
       });
     } catch(e) {}
