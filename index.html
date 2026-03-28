@@ -2300,6 +2300,7 @@ function renderSourcesGrid(filter) {
 
 function filterCategory(cat) {
   currentCategory = cat;
+
   // Update active nav tab
   document.querySelectorAll('.nav-link').forEach(function(el) {
     el.classList.remove('active');
@@ -2307,17 +2308,48 @@ function filterCategory(cat) {
       el.classList.add('active');
     }
   });
+
   // Hide map, show article list
   var mapPanel = document.getElementById('map-panel');
   if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
   var articleList = document.getElementById('article-list');
   if (articleList) articleList.style.display = '';
-  // Render from live cache
-  if (window._liveArticles && window._liveArticles.length > 0) {
-    renderLiveArticles(window._liveArticles, cat);
+
+  // Render filtered articles from live cache
+  var articles = window._liveArticles || [];
+  if (articles.length > 0) {
+    renderLiveArticles(articles, cat);
+    // Update hero to show best article from this category
+    updateHero(articles, cat);
   } else {
     fetchLiveNews(cat, true);
   }
+}
+
+function updateHero(articles, cat) {
+  // Pick best article for this category
+  var pool = cat === 'all' ? articles : articles.filter(function(a) { return a.badge === cat; });
+  if (!pool.length) pool = articles; // fallback to all if category empty
+  // Sort: time-recent first, then time-today
+  var order = { 'time-recent': 0, 'time-today': 1, 'time-old': 2 };
+  var sorted = pool.slice().sort(function(a, b) {
+    return (order[a.timeClass] || 2) - (order[b.timeClass] || 2);
+  });
+  var h = sorted[0];
+  if (!h) return;
+
+  // Update hero DOM elements
+  var el = function(id) { return document.getElementById(id); };
+  if (el('hero-headline')) el('hero-headline').textContent = h.headline || '';
+  if (el('hero-deck'))     el('hero-deck').textContent     = (h.summary || '').replace(/<[^>]+>/g,'').substring(0, 280);
+  if (el('hero-link'))     el('hero-link').href            = h.url || '#';
+  if (el('hero-source'))   el('hero-source').textContent   = h.source || '';
+  if (el('hero-time'))     el('hero-time').textContent     = (h.time || '') + (h.region ? ' · ' + h.region : '');
+  if (el('hero-badge')) {
+    el('hero-badge').textContent  = h.badgeLabel || h.badge || '';
+    el('hero-badge').className    = 'article-badge badge-' + (h.badge || 'seized');
+  }
+  if (el('hero-visual-label')) el('hero-visual-label').textContent = h.badgeLabel || h.badge || '';
 }
 
 function filterSearch(query) {
