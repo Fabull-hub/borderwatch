@@ -280,26 +280,34 @@ export default async function handler(req, res) {
       return true;
     });
 
-  // Remove articles older than 30 days
+  // Remove articles older than 30 days + filter archive/irrelevant content
   const MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
-  articles = articles.filter(a => {
-    if (!a._pubDate) return true; // keep if no date info
-    return (Date.now() - new Date(a._pubDate).getTime()) < MAX_AGE_MS;
+  const SKIP_WORDS = ['archive', '60 minutes arch', 'years ago', 'in 1974', 'in 1978', 'in 1979', 'in 1980', 'obituary'];
+  articles = articles.filter(function(a) {
+    if (a._pubDate && (Date.now() - new Date(a._pubDate).getTime()) > MAX_AGE_MS) return false;
+    const lower = (a.headline || '').toLowerCase();
+    if (SKIP_WORDS.some(function(w){ return lower.includes(w); })) return false;
+    return true;
   });
 
 
       // Re-badge: only override if guessBadge finds a specific match
+  // General news sources default to geopolitics, not seized/border
+  const GENERAL_NEWS = ['CBS News','BBC World','Al Jazeera','Reuters World','DW World',
+    'The Hill','Guardian Drugs','Guardian Migration','CBS News'];
   const SPECIALIST_SOURCES = ['Europol','OCCRP','INTERPOL','InSight Crime','Global Initiative',
     'UNODC','ICE','WCO','US CBP','FreightWaves','TSA','Airport Technology','Frontex',
     'Border Report','IOM','DEA','EMCDDA','Talking Drugs','SIPRI','ATF','gCaptain',
     'Maritime Executive','CITES','TRAFFIC','WWF','DOJ','DEA Releases'];
   articles = articles.map(function(a) {
-    // Never re-badge specialist sources
     if (SPECIALIST_SOURCES.indexOf(a.source) >= 0) return a;
     const guessed = guessBadge((a.headline || '') + ' ' + (a.summary || ''));
-    // Only apply if guessBadge found a real match (not null)
-    if (guessed && guessed !== 'border') {
+    if (guessed) {
       return Object.assign({}, a, { badge: guessed, badgeLabel: BADGE_MAP[guessed] || guessed.toUpperCase() });
+    }
+    // General news with no specific match -> geopolitics
+    if (GENERAL_NEWS.indexOf(a.source) >= 0) {
+      return Object.assign({}, a, { badge: 'geopolitics', badgeLabel: 'GEOPOLITICS' });
     }
     return a;
   });
