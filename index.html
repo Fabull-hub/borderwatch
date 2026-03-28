@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BorderWatch — Global Smuggling & Border Security Intelligence</title>
+<title>BorderTrend — Global Smuggling & Border Security Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -1625,6 +1625,134 @@
     vertical-align: middle;
   }
   .nav-link.active .tab-count { background: rgba(212,168,67,0.35); }
+
+  /* Newsletter Section */
+  .newsletter-section {
+    background: linear-gradient(135deg, #0d1f3a 0%, #0a1628 100%);
+    border-top: 1px solid var(--accent);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 24px;
+    margin: 0;
+  }
+  .newsletter-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .newsletter-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    margin-bottom: 10px;
+  }
+  .newsletter-headline {
+    font-family: var(--font-serif);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text1);
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .newsletter-sub {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+  .newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .newsletter-input {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text1);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .newsletter-input:focus { border-color: var(--accent); }
+  .newsletter-input::placeholder { color: var(--text3); }
+  .newsletter-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    padding: 13px 24px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    text-transform: uppercase;
+  }
+  .newsletter-btn:hover { opacity: 0.85; }
+  .newsletter-privacy {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+  }
+  .newsletter-privacy a { color: var(--accent); }
+  .newsletter-success {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: #4ade80;
+    padding: 20px;
+    border: 1px solid rgba(74,222,128,0.3);
+    border-radius: 6px;
+    text-align: center;
+  }
+  @media (max-width: 768px) {
+    .newsletter-inner { grid-template-columns: 1fr; gap: 24px; }
+    .newsletter-section { padding: 32px 16px; }
+    .newsletter-headline { font-size: 20px; }
+  }
+
+  .ticker-subscribe-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--accent);
+    color: #000;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 10px 18px;
+    border-radius: 4px;
+    text-decoration: none;
+    z-index: 999;
+    box-shadow: 0 4px 20px rgba(212,168,67,0.4);
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .ticker-subscribe-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+  @media (max-width: 480px) { .ticker-subscribe-btn { bottom: 16px; right: 16px; font-size: 9px; padding: 8px 14px; } }
+
+  .article-share-li {
+    display: none;
+    position: absolute;
+    bottom: 8px;
+    right: 44px;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    color: #fff;
+    background: #0077b5;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 3px;
+    text-decoration: none;
+  }
+  .article-card:hover .article-share-li { display: block; }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -1636,12 +1764,44 @@
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="BorderTrend — Border Security Intelligence">
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://bordertrend.com">
+
+  <!-- Google Analytics 4 — replace G-XXXXXXXXXX with your Measurement ID from analytics.google.com -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+
+  <!-- Structured Data: NewsMediaOrganization (helps Google News eligibility) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "NewsMediaOrganization",
+    "name": "BorderTrend",
+    "url": "https://bordertrend.com",
+    "logo": "https://bordertrend.com/favicon.ico",
+    "description": "Real-time global intelligence on smuggling, trafficking, seizures and border security.",
+    "foundingDate": "2026",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "fivestarmediamanagement@hotmail.com",
+      "contactType": "editorial"
+    },
+    "sameAs": []
+  }
+  </script>
+
 </head>
 <body>
 
 <!-- BREAKING NEWS TICKER -->
 <div class="ticker-wrap">
   <div class="ticker-label">■ BREAKING</div>
+  <a class="ticker-subscribe-btn" href="#" onclick="event.preventDefault();document.querySelector('.newsletter-section').scrollIntoView({behavior:'smooth'})">+ Subscribe</a>
   <div style="overflow:hidden;flex:1">
     <div class="ticker-content" id="ticker">
       </div>
@@ -2128,6 +2288,28 @@
 </div>
 
 <!-- FOOTER -->
+<!-- NEWSLETTER SIGNUP -->
+<section class="newsletter-section">
+  <div class="newsletter-inner">
+    <div class="newsletter-left">
+      <div class="newsletter-eyebrow">FREE INTELLIGENCE BRIEFING</div>
+      <div class="newsletter-headline">The BorderTrend Weekly Digest</div>
+      <div class="newsletter-sub">Top seizures, trafficking trends and border security developments — every Monday morning. Trusted by customs officers, compliance professionals and investigators.</div>
+    </div>
+    <div class="newsletter-right">
+      <form class="newsletter-form" onsubmit="handleNewsletterSignup(event)">
+        <input type="text" class="newsletter-input" id="nl-name" placeholder="First name" required>
+        <input type="email" class="newsletter-input" id="nl-email" placeholder="Work email address" required>
+        <button type="submit" class="newsletter-btn">Subscribe Free &rarr;</button>
+        <div class="newsletter-privacy">No spam. Unsubscribe anytime. <a href="#" onclick="event.preventDefault();document.getElementById('modal-privacy').style.display='block'">Privacy Policy</a></div>
+      </form>
+      <div id="newsletter-success" style="display:none" class="newsletter-success">
+        Thank you! Check your inbox to confirm your subscription.
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <div class="footer-brand">
@@ -3074,6 +3256,24 @@ renderCatBars();
 renderHeatmap();
 renderSourcesGrid('all');
 updateSourceCounts();
+
+
+function handleNewsletterSignup(e) {
+  e.preventDefault();
+  var name = document.getElementById('nl-name').value.trim();
+  var email = document.getElementById('nl-email').value.trim();
+  if (!email) return;
+  // Send to mailto as fallback until Mailchimp is connected
+  var subject = encodeURIComponent('BorderTrend Newsletter Signup');
+  var body = encodeURIComponent('New subscriber:\nName: ' + name + '\nEmail: ' + email);
+  window.open('mailto:fivestarmediamanagement@hotmail.com?subject=' + subject + '&body=' + body);
+  document.querySelector('.newsletter-form').style.display = 'none';
+  document.getElementById('newsletter-success').style.display = 'block';
+  // Track with GA4 if available
+  if (typeof gtag !== 'undefined') {
+    gtag('event', 'newsletter_signup', { email_domain: email.split('@')[1] });
+  }
+}
 </script>
 
   <!-- ABOUT MODAL -->
