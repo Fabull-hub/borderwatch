@@ -131,16 +131,17 @@ function formatTime(date) {
 }
 
 function guessBadge(text) {
-  const t = text.toLowerCase();
-  if (t.match(/drug|cocaine|fentanyl|heroin|meth|narc|opium|cannabis/)) return 'narco';
-  if (t.match(/human.traffick|smuggl.*person|migrant.*smuggl|people.smuggl|forced.labour/)) return 'human';
-  if (t.match(/weapon|firearm|gun|arms.traffick|ammunition|explosive/)) return 'weapons';
-  if (t.match(/wildlife|ivory|rhino|pangolin|traffick.*animal|poach/)) return 'wildlife';
-  if (t.match(/airport|passenger|terminal|aviation|inflight|luggage/)) return 'airport';
-  if (t.match(/ship|vessel|maritime|coast.guard|port.seiz|submarine|seas/)) return 'maritime';
-  if (t.match(/cargo|container|freight|import|export|shipment|counterfeit/)) return 'cargo';
-  if (t.match(/seize|seized|arrest|bust|million|billion|operation|launder/)) return 'seized';
-  return 'border';
+  const t = (text||'').toLowerCase();
+  if (t.match(/drug|cocaine|fentanyl|heroin|meth|narc|opium|cannabis|marijuana/)) return 'narco';
+  if (t.match(/human.traffick|smuggl.*person|migrant.*smuggl|people.smuggl|forced.labour|forced labor/)) return 'human';
+  if (t.match(/weapon|firearm|gun|arms.traffick|ammunition|explosive|rifle|pistol/)) return 'weapons';
+  if (t.match(/wildlife|ivory|rhino|pangolin|traffick.*animal|poach|tiger|elephant/)) return 'wildlife';
+  if (t.match(/airport|passenger.*arrest|terminal.*security|aviation.*seiz|luggage.*drugs/)) return 'airport';
+  if (t.match(/ship|vessel|maritime|coast.guard|port.seiz|submarine|seas.*drug|boat.*drug/)) return 'maritime';
+  if (t.match(/cargo|container|freight|import.*seiz|export.*seiz|shipment.*drug|counterfeit/)) return 'cargo';
+  if (t.match(/border.patrol|border.seiz|checkpoint|customs.seiz|customs.bust|smuggling.arrest/)) return 'border';
+  if (t.match(/seized|bust|trafficking|smuggl|contraband|cartel|laundering/)) return 'seized';
+  return null;
 }
 
 async function fetchFeed(feed) {
@@ -275,12 +276,18 @@ export default async function handler(req, res) {
       return true;
     });
 
-      // Re-badge articles using content analysis for better category coverage
-  articles = articles.map(a => {
-    const newBadge = guessBadge((a.headline || '') + ' ' + (a.summary || ''));
-    // Only override 'border' or 'seized' badges with more specific ones
-    if ((a.badge === 'border' || a.badge === 'seized') && newBadge !== 'border') {
-      return Object.assign({}, a, { badge: newBadge, badgeLabel: BADGE_MAP[newBadge] || newBadge.toUpperCase() });
+      // Re-badge: only override if guessBadge finds a specific match
+  const SPECIALIST_SOURCES = ['Europol','OCCRP','INTERPOL','InSight Crime','Global Initiative',
+    'UNODC','ICE','WCO','US CBP','FreightWaves','TSA','Airport Technology','Frontex',
+    'Border Report','IOM','DEA','EMCDDA','Talking Drugs','SIPRI','ATF','gCaptain',
+    'Maritime Executive','CITES','TRAFFIC','WWF','DOJ','DEA Releases'];
+  articles = articles.map(function(a) {
+    // Never re-badge specialist sources
+    if (SPECIALIST_SOURCES.indexOf(a.source) >= 0) return a;
+    const guessed = guessBadge((a.headline || '') + ' ' + (a.summary || ''));
+    // Only apply if guessBadge found a real match (not null)
+    if (guessed && guessed !== 'border') {
+      return Object.assign({}, a, { badge: guessed, badgeLabel: BADGE_MAP[guessed] || guessed.toUpperCase() });
     }
     return a;
   });
