@@ -2552,13 +2552,6 @@ function showMap() {
   }, 50);
 }
 
-// Patch filterCategory to hide map when switching back to news
-filterCategory = function(cat) {
-  const mapPanel = document.getElementById('map-panel');
-  const articleList = document.getElementById('article-list');
-  if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
-  if (articleList) articleList.style.display = '';
-};
 
 
 // ── LATEST ALERTS SIDEBAR ──────────────────────────────────────────────────
