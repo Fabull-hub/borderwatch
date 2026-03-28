@@ -55,6 +55,18 @@ const RSS_FEEDS = [
   { url: 'https://cites.org/eng/news/rss.xml',                         source: 'CITES',               region: 'Global',        badge: 'wildlife'},
   { url: 'https://www.traffic.org/feed/',                               source: 'TRAFFIC',             region: 'Global',        badge: 'wildlife'},
   { url: 'https://www.wwf.org.uk/rss.xml',                             source: 'WWF',                 region: 'Global',        badge: 'wildlife'},
+
+  // HIGH FREQUENCY NEWS SOURCES
+  { url: 'https://feeds.reuters.com/reuters/topNews', source: 'Reuters', region: 'Global', badge: 'seized' },
+  { url: 'https://rss.app/feeds/tQGNxCqLpPGpEzBR.xml', source: 'AP Border News', region: 'Americas', badge: 'border' },
+  { url: 'https://thehill.com/policy/national-security/feed/', source: 'The Hill Security', region: 'Americas', badge: 'border' },
+  { url: 'https://www.theguardian.com/world/drug-trade/rss', source: 'Guardian Drugs', region: 'Global', badge: 'narco' },
+  { url: 'https://www.theguardian.com/world/migration/rss', source: 'Guardian Migration', region: 'Global', badge: 'human' },
+  { url: 'https://rss.dw.com/rdf/rss-en-world', source: 'DW World', region: 'Europe', badge: 'seized' },
+  { url: 'https://www.aljazeera.com/xml/rss/all.xml', source: 'Al Jazeera', region: 'Global', badge: 'seized' },
+  { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', source: 'BBC World', region: 'Global', badge: 'seized' },
+  { url: 'https://www.politico.eu/feed/', source: 'Politico EU', region: 'Europe', badge: 'border' },
+  { url: 'https://www.cbsnews.com/latest/rss/main', source: 'CBS News', region: 'Americas', badge: 'border' },
 ];
 
 const BADGE_MAP = {
@@ -66,8 +78,19 @@ const BADGE_MAP = {
 function parseRSS(xml, feedConfig) {
   const articles = [];
   try {
-    const items = xml.match(/<item[\s\S]*?<\/item>/gi) || [];
-    for (const item of items.slice(0, 5)) {
+    const items = xml.match(/<item[\s\S]*?<\/item>/gi) || [  // HIGH FREQUENCY NEWS SOURCES
+  { url: 'https://feeds.reuters.com/reuters/topNews', source: 'Reuters', region: 'Global', badge: 'seized' },
+  { url: 'https://thehill.com/policy/national-security/feed/', source: 'The Hill', region: 'Americas', badge: 'border' },
+  { url: 'https://www.theguardian.com/world/drug-trade/rss', source: 'Guardian Drugs', region: 'Global', badge: 'narco' },
+  { url: 'https://www.theguardian.com/world/migration/rss', source: 'Guardian Migration', region: 'Global', badge: 'human' },
+  { url: 'https://rss.dw.com/rdf/rss-en-world', source: 'DW World', region: 'Europe', badge: 'seized' },
+  { url: 'https://www.aljazeera.com/xml/rss/all.xml', source: 'Al Jazeera', region: 'Global', badge: 'seized' },
+  { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', source: 'BBC World', region: 'Global', badge: 'seized' },
+  { url: 'https://www.cbsnews.com/latest/rss/main', source: 'CBS News', region: 'Americas', badge: 'border' },
+  { url: 'https://www.justice.gov/feeds/opa/justice-news.xml', source: 'DOJ', region: 'Americas', badge: 'seized' },
+  { url: 'https://www.dea.gov/rss.xml', source: 'DEA Releases', region: 'Americas', badge: 'narco' },
+];
+    for (const item of items.slice(0, 10)) {
       const title = (item.match(/<title[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/title>/) ||
                      item.match(/<title[^>]*>([\s\S]*?)<\/title>/))?.[1]?.trim();
       const link = (item.match(/<link[^>]*>([\s\S]*?)<\/link>/) ||
@@ -166,7 +189,7 @@ async function fetchNewsAPI(key) {
         '?q=' + encodeURIComponent(q.q) +
         '&language=en' +
         '&sortBy=publishedAt' +
-        '&pageSize=5' +
+        '&pageSize=10' +
         '&apiKey=' + key
       );
       if (!res.ok) return;
@@ -271,7 +294,7 @@ export default async function handler(req, res) {
       : articles;
 
     const pageNum = parseInt(page, 10) || 1;
-    const perPage = 100;
+    const perPage = 10;
     const paginated = filtered.slice((pageNum - 1) * perPage, pageNum * perPage);
 
     res.status(200).json({
