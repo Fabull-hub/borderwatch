@@ -3205,35 +3205,45 @@ function updateHero(articles, cat) {
     maritime:'MARITIME', wildlife:'WILDLIFE TRAFFICKING', seized:'SEIZURES',
     geopolitics:'GEOPOLITICS'
   };
-
   var catLabel = CAT_LABELS[cat] || (cat||'').toUpperCase();
   var el = function(id){ return document.getElementById(id); };
 
-  // Always show selected category label
+  // Always update the visual panel label
   if (el('hero-visual-label')) el('hero-visual-label').textContent = catLabel;
+  if (el('hero-badge')) {
+    el('hero-badge').textContent = catLabel;
+    el('hero-badge').className = 'article-badge badge-' + (cat||'seized');
+  }
 
-  // Pick best article for this category
+  // Filter to ONLY this category   never fall back to unrelated articles
   var pool = (cat === 'all') ? articles : articles.filter(function(a){ return a.badge === cat; });
-  if (!pool.length) pool = articles;
+
+  // If no articles in this category   show empty state, not a random article
+  if (!pool.length) {
+    if (el('hero-headline')) el('hero-headline').textContent = 'No ' + catLabel + ' stories right now';
+    if (el('hero-deck')) el('hero-deck').textContent = 'Check back soon   the feed updates every 5 minutes.';
+    if (el('hero-source')) el('hero-source').textContent = '';
+    if (el('hero-time')) el('hero-time').textContent = '';
+    if (el('hero-link')) el('hero-link').href = '#';
+    if (el('hero-visual-source')) el('hero-visual-source').textContent = '';
+    return;
+  }
+
+  // Sort: recent first, then today, then old
   var order = { 'time-recent': 0, 'time-today': 1, 'time-old': 2 };
-  var h = pool.slice().sort(function(a,b){ return (order[a.timeClass]||2)-(order[b.timeClass]||2); })[0];
-  if (!h) return;
+  pool = pool.slice().sort(function(a,b){
+    return (order[a.timeClass]||2) - (order[b.timeClass]||2);
+  });
+  var h = pool[0];
 
   if (el('hero-headline')) el('hero-headline').textContent = cleanText(h.headline);
   if (el('hero-deck'))     el('hero-deck').textContent     = cleanText(h.summary).substring(0,280);
   if (el('hero-link'))     el('hero-link').href            = h.url || '#';
   if (el('hero-source'))   el('hero-source').textContent   = h.source || '';
-  if (el('hero-time'))     el('hero-time').textContent     = (h.time||'') + (h.region ? '   ' + h.region : '');
-
-  // Source line in visual panel
+  if (el('hero-time'))     el('hero-time').textContent     = (h.time||'') + (h.region ? ' ' + h.region : '');
   if (el('hero-visual-source')) el('hero-visual-source').textContent = h.source || '';
 
-  if (el('hero-badge')) {
-    el('hero-badge').textContent = catLabel;
-    el('hero-badge').className   = 'article-badge badge-' + (cat||'seized');
-  }
-
-  // Clear any leftover image divs
+  // Clear any leftover image
   var visual = el('hero-visual');
   if (visual) {
     var imgDiv = visual.querySelector('.hero-visual-img');
