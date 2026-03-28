@@ -1490,19 +1490,19 @@
           <div class="live-dot"></div>
           <span id="live-time">LIVE · Wed 18 Mar 2026 · 14:22 UTC</span>
         </div>
-        <div class="lang-bar">
-          <span class="lang-label">Lang:</span>
-          <button class="lang-btn active" onclick="setLang('en')">EN</button>
-          <button class="lang-btn" onclick="setLang('es')">ES</button>
-          <button class="lang-btn" onclick="setLang('fr')">FR</button>
-          <button class="lang-btn" onclick="setLang('de')">DE</button>
-          <button class="lang-btn" onclick="setLang('pt')">PT</button>
-          <button class="lang-btn" onclick="setLang('ar')">AR</button>
-          <button class="lang-btn" onclick="setLang('zh')">ZH</button>
-          <button class="lang-btn" onclick="setLang('ru')">RU</button>
-          <button class="lang-btn" onclick="setLang('ja')">JA</button>
-          <button class="lang-btn" onclick="setLang('ko')">KO</button>
-        </div>
+        <div class="lang-switcher">
+              <span class="lang-label">LANG:</span>
+              <button class="lang-btn active" onclick="window.open('https://bordertrend.com','_self')">EN</button>
+              <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=es&u=https://bordertrend.com','_blank')">ES</button>
+              <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=fr&u=https://bordertrend.com','_blank')">FR</button>
+              <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=de&u=https://bordertrend.com','_blank')">DE</button>
+              <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=pt&u=https://bordertrend.com','_blank')">PT</button>
+              <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=ar&u=https://bordertrend.com','_blank')">AR</button>
+              <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=zh-CN&u=https://bordertrend.com','_blank')">ZH</button>
+              <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=ru&u=https://bordertrend.com','_blank')">RU</button>
+              <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=ja&u=https://bordertrend.com','_blank')">JA</button>
+              <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=ko&u=https://bordertrend.com','_blank')">KO</button>
+            </div>
       </div>
     </div>
 
@@ -2482,8 +2482,8 @@ function updateClock() {
   const mo = months[now.getUTCMonth()];
   const date = now.getUTCDate();
   const yr = now.getUTCFullYear();
-  const h = String(now.getUTCHours()).padStart(2,'0');
-  const m = String(now.getUTCMinutes()).padStart(2,'0');
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
   const el = document.getElementById('live-time');
   if (el) el.textContent = `LIVE   ${d} ${date} ${mo} ${yr}   ${h}:${m} UTC`;
 }
@@ -2696,7 +2696,7 @@ setInterval(function() {
     var now = new Date();
     var h = String(now.getUTCHours()).padStart(2,'0');
     var m = String(now.getUTCMinutes()).padStart(2,'0');
-    clockEl.textContent = h + ':' + m + ' UTC';
+    clockEl.textContent = h + ':' + m + ' ' + new Date().toLocaleTimeString('en',{timeZoneName:'short'}).split(' ').pop();
   }
 }, 1000);
 
