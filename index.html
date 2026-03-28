@@ -2675,28 +2675,39 @@ function cleanText(str) {
 
 // ── HERO UPDATER ──
 function updateHero(articles, cat) {
-  var pool = cat === 'all' ? articles : articles.filter(function(a){ return a.badge === cat; });
-  if (!pool.length) pool = articles;
+  var CAT_LABELS = {
+    all:'ALL COVERAGE', cargo:'CARGO', airport:'AIRPORT', border:'LAND BORDER',
+    human:'HUMAN SMUGGLING', narco:'NARCOTICS', weapons:'WEAPONS',
+    maritime:'MARITIME', wildlife:'WILDLIFE TRAFFICKING', seized:'SEIZURES'
+  };
+
+  // Always show the SELECTED category label, regardless of fallback
+  var catLabel = CAT_LABELS[cat] || (cat||'').toUpperCase();
+  var el = function(id){ return document.getElementById(id); };
+  if (el('hero-visual-label')) el('hero-visual-label').textContent = catLabel;
+
+  // Pick best article: prefer matching category, fall back to all
+  var pool = (cat === 'all') ? articles : articles.filter(function(a){ return a.badge === cat; });
+  var usingFallback = pool.length === 0;
+  if (usingFallback) pool = articles;
+
   var order = { 'time-recent': 0, 'time-today': 1, 'time-old': 2 };
   var h = pool.slice().sort(function(a,b){ return (order[a.timeClass]||2)-(order[b.timeClass]||2); })[0];
   if (!h) return;
 
-  var el = function(id){ return document.getElementById(id); };
   if (el('hero-headline')) el('hero-headline').textContent = cleanText(h.headline);
   if (el('hero-deck'))     el('hero-deck').textContent     = cleanText(h.summary).substring(0,280);
   if (el('hero-link'))     el('hero-link').href            = h.url || '#';
   if (el('hero-source'))   el('hero-source').textContent   = h.source || '';
   if (el('hero-time'))     el('hero-time').textContent     = (h.time||'') + (h.region ? ' · ' + h.region : '');
+
+  // Badge always shows selected category
   if (el('hero-badge')) {
-    el('hero-badge').textContent = h.badgeLabel || h.badge || '';
-    el('hero-badge').className   = 'article-badge badge-' + (h.badge || 'seized');
+    el('hero-badge').textContent = catLabel;
+    el('hero-badge').className   = 'article-badge badge-' + cat;
   }
 
-  var badge = h.badge || cat || 'all';
-  var label = h.badgeLabel || badge.toUpperCase();
-  if (el('hero-visual-label')) el('hero-visual-label').textContent = label;
-
-  // Category images — top half is text, bottom half is this image
+  // Category image — always matches selected tab
   var HERO_IMAGES = {
     cargo:    'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80',
     airport:  'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&q=80',
@@ -2705,15 +2716,14 @@ function updateHero(articles, cat) {
     narco:    'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&q=80',
     weapons:  'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=600&q=80',
     maritime: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
-    wildlife: 'https://images.unsplash.com/photo-1564760055775-d63b17a55c44?w=600&q=80',
+    wildlife: 'https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=600&q=80',
     seized:   'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80',
     all:      'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?w=600&q=80',
   };
 
-  var imgUrl = HERO_IMAGES[badge] || HERO_IMAGES['all'];
+  var imgUrl = HERO_IMAGES[cat] || HERO_IMAGES['all'];
   var visual = el('hero-visual');
   if (visual) {
-    // Find or create the image div (bottom half)
     var imgDiv = visual.querySelector('.hero-visual-img');
     if (!imgDiv) {
       imgDiv = document.createElement('div');
@@ -2721,7 +2731,6 @@ function updateHero(articles, cat) {
       visual.appendChild(imgDiv);
     }
     imgDiv.style.backgroundImage = 'url(' + imgUrl + ')';
-    // Clear any old background on the parent
     visual.style.backgroundImage = '';
   }
 }
