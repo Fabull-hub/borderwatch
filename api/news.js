@@ -111,6 +111,7 @@ function parseRSS(xml, feedConfig) {
           region: feedConfig.region,
           badge: feedConfig.badge,
           badgeLabel: BADGE_MAP[feedConfig.badge] || feedConfig.badge.toUpperCase(),
+          _pubDate: pubDate,
           time: pubDate ? formatTime(new Date(pubDate)) : 'Recent',
           timeClass: pubDate && (Date.now() - new Date(pubDate)) < 3600000 ? 'time-recent' :
                      pubDate && (Date.now() - new Date(pubDate)) < 86400000 ? 'time-today' : 'time-old',
@@ -133,17 +134,16 @@ function formatTime(date) {
 
 function guessBadge(text) {
   const t = (text||'').toLowerCase();
-  // Geopolitics — check FIRST so off-topic news gets routed here
-  if (t.match(/iran|houthi|sanction|nato|geopolit|missile.strike|military.operation|airstrike|diplomatic|ceasefire|war.crime|coup|insurgent|rebel.group|conflict.zone|civil.war|united.nations.resolution|g7|g20|trade.war|tariff.dispute|semiconductor.ban/)) return 'geopolitics';
-  if (t.match(/drug|cocaine|fentanyl|heroin|meth|narc|opium|cannabis|marijuana/)) return 'narco';
-  if (t.match(/human.traffick|smuggl.*person|migrant.*smuggl|people.smuggl|forced.labour|forced labor/)) return 'human';
-  if (t.match(/weapon|firearm|gun|arms.traffick|ammunition|explosive|rifle|pistol/)) return 'weapons';
-  if (t.match(/wildlife|ivory|rhino|pangolin|traffick.*animal|poach|tiger|elephant/)) return 'wildlife';
-  if (t.match(/airport|passenger.*arrest|terminal.*security|aviation.*seiz|luggage.*drugs/)) return 'airport';
-  if (t.match(/ship|vessel|maritime|coast.guard|port.seiz|submarine|seas.*drug|boat.*drug/)) return 'maritime';
-  if (t.match(/cargo|container|freight|import.*seiz|export.*seiz|shipment.*drug|counterfeit/)) return 'cargo';
-  if (t.match(/border.patrol|border.seiz|checkpoint|customs.seiz|customs.bust|smuggling.arrest/)) return 'border';
-  if (t.match(/seized|bust|trafficking|smuggl|contraband|cartel|laundering/)) return 'seized';
+  if (t.match(/drug|cocaine|fentanyl|heroin|meth|narc|opium|cannabis|marijuana|cartel/)) return 'narco';
+  if (t.match(/human.traffick|smuggl.*person|migrant.*smuggl|people.smuggl|forced.labour|forced labor|sex.traffic/)) return 'human';
+  if (t.match(/weapon|firearm|gun|arms.traffick|ammunition|explosive|rifle|pistol|illicit.arms/)) return 'weapons';
+  if (t.match(/wildlife|ivory|rhino|pangolin|traffick.*animal|poach|tiger|elephant|illegal.*species/)) return 'wildlife';
+  if (t.match(/airport.*seiz|airport.*drug|airport.*smugg|passenger.*smugg|terminal.*security.*seiz/)) return 'airport';
+  if (t.match(/ship.*drug|vessel.*drug|coast.guard.*seiz|port.*seiz|maritime.*smugg|submarine.*drug/)) return 'maritime';
+  if (t.match(/cargo.*seiz|container.*drug|freight.*smugg|customs.*bust|import.*seiz|counterfeit.*seized/)) return 'cargo';
+  if (t.match(/border.patrol.*seiz|checkpoint.*drug|border.*seized|customs.*arrest|smuggling.*arrest/)) return 'border';
+  if (t.match(/sanction|geopolit|diplomac|military.operation|nato|nuclear.deal|iran.deal|houthi|missile.strike|coup|regime.change|war.*border|conflict.*smuggl/)) return 'geopolitics';
+  if (t.match(/seized|bust|trafficking.ring|smuggl|contraband|laundering/)) return 'seized';
   return null;
 }
 
@@ -279,6 +279,14 @@ export default async function handler(req, res) {
       seen.add(key);
       return true;
     });
+
+  // Remove articles older than 30 days
+  const MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
+  articles = articles.filter(a => {
+    if (!a._pubDate) return true; // keep if no date info
+    return (Date.now() - new Date(a._pubDate).getTime()) < MAX_AGE_MS;
+  });
+
 
       // Re-badge: only override if guessBadge finds a specific match
   const SPECIALIST_SOURCES = ['Europol','OCCRP','INTERPOL','InSight Crime','Global Initiative',
