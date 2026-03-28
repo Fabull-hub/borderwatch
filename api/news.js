@@ -145,33 +145,45 @@ async function fetchAllFeeds(feeds) {
 }
 
 async function fetchNewsAPI(key) {
+  if (!key) return [];
+  // Simple 1-2 word queries — NewsAPI free tier works best with these
   const queries = [
-    { q: 'drug smuggling seized police',              badge: 'narco',    label: 'NARCOTICS',          region: 'Global' },
-    { q: 'border seizure customs arrested',           badge: 'seized',   label: 'SEIZURES',           region: 'Global' },
-    { q: 'cargo theft container fraud customs',       badge: 'cargo',    label: 'CARGO',              region: 'Global' },
-    { q: 'airport security screener drugs found',     badge: 'airport',  label: 'AIRPORT',            region: 'Global' },
-    { q: 'trafficking migrants smuggled arrested',    badge: 'human',    label: 'HUMAN SMUGGLING',    region: 'Global' },
-    { q: 'firearms seized illegal guns police',       badge: 'weapons',  label: 'WEAPONS',            region: 'Global' },
-    { q: 'coast guard vessel drugs intercepted sea',  badge: 'maritime', label: 'MARITIME',           region: 'Global' },
-    { q: 'poaching wildlife animals seized customs',  badge: 'wildlife', label: 'WILDLIFE TRAFFICKING',region: 'Global' },
-    { q: 'border crossing patrol checkpoint drugs',   badge: 'border',   label: 'LAND BORDER',        region: 'Global' },
+    { q: 'drug seizure',       badge: 'narco',    label: 'NARCOTICS',          region: 'Global' },
+    { q: 'border smuggling',   badge: 'seized',   label: 'SEIZURES',           region: 'Global' },
+    { q: 'cargo smuggling',    badge: 'cargo',    label: 'CARGO',              region: 'Global' },
+    { q: 'airport security',   badge: 'airport',  label: 'AIRPORT',            region: 'Global' },
+    { q: 'human trafficking',  badge: 'human',    label: 'HUMAN SMUGGLING',    region: 'Global' },
+    { q: 'weapons trafficking',badge: 'weapons',  label: 'WEAPONS',            region: 'Global' },
+    { q: 'coast guard drugs',  badge: 'maritime', label: 'MARITIME',           region: 'Global' },
+    { q: 'wildlife poaching',  badge: 'wildlife', label: 'WILDLIFE TRAFFICKING',region: 'Global'},
+    { q: 'border patrol',      badge: 'border',   label: 'LAND BORDER',        region: 'Global' },
   ];
   const articles = [];
   await Promise.all(queries.map(async (q) => {
     try {
       const res = await fetch(
-        'https://newsapi.org/v2/everything?q=' + encodeURIComponent(q.q) +
-        '&language=en&sortBy=publishedAt&pageSize=6&apiKey=' + key
+        'https://newsapi.org/v2/everything' +
+        '?q=' + encodeURIComponent(q.q) +
+        '&language=en' +
+        '&sortBy=publishedAt' +
+        '&pageSize=5' +
+        '&apiKey=' + key
       );
+      if (!res.ok) return;
       const data = await res.json();
       if (!data.articles) return;
       data.articles.forEach(a => {
         if (!a.title || a.title === '[Removed]') return;
         articles.push({
-          url: a.url, headline: a.title, summary: a.description || '',
-          source: a.source.name || 'NewsAPI', time: formatTime(a.publishedAt),
-          timeClass: 'time-today', region: q.region,
-          badge: q.badge, badgeLabel: q.label,
+          url: a.url,
+          headline: a.title,
+          summary: a.description || '',
+          source: a.source.name || 'NewsAPI',
+          time: formatTime(new Date(a.publishedAt)),
+          timeClass: 'time-today',
+          region: q.region,
+          badge: q.badge,
+          badgeLabel: q.label,
         });
       });
     } catch(e) {}
@@ -240,7 +252,17 @@ export default async function handler(req, res) {
       return true;
     });
 
-    // Auto hero
+      // Re-badge articles using content analysis for better category coverage
+  articles = articles.map(a => {
+    const newBadge = guessBadge((a.headline || '') + ' ' + (a.summary || ''));
+    // Only override 'border' or 'seized' badges with more specific ones
+    if ((a.badge === 'border' || a.badge === 'seized') && newBadge !== 'border') {
+      return Object.assign({}, a, { badge: newBadge, badgeLabel: BADGE_MAP[newBadge] || newBadge.toUpperCase() });
+    }
+    return a;
+  });
+
+  // Auto hero
     const hero = pickHero(articles);
 
     // Category filter
