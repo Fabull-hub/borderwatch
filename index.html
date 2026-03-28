@@ -2510,7 +2510,6 @@ function updateSourceCounts() {
 
 //    SEIZURE MAP                                                               
 let _map = null;
-let _mapInitialised = false;
 let _mapMarkers = [];
 
 // Region   approximate lat/lon for geocoding articles by region field
@@ -2580,23 +2579,7 @@ function jitter(coord) {
   if (sectionSub) sectionSub.textContent = 'Live Incident Map   All Regions';
 
   // Initialise and plot
-  setTimeout(function() {
-    initMap();
-    if (window._liveData && window._liveData.articles) {
-      plotArticlesOnMap(window._liveData.articles);
-    } else if (window._liveArticles && window._liveArticles.length > 0) {
-      plotArticlesOnMap(window._liveArticles);
-    } else {
-      fetch('/api/news?category=all&_t=' + Date.now())
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (data.articles) plotArticlesOnMap(data.articles);
-          if (_map) _map.invalidateSize();
-        });
-    }
-    if (_map) _map.invalidateSize();
-  }, 50);
-}
+
 
 
 
