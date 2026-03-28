@@ -1399,6 +1399,19 @@
     min-height: 120px;
     transition: background-image 0.4s ease;
   }
+
+  .sidebar-ad-edu { padding: 4px 0; }
+  .ad-edu-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .ad-edu-icon { font-size:28px; }
+  .ad-edu-brand { font-family:var(--font-serif); font-size:16px; font-weight:700; color:var(--text1); }
+  .ad-edu-tagline { font-family:var(--font-mono); font-size:8px; color:var(--text3); letter-spacing:0.1em; margin-top:2px; }
+  .ad-edu-title { font-family:var(--font-serif); font-size:13px; font-weight:600; color:var(--text1); margin-bottom:10px; line-height:1.4; }
+  .ad-edu-features { list-style:none; padding:0; margin:0 0 12px; display:flex; flex-direction:column; gap:5px; }
+  .ad-edu-features li { font-family:var(--font-sans); font-size:11px; color:var(--text2); }
+  .ad-edu-badges { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px; }
+  .ad-edu-badges span { font-family:var(--font-mono); font-size:8px; color:var(--accent); border:1px solid var(--accent); border-radius:3px; padding:2px 6px; letter-spacing:0.05em; }
+  .ad-edu-cta { display:block; background:var(--accent); color:#000; text-align:center; padding:8px; border-radius:4px; font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.1em; text-decoration:none; }
+  .ad-edu-cta:hover { opacity:0.85; }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -1681,36 +1694,29 @@
 </div>
 
       <!-- ACTIVITY HEATMAP -->
-      <div class="sidebar-block">
-          <div class="sidebar-block-header">
-            <span class="sidebar-block-title">SPONSORED</span>
-          </div>
-          <div style="background:linear-gradient(135deg,#0d1f3a 0%,#0a1628 100%);border:1px solid rgba(100,140,220,0.15);border-radius:8px;padding:20px;position:relative;overflow:hidden;">
-            <!-- accent line -->
-            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#3a7bd5,#00d2ff);"></div>
-            <!-- logo / icon area -->
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-              <div style="width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#1a4a8a,#3a7bd5);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-              </div>
+      <div class="sidebar-block ad-sidebar-block">
+          <div class="ad-label">SPONSORED</div>
+          <div class="sidebar-ad-edu">
+            <div class="ad-edu-header">
+              <div class="ad-edu-icon">🎓</div>
               <div>
-                <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:#dde6f5;letter-spacing:0.02em;">TradeAcademy</div>
-                <div style="font-family:'DM Mono',monospace;font-size:9px;color:#4a6a9a;letter-spacing:0.1em;text-transform:uppercase;">Customs &amp; Trade Compliance Training</div>
+                <div class="ad-edu-brand">BorderGuard<span style="color:var(--accent)">Academy</span></div>
+                <div class="ad-edu-tagline">BORDER SECURITY & INTELLIGENCE TRAINING</div>
               </div>
             </div>
-            <!-- tagline -->
-            <div style="font-family:'Source Serif 4',Georgia,serif;font-size:14px;font-weight:600;color:#dde6f5;line-height:1.4;margin-bottom:10px;">
-              Professional Certification in Trade &amp; Border Compliance
-            </div>
-            <!-- bullets -->
-            <ul style="list-style:none;padding:0;margin:0 0 14px 0;">
-              <li style="font-family:'DM Sans',sans-serif;font-size:11px;color:#8a9dbf;padding:3px 0;display:flex;align-items:center;gap:6px;"><span style="color:#3a7bd5;font-size:14px;">&#9679;</span>WCO-aligned curriculum</li>
-              <li style="font-family:'DM Sans',sans-serif;font-size:11px;color:#8a9dbf;padding:3px 0;display:flex;align-items:center;gap:6px;"><span style="color:#3a7bd5;font-size:14px;">&#9679;</span>Online &amp; self-paced modules</li>
-              <li style="font-family:'DM Sans',sans-serif;font-size:11px;color:#8a9dbf;padding:3px 0;display:flex;align-items:center;gap:6px;"><span style="color:#3a7bd5;font-size:14px;">&#9679;</span>Recognised by 60+ customs authorities</li>
+            <div class="ad-edu-title">Advanced Contraband Detection & Risk Assessment</div>
+            <ul class="ad-edu-features">
+              <li>🔍 Behavioural detection techniques</li>
+              <li>📡 Non-intrusive inspection technology</li>
+              <li>🌐 Cross-border intelligence sharing</li>
+              <li>⚖️ Legal frameworks & chain of custody</li>
             </ul>
-            <!-- CTA -->
-            <a href="#" style="display:block;background:linear-gradient(90deg,#1a4a8a,#3a7bd5);color:#fff;text-align:center;padding:9px 0;border-radius:5px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;font-weight:600;">Enrol Free &rarr;</a>
-            <div style="font-family:'DM Mono',monospace;font-size:8px;color:#4a5a7a;text-align:center;margin-top:8px;letter-spacing:0.08em;">ADVERTISEMENT</div>
+            <div class="ad-edu-badges">
+              <span>Accredited by WCO</span>
+              <span>12 CPD Hours</span>
+              <span>Online & In-Person</span>
+            </div>
+            <a href="#" class="ad-edu-cta">Enroll Now &rarr;</a>
           </div>
         </div>
 
