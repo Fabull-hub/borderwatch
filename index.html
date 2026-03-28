@@ -2691,12 +2691,13 @@ setInterval(function() {
 
 // Live clock update every second
 setInterval(function() {
-  var clockEl = document.getElementById('live-clock');
-  if (clockEl) {
+  var timeEl = document.getElementById('live-time');
+  if (timeEl) {
     var now = new Date();
-    var h = String(now.getUTCHours()).padStart(2,'0');
-    var m = String(now.getUTCMinutes()).padStart(2,'0');
-    clockEl.textContent = h + ':' + m + ' ' + new Date().toLocaleTimeString('en',{timeZoneName:'short'}).split(' ').pop();
+    var h = String(now.getHours()).padStart(2,'0');
+    var m = String(now.getMinutes()).padStart(2,'0');
+    var tz = new Date().toLocaleTimeString('en',{timeZoneName:'short'}).split(' ').pop();
+    timeEl.textContent = h + ':' + m + ' ' + tz;
   }
 }, 1000);
 
