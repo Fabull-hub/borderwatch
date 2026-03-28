@@ -91,7 +91,7 @@ function parseRSS(xml, feedConfig) {
   { url: 'https://www.justice.gov/feeds/opa/justice-news.xml', source: 'DOJ', region: 'Americas', badge: 'seized' },
   { url: 'https://www.dea.gov/rss.xml', source: 'DEA Releases', region: 'Americas', badge: 'narco' },
 ];
-    for (const item of items.slice(0, 10)) {
+    for (const item of items.slice(0, 15)) {
       const title = (item.match(/<title[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/title>/) ||
                      item.match(/<title[^>]*>([\s\S]*?)<\/title>/))?.[1]?.trim();
       const link = (item.match(/<link[^>]*>([\s\S]*?)<\/link>/) ||
@@ -114,7 +114,7 @@ function parseRSS(xml, feedConfig) {
           _pubDate: pubDate,
           time: pubDate ? formatTime(new Date(pubDate)) : 'Recent',
           timeClass: pubDate && (Date.now() - new Date(pubDate)) < 3600000 ? 'time-recent' :
-                     pubDate && (Date.now() - new Date(pubDate)) < 86400000 ? 'time-today' : 'time-old',
+                     pubDate && (Date.now() - new Date(pubDate)) < 86500000 ? 'time-today' : 'time-old',
         });
       }
     }
@@ -165,7 +165,7 @@ async function fetchFeed(feed) {
 // Race all feeds in parallel against a hard 10s deadline
 async function fetchAllFeeds(feeds) {
   const deadline = new Promise(resolve =>
-    setTimeout(() => resolve([]), 10000)
+    setTimeout(() => resolve([]), 14000)
   );
   const allFetches = Promise.all(feeds.map(fetchFeed)).then(r => r.flat());
   return Promise.race([allFetches, deadline]);
@@ -254,7 +254,7 @@ function pickHero(articles) {
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
-  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=60 ');
+  res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=120, stale-while-revalidate=60 ');
 
   const { category = 'all', page = '1' } = req.query;
 
