@@ -307,14 +307,16 @@
     min-height: 300px;
   }
   .hero-visual {
-    background: linear-gradient(135deg, #0d1f3a 0%, #1a0d0d 50%, #0d1a10 100%);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    background:
+      linear-gradient(160deg, #0a1628 0%, #0d0a1a 40%, #0a1a0d 100%);
+    gap: 0;
   }
   .hero-visual-art {
     position: absolute;
@@ -322,25 +324,19 @@
     opacity: 0.3;
   }
   .hero-visual-label {
-    width: 100%;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-family: var(--font-mono);
-    font-size: clamp(14px, 3.5vw, 52px);
+    font-size: clamp(22px, 4.5vw, 58px);
     font-weight: 500;
-    color: rgba(212, 168, 67, 0.25);
+    color: rgba(212, 168, 67, 0.18);
     text-transform: uppercase;
     letter-spacing: -0.02em;
     text-align: center;
-    padding: 12px 16px;
-    white-space: normal;
-    word-break: break-word;
-    overflow: hidden;
+    line-height: 1;
     position: relative;
     z-index: 2;
-    line-height: 1.1;
+    white-space: normal;
+    word-break: break-word;
+    padding: 0 12px;
   }
   .hero-content {
     padding: 28px;
@@ -1390,15 +1386,7 @@
   .hero-visual::after { display: none; }
   
 
-  .hero-visual-img {
-    width: 100%;
-    flex: 1;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    min-height: 120px;
-    transition: background-image 0.4s ease;
-  }
+  .hero-visual-img { display: none; }
 
   .sidebar-ad-edu { padding: 4px 0; }
   .ad-edu-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
@@ -1412,6 +1400,67 @@
   .ad-edu-badges span { font-family:var(--font-mono); font-size:8px; color:var(--accent); border:1px solid var(--accent); border-radius:3px; padding:2px 6px; letter-spacing:0.05em; }
   .ad-edu-cta { display:block; background:var(--accent); color:#000; text-align:center; padding:8px; border-radius:4px; font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.1em; text-decoration:none; }
   .ad-edu-cta:hover { opacity:0.85; }
+
+  /* Hero visual atmospheric effects */
+  .hero-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255,255,255,0.012) 2px,
+      rgba(255,255,255,0.012) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+  .hero-visual-rule {
+    width: 40px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.6;
+    margin: 14px auto;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-visual-source {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    color: rgba(212, 168, 67, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  .hero-live-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    color: rgba(212, 168, 67, 0.7);
+    letter-spacing: 0.15em;
+    z-index: 3;
+  }
+  .hero-live-badge::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -1545,7 +1594,11 @@
       <!-- HERO STORY -->
       <div class="hero-card" id="hero-block">
         <div class="hero-visual" id="hero-visual">
-          <div class="hero-visual-label" id="hero-visual-label">CARGO</div>
+          <div class="hero-live-badge">LIVE</div>
+          <div class="hero-visual-label" id="hero-visual-label">ALL COVERAGE</div>
+          <div class="hero-visual-rule"></div>
+          <div class="hero-visual-source" id="hero-visual-source"></div>
+        </div>
         </div>
         <div class="hero-content">
           <div>
@@ -2621,12 +2674,13 @@ function updateHero(articles, cat) {
     maritime:'MARITIME', wildlife:'WILDLIFE TRAFFICKING', seized:'SEIZURES'
   };
 
-  // Always show the selected category label
   var catLabel = CAT_LABELS[cat] || (cat||'').toUpperCase();
   var el = function(id){ return document.getElementById(id); };
+
+  // Always show selected category label
   if (el('hero-visual-label')) el('hero-visual-label').textContent = catLabel;
 
-  // Pick best article for this category, fall back to all
+  // Pick best article for this category
   var pool = (cat === 'all') ? articles : articles.filter(function(a){ return a.badge === cat; });
   if (!pool.length) pool = articles;
   var order = { 'time-recent': 0, 'time-today': 1, 'time-old': 2 };
@@ -2638,37 +2692,20 @@ function updateHero(articles, cat) {
   if (el('hero-link'))     el('hero-link').href            = h.url || '#';
   if (el('hero-source'))   el('hero-source').textContent   = h.source || '';
   if (el('hero-time'))     el('hero-time').textContent     = (h.time||'') + (h.region ? '   ' + h.region : '');
+
+  // Source line in visual panel
+  if (el('hero-visual-source')) el('hero-visual-source').textContent = h.source || '';
+
   if (el('hero-badge')) {
     el('hero-badge').textContent = catLabel;
-    el('hero-badge').className   = 'article-badge badge-' + cat;
+    el('hero-badge').className   = 'article-badge badge-' + (cat||'seized');
   }
 
-  // Fallback category images (used when article has no image)
-  var FALLBACK_IMAGES = {
-    cargo:    'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80',
-    airport:  'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=600&q=80',
-    border:   'https://images.unsplash.com/photo-1541336744128-ced197bb1d0e?w=600&q=80',
-    human:    'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600&q=80',
-    narco:    'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&q=80',
-    weapons:  'https://images.unsplash.com/photo-1595590424283-b8f17842773f?w=600&q=80',
-    maritime: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
-    wildlife: 'https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=600&q=80',
-    seized:   'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80',
-    all:      'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?w=600&q=80',
-  };
-
-  // Use live article image if available, otherwise category fallback
-  var imgUrl = (h.image && h.image.startsWith('http')) ? h.image : (FALLBACK_IMAGES[cat] || FALLBACK_IMAGES['all']);
-
+  // Clear any leftover image divs
   var visual = el('hero-visual');
   if (visual) {
     var imgDiv = visual.querySelector('.hero-visual-img');
-    if (!imgDiv) {
-      imgDiv = document.createElement('div');
-      imgDiv.className = 'hero-visual-img';
-      visual.appendChild(imgDiv);
-    }
-    imgDiv.style.backgroundImage = 'url(' + imgUrl + ')';
+    if (imgDiv) imgDiv.remove();
     visual.style.backgroundImage = '';
   }
 }
