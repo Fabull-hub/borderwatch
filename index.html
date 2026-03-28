@@ -2301,6 +2301,9 @@ function renderSourcesGrid(filter) {
 function filterCategory(cat) {
   currentCategory = cat;
 
+  // Scroll to top so hero + articles are visible immediately
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
   // Update active nav tab
   document.querySelectorAll('.nav-link').forEach(function(el) {
     el.classList.remove('active');
@@ -2315,11 +2318,10 @@ function filterCategory(cat) {
   var articleList = document.getElementById('article-list');
   if (articleList) articleList.style.display = '';
 
-  // Render filtered articles from live cache
+  // Render filtered articles + update hero
   var articles = window._liveArticles || [];
   if (articles.length > 0) {
     renderLiveArticles(articles, cat);
-    // Update hero to show best article from this category
     updateHero(articles, cat);
   } else {
     fetchLiveNews(cat, true);
