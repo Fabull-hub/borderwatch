@@ -1613,6 +1613,18 @@
   .article-card { position: relative; }
   .article-card:hover .article-share { display: block; }
   .article-share:hover { opacity: 1; background: rgba(212,168,67,0.1); }
+
+  .nav-link .tab-count {
+    background: rgba(212,168,67,0.15);
+    color: var(--accent);
+    font-size: 8px;
+    font-family: var(--font-mono);
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .nav-link.active .tab-count { background: rgba(212,168,67,0.35); }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -2360,17 +2372,26 @@ function updateStats(articles) {
 function updateTabCounts(articles) {
   var CATS = ['all','cargo','airport','border','human','narco','weapons','maritime','wildlife','seized','geopolitics'];
   CATS.forEach(function(cat) {
-    var btn = document.querySelector('[data-cat="' + cat + '"]');
-    if (!btn) return;
     var count = cat === 'all' ? articles.length : articles.filter(function(a){ return a.badge === cat; }).length;
-    var badge = btn.querySelector('.tab-count');
-    if (!badge) {
-      badge = document.createElement('span');
-      badge.className = 'tab-count';
-      btn.appendChild(badge);
+    // Find the nav link for this category
+    var link = document.querySelector('[data-cat="' + cat + '"]') ||
+               Array.from(document.querySelectorAll('.nav-link, .tab-btn')).find(function(el) {
+                 var oc = el.getAttribute('onclick') || '';
+                 return oc.includes("'" + cat + "'") || oc.includes('"' + cat + '"');
+               });
+    if (!link) return;
+    var countSpan = link.querySelector('.tab-count');
+    if (!countSpan) {
+      countSpan = document.createElement('span');
+      countSpan.className = 'tab-count';
+      link.appendChild(countSpan);
     }
-    badge.textContent = count;
-    badge.style.display = count === 0 ? 'none' : 'inline-block';
+    if (count > 0) {
+      countSpan.textContent = count;
+      countSpan.style.display = 'inline-block';
+    } else {
+      countSpan.style.display = 'none';
+    }
   });
 }
 
