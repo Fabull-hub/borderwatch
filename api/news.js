@@ -10,6 +10,8 @@ const RSS_FEEDS = [
   { url: 'https://www.globalinitiative.net/feed/', source: 'Global Initiative', region: 'Global', badge: 'seized' },
   { url: 'https://www.justice.gov/feeds/opa/justice-news.xml', source: 'US DOJ', region: 'Americas', badge: 'seized' },
   { url: 'https://www.fbi.gov/feeds/fbi-in-the-news/rss.xml', source: 'FBI', region: 'Americas', badge: 'seized' },
+  { url: 'https://www.nationalcrimeagency.gov.uk/news/rss', source: 'UK NCA', region: 'Europe', badge: 'seized' },
+  { url: 'https://www.gov.uk/government/organisations/serious-fraud-office.atom', source: 'UK SFO', region: 'Europe', badge: 'seized' },
 
   // === NARCOTICS ===
   { url: 'https://insightcrime.org/feed/', source: 'InSight Crime', region: 'Latin America', badge: 'narco' },
@@ -17,15 +19,19 @@ const RSS_FEEDS = [
   { url: 'https://www.dea.gov/rss.xml', source: 'DEA', region: 'Americas', badge: 'narco' },
   { url: 'https://www.emcdda.europa.eu/rss/news_en', source: 'EMCDDA', region: 'Europe', badge: 'narco' },
   { url: 'https://www.talkingdrugs.org/feed', source: 'Talking Drugs', region: 'Global', badge: 'narco' },
-  { url: 'https://www.theguardian.com/world/drug-trade/rss', source: 'Guardian Drug Trade', region: 'Global', badge: 'narco' },
+  { url: 'https://www.theguardian.com/world/drug-trade/rss', source: 'Guardian Drugs', region: 'Global', badge: 'narco' },
 
   // === CARGO / TRADE ===
-  { url: 'https://www.wcoomd.org/en/media/newsroom/rss.ashx', source: 'WCO', region: 'Global', badge: 'cargo' },
   { url: 'https://www.cbp.gov/rss.xml', source: 'US CBP', region: 'Americas', badge: 'cargo' },
+  { url: 'https://www.cbp.gov/rss/newsroom', source: 'US CBP Newsroom', region: 'Americas', badge: 'cargo' },
+  { url: 'https://www.cbp.gov/rss/trade', source: 'US CBP Trade', region: 'Americas', badge: 'cargo' },
+  { url: 'https://www.cbp.gov/rss/trade/forced-labor', source: 'US CBP Forced Labor', region: 'Americas', badge: 'cargo' },
+  { url: 'https://www.cbp.gov/rss/border-security', source: 'US CBP Border Security', region: 'Americas', badge: 'border' },
+  { url: 'https://www.wcoomd.org/en/media/newsroom/rss.ashx', source: 'WCO', region: 'Global', badge: 'cargo' },
   { url: 'https://www.freightwaves.com/news/feed', source: 'FreightWaves', region: 'Global', badge: 'cargo' },
   { url: 'https://www.supplychaindive.com/feeds/news/', source: 'Supply Chain Dive', region: 'Global', badge: 'cargo' },
   { url: 'https://www.logisticsmgmt.com/rss/news', source: 'Logistics Mgmt', region: 'Global', badge: 'cargo' },
-  { url: 'https://www.dhs.gov/dhs-news-updates', source: 'DHS', region: 'Americas', badge: 'cargo' },
+  { url: 'https://www.abf.gov.au/about-us/news/media-releases/rss', source: 'Australia ABF', region: 'Asia-Pacific', badge: 'cargo' },
 
   // === AIRPORT ===
   { url: 'https://www.tsa.gov/news-releases/feed', source: 'TSA', region: 'Americas', badge: 'airport' },
@@ -38,8 +44,7 @@ const RSS_FEEDS = [
   { url: 'https://www.borderreport.com/feed/', source: 'Border Report', region: 'Americas', badge: 'border' },
   { url: 'https://www.borderlandbeat.com/feeds/posts/default', source: 'Borderland Beat', region: 'Latin America', badge: 'border' },
   { url: 'https://www.ice.gov/rss', source: 'ICE', region: 'Americas', badge: 'border' },
-  { url: 'https://feeds.foxnews.com/foxnews/national', source: 'Fox News', region: 'Americas', badge: 'border' },
-  { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', source: 'BBC World', region: 'Global', badge: 'border' },
+  { url: 'https://www.dhs.gov/rss/news.rss', source: 'DHS', region: 'Americas', badge: 'border' },
 
   // === HUMAN SMUGGLING ===
   { url: 'https://www.iom.int/rss.xml', source: 'IOM', region: 'Global', badge: 'human' },
@@ -57,24 +62,27 @@ const RSS_FEEDS = [
   { url: 'https://gcaptain.com/feed/', source: 'gCaptain', region: 'Global', badge: 'maritime' },
   { url: 'https://www.maritime-executive.com/rss', source: 'Maritime Executive', region: 'Global', badge: 'maritime' },
   { url: 'https://www.imo.org/en/MediaCentre/PressBriefings/rss', source: 'IMO', region: 'Global', badge: 'maritime' },
-  { url: 'https://www.icc-ccs.org/index.php/1158-latest-news?format=feed&type=rss', source: 'ICC-CCS', region: 'Global', badge: 'maritime' },
+  { url: 'https://www.icc-ccs.org/index.php/1158-latest-news?format=feed&type=rss', source: 'ICC-CCS Piracy', region: 'Global', badge: 'maritime' },
   { url: 'https://www.uscg.mil/Updates/NewsUpdates.aspx?rss=1', source: 'US Coast Guard', region: 'Americas', badge: 'maritime' },
+  { url: 'https://www.marinetraffic.com/en/news/feed', source: 'Marine Traffic', region: 'Global', badge: 'maritime' },
 
   // === WILDLIFE TRAFFICKING ===
   { url: 'https://cites.org/eng/news/rss.xml', source: 'CITES', region: 'Global', badge: 'wildlife' },
   { url: 'https://www.traffic.org/feed/', source: 'TRAFFIC', region: 'Global', badge: 'wildlife' },
-  { url: 'https://www.wwf.org.uk/rss.xml', source: 'WWF', region: 'Global', badge: 'wildlife' },
+  { url: 'https://www.wwf.org.uk/rss.xml', source: 'WWF UK', region: 'Global', badge: 'wildlife' },
   { url: 'https://news.mongabay.com/feed/', source: 'Mongabay', region: 'Global', badge: 'wildlife' },
+  { url: 'https://www.worldwildlife.org/stories.rss', source: 'WWF Global', region: 'Global', badge: 'wildlife' },
 
-  // === GEOPOLITICS (border-security relevant) ===
+  // === GEOPOLITICS (border-security relevant only) ===
   { url: 'https://rss.dw.com/rdf/rss-en-world', source: 'DW World', region: 'Europe', badge: 'geopolitics' },
   { url: 'https://thehill.com/policy/national-security/feed/', source: 'The Hill', region: 'Americas', badge: 'geopolitics' },
-  { url: 'https://feeds.reuters.com/reuters/topNews', source: 'Reuters', region: 'Global', badge: 'geopolitics' },
-  { url: 'https://www.cbsnews.com/latest/rss/main', source: 'CBS News', region: 'Americas', badge: 'geopolitics' },
   { url: 'https://www.infobae.com/rss/internacionales.xml', source: 'Infobae', region: 'Latin America', badge: 'geopolitics' },
+  { url: 'https://feeds.foxnews.com/foxnews/national', source: 'Fox News', region: 'Americas', badge: 'geopolitics' },
+  { url: 'https://feeds.bbci.co.uk/news/world/rss.xml', source: 'BBC World', region: 'Global', badge: 'geopolitics' },
+  { url: 'https://www.cbsnews.com/latest/rss/main', source: 'CBS News', region: 'Americas', badge: 'geopolitics' },
+  { url: 'https://feeds.reuters.com/reuters/topNews', source: 'Reuters', region: 'Global', badge: 'geopolitics' },
 
 ];
-
 const BADGE_MAP = {
   narco: 'NARCOTICS', border: 'LAND BORDER', cargo: 'CARGO', airport: 'AIRPORT',
   human: 'HUMAN SMUGGLING', seized: 'SEIZURES', weapons: 'WEAPONS',
