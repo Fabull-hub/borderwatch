@@ -2300,25 +2300,19 @@ function renderSourcesGrid(filter) {
 
 function filterCategory(cat) {
   currentCategory = cat;
-
-  // Hide map, show articles
-  var mapPanel = document.getElementById('map-panel');
-  var articleList = document.getElementById('article-list');
-  if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
-  if (articleList) articleList.style.display = '';
-
   // Update active nav tab
-  document.querySelectorAll('.nav-link').forEach(function(el) { el.classList.remove('active'); });
   document.querySelectorAll('.nav-link').forEach(function(el) {
-    var oc = el.getAttribute('onclick') || '';
-    if (oc.indexOf("'" + cat + "'") !== -1) el.classList.add('active');
+    el.classList.remove('active');
+    if ((el.getAttribute('onclick') || '').indexOf("'" + cat + "'") !== -1) {
+      el.classList.add('active');
+    }
   });
-
-  // Update section subtitle
-  var sub = document.getElementById('section-sub');
-  if (sub) sub.textContent = 'Live Feed · All Categories';
-
-  // Render filtered articles from cache
+  // Hide map, show article list
+  var mapPanel = document.getElementById('map-panel');
+  if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
+  var articleList = document.getElementById('article-list');
+  if (articleList) articleList.style.display = '';
+  // Render from live cache
   if (window._liveArticles && window._liveArticles.length > 0) {
     renderLiveArticles(window._liveArticles, cat);
   } else {
