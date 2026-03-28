@@ -181,6 +181,37 @@ const RSS_FEEDS = [
   // === MIDDLE EAST ===
   { url: 'https://www.customs.gov.sa/en/rss', source: 'Saudi Customs', region: 'Middle East', badge: 'cargo' },
   { url: 'https://www.mof.gov.ae/rss', source: 'UAE Finance', region: 'Middle East', badge: 'cargo' },
+
+  // === G-M COUNTRY AGENCIES (RSS confirmed) ===
+  // Germany
+  { url: 'https://www.zoll.de/SiteGlobals/Functions/RSSFeed/EN/RSSNewsfeed_EN.xml', source: 'Germany Zoll', region: 'Europe', badge: 'cargo' },
+  { url: 'https://www.bka.de/EN/CurrentInformation/PressReleases/pressreleases_node.html;jsessionid=', source: 'Germany BKA', region: 'Europe', badge: 'seized' },
+  // Japan - CONFIRMED RSS
+  { url: 'https://www.customs.go.jp/english/rss.xml', source: 'Japan Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  // Hong Kong
+  { url: 'https://www.customs.gov.hk/filemanager/content/rss/en/pressrelease_e.xml', source: 'HK Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  // Mexico
+  { url: 'https://www.sat.gob.mx/servicio/rss-noticias', source: 'Mexico SAT', region: 'Latin America', badge: 'cargo' },
+  // India  
+  { url: 'https://www.cbic.gov.in/rss/customs-rss.xml', source: 'India CBIC', region: 'Asia-Pacific', badge: 'cargo' },
+  // Indonesia
+  { url: 'https://www.beacukai.go.id/rss/berita.xml', source: 'Indonesia Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  // Korea
+  { url: 'https://www.customs.go.kr/english/rss/rss.do', source: 'Korea Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  // Israel
+  { url: 'https://taxes.gov.il/English/Tax/Customs/Pages/rss.aspx', source: 'Israel Tax Authority', region: 'Middle East', badge: 'cargo' },
+  // Italy
+  { url: 'https://www.agenziadogane.gov.it/en/rss/', source: 'Italy Customs', region: 'Europe', badge: 'cargo' },
+  // Greece
+  { url: 'https://www.aade.gr/en/rss', source: 'Greece AADE', region: 'Europe', badge: 'cargo' },
+  // Guatemala/Honduras (investigative)
+  { url: 'https://www.plazapublica.com.gt/feed', source: 'Plaza Publica GT', region: 'Latin America', badge: 'seized' },
+  { url: 'https://contralinea.com.mx/feed/', source: 'Contralinea MX', region: 'Latin America', badge: 'narco' },
+  { url: 'https://www.criterio.hn/feed/', source: 'Criterio HN', region: 'Latin America', badge: 'border' },
+  { url: 'https://nomada.gt/feed/', source: 'Nomada GT', region: 'Latin America', badge: 'seized' },
+  // Mexico investigative
+  { url: 'https://www.elfinanciero.com.mx/rss/economia.xml', source: 'El Financiero MX', region: 'Latin America', badge: 'cargo' },
+  { url: 'https://www.milenio.com/rss', source: 'Milenio MX', region: 'Latin America', badge: 'narco' },
 ];
 const BADGE_MAP = {
   narco: 'NARCOTICS', border: 'LAND BORDER', cargo: 'CARGO', airport: 'AIRPORT',
@@ -326,6 +357,23 @@ async function fetchNewsAPI(key) {
     { q: 'Philippines customs drugs seized arrested', badge: 'narco', label: 'NARCOTICS' },
     { q: 'Malaysia customs seized drugs trafficking', badge: 'narco', label: 'NARCOTICS' },
     { q: 'Indonesia customs drugs seized arrested', badge: 'narco', label: 'NARCOTICS' },
+
+    // G-M country customs news
+    { q: 'Germany Zoll customs seizure drug smuggling', badge: 'cargo', label: 'CARGO' },
+    { q: 'Greece customs seized drugs smuggling', badge: 'cargo', label: 'CARGO' },
+    { q: 'Guatemala Honduras customs border drugs seized', badge: 'border', label: 'LAND BORDER' },
+    { q: 'India CBIC customs seized smuggling gold', badge: 'cargo', label: 'CARGO' },
+    { q: 'Indonesia customs Bea Cukai seized drugs', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Iran border customs smuggling seized', badge: 'border', label: 'LAND BORDER' },
+    { q: 'Iraq customs border smuggling seized', badge: 'border', label: 'LAND BORDER' },
+    { q: 'Israel customs seized drugs weapons border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Italy customs GdF sequestro droga', badge: 'seized', label: 'SEIZURES' },
+    { q: 'Jamaica customs seized drugs border', badge: 'maritime', label: 'MARITIME' },
+    { q: 'Japan customs seized drugs firearms', badge: 'cargo', label: 'CARGO' },
+    { q: 'Jordan customs seized smuggling border', badge: 'border', label: 'LAND BORDER' },
+    { q: 'Kenya customs seized drugs wildlife', badge: 'seized', label: 'SEIZURES' },
+    { q: 'Korea customs seized drugs smuggling', badge: 'cargo', label: 'CARGO' },
+    { q: 'Mexico SAT aduanas decomiso contrabando', badge: 'cargo', label: 'CARGO' },
   ];
   const articles = [];
   await Promise.all(queries.map(async (q) => {
