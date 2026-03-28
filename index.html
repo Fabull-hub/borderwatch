@@ -1467,6 +1467,34 @@
   }
 
   .article-card > div:first-child { flex: 1; padding-right: 14px; min-width: 0; }
+
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .tab-count {
+    display: inline-block;
+    background: rgba(212,168,67,0.2);
+    color: var(--accent);
+    font-size: 8px;
+    padding: 1px 4px;
+    border-radius: 8px;
+    margin-left: 4px;
+    font-family: var(--font-mono);
+    vertical-align: middle;
+    min-width: 14px;
+    text-align: center;
+  }
+  .tab-btn.active .tab-count {
+    background: rgba(212,168,67,0.35);
+  }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -1541,7 +1569,62 @@
               <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=zh-CN&u=https://bordertrend.com','_blank')">ZH</button>
               <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=ru&u=https://bordertrend.com','_blank')">RU</button>
               <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=ja&u=https://bordertrend.com','_blank')">JA</button>
-              <button class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=ko&u=https://bordertrend.com','_blank')">KO</button>
+              <button data-cat="seized)>Seizures</a>
+          <button class=tab-btn onclick=filterCategory(geopolitics" data-cat="wildlife)>Wildlife Trafficking</a>
+      <a class=nav-link onclick=filterCategory(seized)>Seizures</a>
+          <button class=tab-btn onclick=filterCategory(geopolitics" data-cat="maritime)>Maritime</a>
+      <a class=nav-link onclick=filterCategory(wildlife)>Wildlife Trafficking</a>
+      <a class=nav-link onclick=filterCategory(seized)>Seizures</a>
+          <button class=tab-btn onclick=filterCategory(geopolitics" data-cat="weapons)>Weapons</a>
+      <a class=nav-link onclick=filterCategory(maritime)>Maritime</a>
+      <a class=nav-link onclick=filterCategory(wildlife)>Wildlife Trafficking</a>
+      <a class=nav-link onclick=filterCategory(seized)>Seizures</a>
+          <button class=tab-btn onclick=filterCategory(geopolitics" data-cat="narco)>Narcotics</a>
+      <a class=nav-link onclick=filterCategory(weapons)>Weapons</a>
+      <a class=nav-link onclick=filterCategory(maritime)>Maritime</a>
+      <a class=nav-link onclick=filterCategory(wildlife)>Wildlife Trafficking</a>
+      <a class=nav-link onclick=filterCategory(seized)>Seizures</a>
+          <button class=tab-btn onclick=filterCategory(geopolitics" data-cat="human)>Human Smuggling</a>
+      <a class=nav-link onclick=filterCategory(narco)>Narcotics</a>
+      <a class=nav-link onclick=filterCategory(weapons)>Weapons</a>
+      <a class=nav-link onclick=filterCategory(maritime)>Maritime</a>
+      <a class=nav-link onclick=filterCategory(wildlife)>Wildlife Trafficking</a>
+      <a class=nav-link onclick=filterCategory(seized)>Seizures</a>
+          <button class=tab-btn onclick=filterCategory(geopolitics" data-cat="border)>Land Border</a>
+      <a class=nav-link onclick=filterCategory(human)>Human Smuggling</a>
+      <a class=nav-link onclick=filterCategory(narco)>Narcotics</a>
+      <a class=nav-link onclick=filterCategory(weapons)>Weapons</a>
+      <a class=nav-link onclick=filterCategory(maritime)>Maritime</a>
+      <a class=nav-link onclick=filterCategory(wildlife)>Wildlife Trafficking</a>
+      <a class=nav-link onclick=filterCategory(seized)>Seizures</a>
+          <button class=tab-btn onclick=filterCategory(geopolitics" data-cat="airport)>Airport</a>
+      <a class=nav-link onclick=filterCategory(border)>Land Border</a>
+      <a class=nav-link onclick=filterCategory(human)>Human Smuggling</a>
+      <a class=nav-link onclick=filterCategory(narco)>Narcotics</a>
+      <a class=nav-link onclick=filterCategory(weapons)>Weapons</a>
+      <a class=nav-link onclick=filterCategory(maritime)>Maritime</a>
+      <a class=nav-link onclick=filterCategory(wildlife)>Wildlife Trafficking</a>
+      <a class=nav-link onclick=filterCategory(seized)>Seizures</a>
+          <button class=tab-btn onclick=filterCategory(geopolitics" data-cat="cargo)>Cargo</a>
+      <a class=nav-link onclick=filterCategory(airport)>Airport</a>
+      <a class=nav-link onclick=filterCategory(border)>Land Border</a>
+      <a class=nav-link onclick=filterCategory(human)>Human Smuggling</a>
+      <a class=nav-link onclick=filterCategory(narco)>Narcotics</a>
+      <a class=nav-link onclick=filterCategory(weapons)>Weapons</a>
+      <a class=nav-link onclick=filterCategory(maritime)>Maritime</a>
+      <a class=nav-link onclick=filterCategory(wildlife)>Wildlife Trafficking</a>
+      <a class=nav-link onclick=filterCategory(seized)>Seizures</a>
+          <button class=tab-btn onclick=filterCategory(geopolitics" data-cat="all)>All Coverage</a>
+      <a class=nav-link onclick=filterCategory(cargo)>Cargo</a>
+      <a class=nav-link onclick=filterCategory(airport)>Airport</a>
+      <a class=nav-link onclick=filterCategory(border)>Land Border</a>
+      <a class=nav-link onclick=filterCategory(human)>Human Smuggling</a>
+      <a class=nav-link onclick=filterCategory(narco)>Narcotics</a>
+      <a class=nav-link onclick=filterCategory(weapons)>Weapons</a>
+      <a class=nav-link onclick=filterCategory(maritime)>Maritime</a>
+      <a class=nav-link onclick=filterCategory(wildlife)>Wildlife Trafficking</a>
+      <a class=nav-link onclick=filterCategory(seized)>Seizures</a>
+          <button class=tab-btn onclick=filterCategory(geopolitics" class="lang-btn" onclick="window.open('https://translate.google.com/translate?sl=en&tl=ko&u=https://bordertrend.com','_blank')">KO</button>
             </div>
       </div>
     </div>
@@ -1557,7 +1640,7 @@
       <a class="nav-link" onclick="filterCategory('maritime')">Maritime</a>
       <a class="nav-link" onclick="filterCategory('wildlife')">Wildlife Trafficking</a>
       <a class="nav-link" onclick="filterCategory('seized')">Seizures</a>
-          <button class="tab-btn" onclick="filterCategory('geopolitics', this)">GEOPOLITICS</button>
+          <button data-cat="geopolitics" class="tab-btn" onclick="filterCategory('geopolitics', this)">GEOPOLITICS</button>
       <a class="nav-link" onclick="showSources()">Sources Directory</a>
       <div class="search-box">
         <input type="text" class="search-input" placeholder="Search smuggling news…" id="search-input" oninput="filterSearch(this.value)">
@@ -2088,6 +2171,7 @@ function showApiError(fallbackFn) {
 function renderLiveArticles(articles, filter) {
       renderTicker(_liveArticles);
       updateStats(_liveArticles);
+      updateTabCounts(_liveArticles);
   const list = document.getElementById('article-list');
   if (!list) return;
   const filtered = (!filter || filter === 'all') ? articles : articles.filter(a => a.badge === filter);
@@ -2151,6 +2235,23 @@ function updateStats(articles) {
   var freshTime = recent.length ? recent[0].time : (articles[0] ? articles[0].time : '--');
   if (el('stat-fresh')) el('stat-fresh').textContent = freshTime;
   if (el('stat-fresh-sub')) el('stat-fresh-sub').textContent = recent.length ? 'breaking now' : 'latest article';
+}
+
+function updateTabCounts(articles) {
+  var CATS = ['all','cargo','airport','border','human','narco','weapons','maritime','wildlife','seized','geopolitics'];
+  CATS.forEach(function(cat) {
+    var btn = document.querySelector('[data-cat="' + cat + '"]');
+    if (!btn) return;
+    var count = cat === 'all' ? articles.length : articles.filter(function(a){ return a.badge === cat; }).length;
+    var badge = btn.querySelector('.tab-count');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'tab-count';
+      btn.appendChild(badge);
+    }
+    badge.textContent = count;
+    badge.style.display = count === 0 ? 'none' : 'inline-block';
+  });
 }
 
 async function fetchLiveNews(category, force) {
@@ -2782,5 +2883,40 @@ renderHeatmap();
 renderSourcesGrid('all');
 updateSourceCounts();
 </script>
+
+  <!-- ABOUT MODAL -->
+  <div id="modal-about" style="display:none;position:fixed;inset:0;background:rgba(6,11,24,0.92);z-index:9999;overflow-y:auto;padding:40px 20px">
+    <div style="max-width:640px;margin:0 auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:40px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.15em">ABOUT BORDERTREND</div>
+        <button onclick="document.getElementById('modal-about').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:0">&times;</button>
+      </div>
+      <h2 style="font-family:var(--font-serif);font-size:24px;color:var(--text1);margin-bottom:16px">Global Smuggling &amp; Border Security Intelligence</h2>
+      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px">BorderTrend is a real-time intelligence platform aggregating open-source reporting on smuggling, trafficking, border security, and related enforcement activity from over 70 official, investigative, and media sources worldwide.</p>
+      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px">Our mission is to make border security intelligence accessible to researchers, journalists, law enforcement professionals, policy makers, and trade compliance practitioners.</p>
+      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px">All content is sourced from publicly available RSS feeds and news APIs. BorderTrend does not produce original reporting and links directly to original sources.</p>
+      <div style="border-top:1px solid var(--border);padding-top:20px">
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:8px">CONTACT</div>
+        <a href="#" onclick="document.getElementById('modal-privacy').style.display='block';return false;" style="cursor:pointer">fivestarmediamanagement@hotmail.com</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIVACY MODAL -->
+  <div id="modal-privacy" style="display:none;position:fixed;inset:0;background:rgba(6,11,24,0.92);z-index:9999;overflow-y:auto;padding:40px 20px">
+    <div style="max-width:640px;margin:0 auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:40px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+        <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.15em">PRIVACY POLICY</div>
+        <button onclick="document.getElementById('modal-privacy').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:0">&times;</button>
+      </div>
+      <h2 style="font-family:var(--font-serif);font-size:24px;color:var(--text1);margin-bottom:16px">Privacy Policy</h2>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:20px">Last updated: March 2026</div>
+      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px"><strong style="color:var(--text1)">Data we collect:</strong> BorderTrend does not collect personal data. We do not require registration, login, or any form of personal identification to use the service.</p>
+      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px"><strong style="color:var(--text1)">Cookies:</strong> We do not use tracking cookies. Standard web server logs may record IP addresses for security and performance monitoring purposes only.</p>
+      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px"><strong style="color:var(--text1)">Third-party content:</strong> Articles displayed on BorderTrend link to third-party news sources. We are not responsible for the privacy practices of those sources.</p>
+      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px"><strong style="color:var(--text1)">Advertising:</strong> BorderTrend displays mock advertising placements. No behavioural advertising or user tracking is employed.</p>
+      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px"><strong style="color:var(--text1)">Contact:</strong> For privacy-related questions, contact us at <a href="mailto:fivestarmediamanagement@hotmail.com" style="color:var(--accent)">fivestarmediamanagement@hotmail.com</a>.</p>
+    </div>
+  </div>
 </body>
 </html>
