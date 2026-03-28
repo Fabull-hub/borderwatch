@@ -144,6 +144,43 @@ const RSS_FEEDS = [
   { url: 'https://www.revenue.ie/en/news/rss.xml', source: 'Ireland Revenue', region: 'Europe', badge: 'cargo' },
   { url: 'https://www.belastingdienst.nl/rss/nieuws.rss', source: 'Netherlands Customs', region: 'Europe', badge: 'cargo' },
   { url: 'https://www.zoll.de/SiteGlobals/Functions/RSSFeed/EN/RSSNewsfeed_EN.xml', source: 'Germany Zoll', region: 'Europe', badge: 'cargo' },
+
+  // === C-F COUNTRY CUSTOMS AGENCIES (confirmed RSS) ===
+  { url: 'https://www.cbsa-asfc.gc.ca/media/releases-communiques/rss-eng.xml', source: 'Canada CBSA', region: 'Americas', badge: 'border' },
+  { url: 'https://www.aduana.cl/aduana/site/rss/rssNoticias.xml', source: 'Chile Aduanas', region: 'Latin America', badge: 'cargo' },
+  { url: 'https://english.customs.gov.cn/rss.xml', source: 'China GAC', region: 'Asia-Pacific', badge: 'cargo' },
+  { url: 'https://www.aduanacolombia.com/rss', source: 'Colombia DIAN', region: 'Latin America', badge: 'cargo' },
+  { url: 'https://www.carina.gob.cu/rss', source: 'Cuba Customs', region: 'Americas', badge: 'cargo' },
+  { url: 'https://www.carina.gob.do/rss', source: 'Dominican Republic Customs', region: 'Americas', badge: 'cargo' },
+  { url: 'https://www.douane.gouv.fr/rss/actualites.xml', source: 'France Douanes', region: 'Europe', badge: 'cargo' },
+  { url: 'https://www.afad.gov.tr/rss', source: 'Turkey Customs', region: 'Europe', badge: 'cargo' },
+  { url: 'https://www.revenue.ie/en/news/rss.xml', source: 'Ireland Revenue', region: 'Europe', badge: 'cargo' },
+
+  // === LATIN AMERICA INVESTIGATIVE (Spanish) ===
+  { url: 'https://www.elespectador.com/rss/noticias/', source: 'El Espectador', region: 'Latin America', badge: 'seized' },
+  { url: 'https://connectas.org/feed/', source: 'CONNECTAS', region: 'Latin America', badge: 'seized' },
+  { url: 'https://elpais.com/rss/tag/trafico_drogas/', source: 'El Pais Drogas', region: 'Latin America', badge: 'narco' },
+  { url: 'https://www.telesurtv.net/rss/noticias.xml', source: 'TeleSur', region: 'Latin America', badge: 'geopolitics' },
+  { url: 'https://www.elsalvador.com/rss', source: 'El Salvador News', region: 'Latin America', badge: 'border' },
+  { url: 'https://www.proceso.com.mx/rss/noticias', source: 'Proceso MX', region: 'Latin America', badge: 'narco' },
+  { url: 'https://www.animalpolitico.com/feed/', source: 'Animal Politico', region: 'Latin America', badge: 'narco' },
+  { url: 'https://elfaro.net/rss', source: 'El Faro', region: 'Latin America', badge: 'seized' },
+  { url: 'https://contracorriente.red/feed/', source: 'Contra Corriente', region: 'Latin America', badge: 'border' },
+
+  // === ASIA-PACIFIC AGENCIES ===
+  { url: 'https://www.customs.gov.sg/news-and-media/press-releases/rss', source: 'Singapore Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  { url: 'https://www.police.gov.sg/newsroom/press-releases/rss', source: 'Singapore Police', region: 'Asia-Pacific', badge: 'seized' },
+  { url: 'https://www.customs.gov.ph/rss', source: 'Philippines Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  { url: 'https://www.customs.gov.my/en/rss', source: 'Malaysia Customs', region: 'Asia-Pacific', badge: 'cargo' },
+
+  // === AFRICA (agencies with English news) ===
+  { url: 'https://www.sars.gov.za/rss', source: 'South Africa SARS', region: 'Africa', badge: 'cargo' },
+  { url: 'https://www.kra.go.ke/rss', source: 'Kenya Revenue', region: 'Africa', badge: 'cargo' },
+  { url: 'https://www.customs.gov.ng/rss', source: 'Nigeria Customs', region: 'Africa', badge: 'cargo' },
+
+  // === MIDDLE EAST ===
+  { url: 'https://www.customs.gov.sa/en/rss', source: 'Saudi Customs', region: 'Middle East', badge: 'cargo' },
+  { url: 'https://www.mof.gov.ae/rss', source: 'UAE Finance', region: 'Middle East', badge: 'cargo' },
 ];
 const BADGE_MAP = {
   narco: 'NARCOTICS', border: 'LAND BORDER', cargo: 'CARGO', airport: 'AIRPORT',
@@ -271,6 +308,24 @@ async function fetchNewsAPI(key) {
     { q: 'cargo xray scanning technology border security', badge: 'cargo', label: 'CARGO' },
     { q: 'airport security technology scanner biometric', badge: 'airport', label: 'AIRPORT' },
     { q: 'border security technology AI surveillance', badge: 'border', label: 'LAND BORDER' },
+
+    // C-F country customs news
+    { q: 'Canada CBSA customs seizure border arrest', badge: 'border', label: 'LAND BORDER' },
+    { q: 'Chile aduanas decomiso contrabando', badge: 'cargo', label: 'CARGO' },
+    { q: 'China customs seized smuggling arrested', badge: 'cargo', label: 'CARGO' },
+    { q: 'Colombia DIAN decomiso contrabando', badge: 'seized', label: 'SEIZURES' },
+    { q: 'Cuba customs contraband seized', badge: 'cargo', label: 'CARGO' },
+    { q: 'France douanes saisie trafic', badge: 'cargo', label: 'CARGO' },
+    // Africa / Middle East
+    { q: 'South Africa customs seized smuggling drugs', badge: 'seized', label: 'SEIZURES' },
+    { q: 'Nigeria customs seizure contraband arrested', badge: 'cargo', label: 'CARGO' },
+    { q: 'Kenya revenue customs seized drugs', badge: 'cargo', label: 'CARGO' },
+    { q: 'Dubai UAE customs seized smuggling', badge: 'cargo', label: 'CARGO' },
+    // Asia-Pacific
+    { q: 'Singapore customs seized smuggling drugs', badge: 'cargo', label: 'CARGO' },
+    { q: 'Philippines customs drugs seized arrested', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Malaysia customs seized drugs trafficking', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Indonesia customs drugs seized arrested', badge: 'narco', label: 'NARCOTICS' },
   ];
   const articles = [];
   await Promise.all(queries.map(async (q) => {
