@@ -1522,7 +1522,6 @@
         <input type="text" class="search-input" placeholder="Search smuggling news…" id="search-input" oninput="filterSearch(this.value)">
       </div>
     
-      <a class="nav-link" onclick="showMap()" id="map-nav-btn">🗺️ Map</a></nav>
   </div>
 </header>
 
@@ -1602,24 +1601,7 @@
       </div>
 
       <!-- ── LIVE SEIZURE MAP ─────────────────────────────────────────── -->
-      <div class="map-panel" id="map-panel">
-        <div class="map-stats">
-          <div class="map-stat"><span id="map-pin-count">0</span>Active Incidents</div>
-          <div class="map-stat"><span id="map-region-count">0</span>Regions</div>
-          <div class="map-stat"><span id="map-feed-time">—</span>Last Updated</div>
-        </div>
-        <div id="seizure-map"></div>
-        <div class="map-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:#e74c3c;"></div>Seizures</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#e67e22;"></div>Narcotics</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#3a7bd5;"></div>Maritime</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#9b59b6;"></div>Human Smuggling</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#d4a843;"></div>Cargo / Border</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#27ae60;"></div>Wildlife</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#e74c3c;box-shadow:0 0 0 3px rgba(231,76,60,0.3);"></div>Weapons</div>
-        </div>
-      </div>
-
+      
       <!-- AD ZONE 3: IN-FEED NATIVE AD (injected between articles) -->
       <div class="ad-infeed" id="ad-infeed-1" onclick="window.open('https://lexport.com','_blank')" style="cursor:pointer;border-left:3px solid #d4a843;">
   <div class="ad-infeed-badge">SPONSORED</div>
@@ -2584,58 +2566,8 @@ function jitter(coord) {
   return coord + (Math.random() - 0.5) * 8;
 }
 
-function initMap() {
-  if (_mapInitialised) return;
-  _mapInitialised = true;
-  _map = L.map('seizure-map', { center:[20,0], zoom:2, minZoom:2, maxZoom:8 });
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 19,
-    className: 'map-tiles',
-  }).addTo(_map);
-}
 
-function plotArticlesOnMap(articles) {
-  if (!_map) return;
 
-  // Clear existing markers
-  _mapMarkers.forEach(m => _map.removeLayer(m));
-  _mapMarkers = [];
-
-  const regionSet = new Set();
-  let plotted = 0;
-
-  articles.forEach(a => {
-    const base = REGION_COORDS[a.region];
-    if (!base) return;
-    regionSet.add(a.region);
-    const lat = jitter(base[0]);
-    const lng = jitter(base[1]);
-    const icon = makeMarkerIcon(a.badge);
-
-    const marker = L.marker([lat, lng], { icon })
-      .bindPopup(`
-        <div class="map-popup-headline">${a.headline}</div>
-        <div class="map-popup-meta">${a.badgeLabel} &middot; ${a.source} &middot; ${a.time}</div>
-        <a class="map-popup-link" href="${a.url}" target="_blank" rel="noopener">Read full story &rarr;</a>
-      `, { maxWidth: 280 })
-      .addTo(_map);
-
-    _mapMarkers.push(marker);
-    plotted++;
-  });
-
-  // Update stats
-  const pinCount = document.getElementById('map-pin-count');
-  const regionCount = document.getElementById('map-region-count');
-  const feedTime = document.getElementById('map-feed-time');
-  if (pinCount) pinCount.textContent = plotted;
-  if (regionCount) regionCount.textContent = regionSet.size;
-  if (feedTime) feedTime.textContent = new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', hour12:false }) + ' UTC';
-}
-
-function showMap() {
   // Update nav active state
   document.querySelectorAll('.nav-link').forEach(function(el) { el.classList.remove('active'); });
   var btn = document.getElementById('map-nav-btn');
