@@ -401,16 +401,17 @@
     background: var(--bg2);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 10px 14px;
+    padding: 10px 0 10px 14px;
     display: flex;
     flex-direction: row;
-    gap: 12px;
+    gap: 0;
     align-items: stretch;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
     text-decoration: none;
     color: inherit;
     margin-bottom: 4px;
+    overflow: hidden;
   }
   .article-card:hover { background: var(--bg3); border-color: var(--border2); }
   .article-badge {
@@ -1461,6 +1462,8 @@
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.4; transform: scale(0.8); }
   }
+
+  .article-card > div:first-child { flex: 1; padding-right: 14px; min-width: 0; }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
