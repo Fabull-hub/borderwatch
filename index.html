@@ -2068,6 +2068,7 @@ async function fetchLiveNews(category, force) {
   const now = Date.now();
   if (!force && _liveArticles.length > 0 && (now - _lastFetch) < CACHE_TTL) {
     renderLiveArticles(_liveArticles, category); return;
+      updateHero(_liveArticles, category);
   }
   if (_isLoading) return;
   _isLoading = true;
