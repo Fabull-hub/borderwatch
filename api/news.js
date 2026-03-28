@@ -271,7 +271,7 @@ export default async function handler(req, res) {
       : articles;
 
     const pageNum = parseInt(page, 10) || 1;
-    const perPage = 20;
+    const perPage = 100;
     const paginated = filtered.slice((pageNum - 1) * perPage, pageNum * perPage);
 
     res.status(200).json({
