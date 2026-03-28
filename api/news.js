@@ -254,6 +254,63 @@ const RSS_FEEDS = [
   { url: 'https://ojo-publico.com/feed', source: 'Ojo Publico Peru', region: 'Latin America', badge: 'seized' },
   { url: 'https://www.connectas.org/feed/', source: 'Connectas', region: 'Latin America', badge: 'seized' },
   { url: 'https://www.seguridadjusticiaypaz.org.mx/feed', source: 'Seguridad Justicia MX', region: 'Latin America', badge: 'narco' },
+
+  // === N-Z COUNTRY AGENCIES ===
+
+  // Netherlands - RSS CONFIRMED
+  { url: 'https://nh.douane.nl/rssfeeds/berichten.rss', source: 'Netherlands Douane', region: 'Europe', badge: 'cargo' },
+
+  // Spain - RSS CONFIRMED
+  { url: 'https://sede.agenciatributaria.gob.es/rss/aduanas.xml', source: 'Spain AEAT Customs', region: 'Europe', badge: 'cargo' },
+
+  // Sweden
+  { url: 'https://www.tullverket.se/rss/nyheter.xml', source: 'Sweden Tullverket', region: 'Europe', badge: 'cargo' },
+
+  // Norway
+  { url: 'https://www.toll.no/en/rss/', source: 'Norway Tollvesenet', region: 'Europe', badge: 'cargo' },
+
+  // Poland
+  { url: 'https://www.gov.pl/rss/sluzba-celno-skarbowa', source: 'Poland Customs', region: 'Europe', badge: 'cargo' },
+
+  // Russia
+  { url: 'https://eng.customs.gov.ru/rss', source: 'Russia FCS', region: 'Europe', badge: 'cargo' },
+
+  // Switzerland
+  { url: 'https://www.bazg.admin.ch/bazg/en/home/services/rss.html', source: 'Switzerland BAZG', region: 'Europe', badge: 'cargo' },
+
+  // Ukraine
+  { url: 'https://customs.gov.ua/en/rss', source: 'Ukraine Customs', region: 'Europe', badge: 'cargo' },
+
+  // New Zealand - confirmed above
+  { url: 'https://www.customs.govt.nz/news/press-releases/rss/', source: 'NZ Customs', region: 'Asia-Pacific', badge: 'border' },
+
+  // Thailand
+  { url: 'https://www.customs.go.th/rss/', source: 'Thailand Customs', region: 'Asia-Pacific', badge: 'cargo' },
+
+  // Vietnam
+  { url: 'https://www.customs.gov.vn/en/rss', source: 'Vietnam Customs', region: 'Asia-Pacific', badge: 'cargo' },
+
+  // South Africa - major enforcement agency
+  { url: 'https://www.saps.gov.za/newsroom/rss', source: 'South Africa Police', region: 'Africa', badge: 'seized' },
+
+  // Venezuela (investigative - key narco corridor)
+  { url: 'https://efectococuyo.com/feed/', source: 'Efecto Cocuyo', region: 'Latin America', badge: 'geopolitics' },
+  { url: 'https://prodavinci.com/feed/', source: 'Prodavinci', region: 'Latin America', badge: 'geopolitics' },
+
+  // Peru / Ecuador (key smuggling routes)
+  { url: 'https://ojo-publico.com/feed', source: 'Ojo Publico PE', region: 'Latin America', badge: 'seized' },
+  { url: 'https://www.planv.com.ec/feed', source: 'Plan V Ecuador', region: 'Latin America', badge: 'seized' },
+  { url: 'https://www.primicias.ec/feed/', source: 'Primicias EC', region: 'Latin America', badge: 'seized' },
+
+  // Panama (key transit country)
+  { url: 'https://www.laestrella.com.pa/rss.xml', source: 'La Estrella Panama', region: 'Latin America', badge: 'maritime' },
+
+  // Zimbabwe / Zambia (wildlife trafficking)
+  { url: 'https://allafrica.com/tools/headlines/rdf/zimbabwe/headlines.rdf', source: 'AllAfrica Zimbabwe', region: 'Africa', badge: 'wildlife' },
+  { url: 'https://allafrica.com/tools/headlines/rdf/zambia/headlines.rdf', source: 'AllAfrica Zambia', region: 'Africa', badge: 'wildlife' },
+  { url: 'https://allafrica.com/tools/headlines/rdf/nigeria/headlines.rdf', source: 'AllAfrica Nigeria', region: 'Africa', badge: 'seized' },
+  { url: 'https://allafrica.com/tools/headlines/rdf/kenya/headlines.rdf', source: 'AllAfrica Kenya', region: 'Africa', badge: 'seized' },
+  { url: 'https://allafrica.com/tools/headlines/rdf/southafrica/headlines.rdf', source: 'AllAfrica South Africa', region: 'Africa', badge: 'seized' },
 ];
 const BADGE_MAP = {
   narco: 'NARCOTICS', border: 'LAND BORDER', cargo: 'CARGO', airport: 'AIRPORT',
@@ -441,6 +498,31 @@ async function fetchNewsAPI(key) {
     { q: 'Venezuela drugs seized border trafficking', badge: 'narco', label: 'NARCOTICS' },
     { q: 'Vietnam customs seized drugs arrested', badge: 'narco', label: 'NARCOTICS' },
     { q: 'Zambia Zimbabwe customs seized drugs wildlife', badge: 'wildlife', label: 'WILDLIFE TRAFFICKING' },
+
+    // N-Z country customs news
+    { q: 'Netherlands Dutch customs seized drugs Rotterdam port', badge: 'maritime', label: 'MARITIME' },
+    { q: 'New Zealand customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Nigeria customs FIRS seized smuggling', badge: 'cargo', label: 'CARGO' },
+    { q: 'Norway customs toll seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Pakistan customs FBR seized smuggling border', badge: 'border', label: 'LAND BORDER' },
+    { q: 'Panama canal customs seized drugs maritime', badge: 'maritime', label: 'MARITIME' },
+    { q: 'Peru customs SUNAT seized drugs trafficking', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Philippines Bureau Customs seized drugs', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Poland customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Portugal customs AT seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Romania customs ANAF seized smuggling', badge: 'cargo', label: 'CARGO' },
+    { q: 'Russia customs FCS seized smuggling border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Saudi Arabia customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Spain AEAT aduana decomiso contrabando', badge: 'cargo', label: 'CARGO' },
+    { q: 'Sweden customs Tullverket seized drugs', badge: 'cargo', label: 'CARGO' },
+    { q: 'Switzerland customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Thailand customs seized drugs wildlife', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Turkey customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'UAE Dubai customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Ukraine customs seized smuggling border', badge: 'border', label: 'LAND BORDER' },
+    { q: 'Venezuela drugs smuggling seized border', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Vietnam customs seized drugs border', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Zambia Zimbabwe wildlife customs seized', badge: 'wildlife', label: 'WILDLIFE TRAFFICKING' },
   ];
   const articles = [];
   await Promise.all(queries.map(async (q) => {
