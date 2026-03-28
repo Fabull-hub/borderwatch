@@ -2683,6 +2683,22 @@ function updateHero(articles, cat) {
 
 //     INIT                                                                     
 fetchLiveNews('all');
+// Auto-refresh news every 5 minutes
+setInterval(function() {
+  fetchLiveNews(currentCategory || 'all', true);
+}, 5 * 60 * 1000);
+
+// Live clock update every second
+setInterval(function() {
+  var clockEl = document.getElementById('live-clock');
+  if (clockEl) {
+    var now = new Date();
+    var h = String(now.getUTCHours()).padStart(2,'0');
+    var m = String(now.getUTCMinutes()).padStart(2,'0');
+    clockEl.textContent = h + ':' + m + ' UTC';
+  }
+}, 1000);
+
 renderThreeCol();
 renderSidebarSources();
 renderCatBars();
