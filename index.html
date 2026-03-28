@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BorderTrend — Global Smuggling & Border Security Intelligence</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.googleapis.com"
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -2022,7 +2022,7 @@
       <div class="section-header">
         <div class="section-title" id="section-title">Latest Intelligence</div>
         <div class="section-rule"></div>
-        <div class="section-sub" id="section-sub">Live Feed · All Categories</div>
+        <div class="section-sub" id="section-sub">Live Feed</div>
       </div>
 
       <!-- ARTICLE LIST -->
@@ -2988,6 +2988,11 @@ function filterCategory(cat) {
   // Render from live cache
   if (window._liveArticles && window._liveArticles.length > 0) {
     renderLiveArticles(window._liveArticles, cat);
+    var subEl = document.getElementById('section-sub');
+    if (subEl) {
+      var CAT_DISPLAY = {all:'All Categories',cargo:'Cargo',airport:'Airport',border:'Land Border',human:'Human Smuggling',narco:'Narcotics',weapons:'Weapons',maritime:'Maritime',wildlife:'Wildlife Trafficking',seized:'Seizures',geopolitics:'Geopolitics'};
+      subEl.textContent = 'Live Feed  ' + (CAT_DISPLAY[cat] || cat);
+    }
     updateHero(_liveArticles, cat);
   } else {
     fetchLiveNews(cat, true);
