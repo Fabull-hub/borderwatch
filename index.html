@@ -1495,6 +1495,19 @@
   .tab-btn.active .tab-count {
     background: rgba(212,168,67,0.35);
   }
+
+  .tab-count {
+    display: inline-block;
+    background: rgba(212,168,67,0.18);
+    color: var(--accent);
+    font-size: 8px;
+    font-family: var(--font-mono);
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .tab-btn.active .tab-count { background: rgba(212,168,67,0.35); }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -2172,6 +2185,7 @@ function renderLiveArticles(articles, filter) {
       renderTicker(_liveArticles);
       updateStats(_liveArticles);
       updateTabCounts(_liveArticles);
+      updateTabCounts(_liveArticles);
   const list = document.getElementById('article-list');
   if (!list) return;
   const filtered = (!filter || filter === 'all') ? articles : articles.filter(a => a.badge === filter);
@@ -2251,6 +2265,27 @@ function updateTabCounts(articles) {
     }
     badge.textContent = count;
     badge.style.display = count === 0 ? 'none' : 'inline-block';
+  });
+}
+
+function updateTabCounts(articles) {
+  var CATS = ['all','cargo','airport','border','human','narco','weapons','maritime','wildlife','seized','geopolitics'];
+  CATS.forEach(function(cat) {
+    var count = cat === 'all' ? articles.length : articles.filter(function(a){ return a.badge === cat; }).length;
+    // Find button for this category and update/add count
+    var btn = document.querySelector('[data-cat="' + cat + '"]') ||
+              Array.from(document.querySelectorAll('button')).find(function(b) {
+                return b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + cat + "'");
+              });
+    if (!btn) return;
+    var countSpan = btn.querySelector('.tab-count');
+    if (!countSpan) {
+      countSpan = document.createElement('span');
+      countSpan.className = 'tab-count';
+      btn.appendChild(countSpan);
+    }
+    countSpan.textContent = count > 0 ? count : '';
+    countSpan.style.display = count > 0 ? 'inline-block' : 'none';
   });
 }
 
@@ -2897,26 +2932,42 @@ updateSourceCounts();
       <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px">All content is sourced from publicly available RSS feeds and news APIs. BorderTrend does not produce original reporting and links directly to original sources.</p>
       <div style="border-top:1px solid var(--border);padding-top:20px">
         <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:8px">CONTACT</div>
-        <a href="#" onclick="document.getElementById('modal-privacy').style.display='block';return false;" style="cursor:pointer">fivestarmediamanagement@hotmail.com</a>
-      </div>
+        <a href="#" onclick="event.preventDefault();document.getElementById('modal-privacy').style.display='block'">Privacy Policy</a>.</p>
     </div>
   </div>
 
-  <!-- PRIVACY MODAL -->
-  <div id="modal-privacy" style="display:none;position:fixed;inset:0;background:rgba(6,11,24,0.92);z-index:9999;overflow-y:auto;padding:40px 20px">
-    <div style="max-width:640px;margin:0 auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:40px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-        <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.15em">PRIVACY POLICY</div>
-        <button onclick="document.getElementById('modal-privacy').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:0">&times;</button>
-      </div>
-      <h2 style="font-family:var(--font-serif);font-size:24px;color:var(--text1);margin-bottom:16px">Privacy Policy</h2>
-      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:20px">Last updated: March 2026</div>
-      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px"><strong style="color:var(--text1)">Data we collect:</strong> BorderTrend does not collect personal data. We do not require registration, login, or any form of personal identification to use the service.</p>
-      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px"><strong style="color:var(--text1)">Cookies:</strong> We do not use tracking cookies. Standard web server logs may record IP addresses for security and performance monitoring purposes only.</p>
-      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px"><strong style="color:var(--text1)">Third-party content:</strong> Articles displayed on BorderTrend link to third-party news sources. We are not responsible for the privacy practices of those sources.</p>
-      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px"><strong style="color:var(--text1)">Advertising:</strong> BorderTrend displays mock advertising placements. No behavioural advertising or user tracking is employed.</p>
-      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px"><strong style="color:var(--text1)">Contact:</strong> For privacy-related questions, contact us at <a href="mailto:fivestarmediamanagement@hotmail.com" style="color:var(--accent)">fivestarmediamanagement@hotmail.com</a>.</p>
+<!-- ABOUT MODAL -->
+<div id="modal-about" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;overflow-y:auto">
+  <div style="max-width:700px;margin:60px auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:48px;position:relative">
+    <button onclick="document.getElementById('modal-about').style.display='none'" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">x</button>
+    <div style="font-family:var(--font-mono);font-size:9px;color:var(--accent);letter-spacing:0.15em;margin-bottom:8px">ABOUT BORDERTREND</div>
+    <h2 style="font-family:var(--font-serif);font-size:28px;color:var(--text1);margin:0 0 24px">Global Smuggling & Border Security Intelligence</h2>
+    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px">BorderTrend is a real-time intelligence aggregator tracking global smuggling, trafficking, and border security developments. We monitor 70+ official, investigative, and news sources across 5 regions to surface the stories that matter to professionals in customs, law enforcement, trade compliance, and border security.</p>
+    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px">Our platform covers narcotics seizures, human trafficking operations, cargo fraud, weapons interdictions, maritime smuggling, wildlife trafficking, and geopolitical developments affecting global trade corridors.</p>
+    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:32px">BorderTrend aggregates publicly available information from government agencies, international organisations, investigative media, and NGOs. We do not produce original intelligence or endorse any political position.</p>
+    <div style="border-top:1px solid var(--border);padding-top:24px">
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:8px">CONTACT</div>
+      <a href="mailto:fivestarmediamanagement@hotmail.com" style="color:var(--accent);font-family:var(--font-mono);font-size:11px">fivestarmediamanagement@hotmail.com</a>
     </div>
   </div>
+</div>
+
+<!-- PRIVACY MODAL -->
+<div id="modal-privacy" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;overflow-y:auto">
+  <div style="max-width:700px;margin:60px auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:48px;position:relative">
+    <button onclick="document.getElementById('modal-privacy').style.display='none'" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">x</button>
+    <div style="font-family:var(--font-mono);font-size:9px;color:var(--accent);letter-spacing:0.15em;margin-bottom:8px">PRIVACY POLICY</div>
+    <h2 style="font-family:var(--font-serif);font-size:28px;color:var(--text1);margin:0 0 24px">Your Privacy</h2>
+    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px"><strong style="color:var(--text1)">Data we collect:</strong> BorderTrend does not collect personal data, require registration, or track individual users. We do not use cookies beyond what is technically necessary to serve the site.</p>
+    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px"><strong style="color:var(--text1)">Third-party content:</strong> This site displays advertisements from third-party providers and aggregates content from external news sources. Those providers may have their own privacy practices which we do not control.</p>
+    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px"><strong style="color:var(--text1)">Analytics:</strong> We may use anonymous, aggregate analytics to understand site traffic. No personally identifiable information is stored or shared.</p>
+    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px"><strong style="color:var(--text1)">GDPR / CCPA:</strong> If you are located in the European Union or California and have questions about your data rights, contact us at the email below. As we collect no personal data, there is nothing to request deletion of.</p>
+    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:32px"><strong style="color:var(--text1)">Updates:</strong> This policy may be updated periodically. Continued use of the site constitutes acceptance of the current policy.</p>
+    <div style="border-top:1px solid var(--border);padding-top:24px">
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:8px">CONTACT</div>
+      <a href="mailto:fivestarmediamanagement@hotmail.com" style="color:var(--accent);font-family:var(--font-mono);font-size:11px">fivestarmediamanagement@hotmail.com</a>
+    </div>
+  </div>
+</div>
 </body>
 </html>
