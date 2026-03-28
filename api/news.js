@@ -175,7 +175,7 @@ async function fetchNewsAPI(key) {
       data.articles.forEach(a => {
         if (!a.title || a.title === '[Removed]') return;
         articles.push({
-          url: a.url,
+          url: a.url, image: a.urlToImage || '',
           headline: a.title,
           summary: (a.description||'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().substring(0,200),
           source: a.source.name || 'NewsAPI',
