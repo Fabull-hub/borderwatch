@@ -325,17 +325,19 @@
   }
   .hero-visual-label {
     font-family: var(--font-mono);
-    font-size: clamp(22px, 4.5vw, 58px);
+    font-size: clamp(14px, 3vw, 42px);
     font-weight: 500;
     color: rgba(212, 168, 67, 0.18);
     text-transform: uppercase;
     letter-spacing: -0.02em;
     text-align: center;
-    line-height: 1;
+    line-height: 1.1;
     position: relative;
     z-index: 2;
-    white-space: normal;
-    word-break: break-word;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
     padding: 0 12px;
   }
   .hero-content {
@@ -3208,20 +3210,27 @@ function updateHero(articles, cat) {
   var catLabel = CAT_LABELS[cat] || (cat||'').toUpperCase();
   var el = function(id){ return document.getElementById(id); };
 
-  // Always update the visual panel label
-  if (el('hero-visual-label')) el('hero-visual-label').textContent = catLabel;
+  // Update visual panel label + scale font to fit
+  var labelEl = el('hero-visual-label');
+  if (labelEl) {
+    labelEl.textContent = catLabel;
+    // Scale font: short labels big, long labels smaller
+    var len = catLabel.length;
+    var size = len <= 7 ? '42px' : len <= 12 ? '32px' : len <= 18 ? '24px' : '18px';
+    labelEl.style.fontSize = size;
+  }
+
   if (el('hero-badge')) {
     el('hero-badge').textContent = catLabel;
     el('hero-badge').className = 'article-badge badge-' + (cat||'seized');
   }
 
-  // Filter to ONLY this category   never fall back to unrelated articles
+  // Filter to ONLY this category
   var pool = (cat === 'all') ? articles : articles.filter(function(a){ return a.badge === cat; });
 
-  // If no articles in this category   show empty state, not a random article
   if (!pool.length) {
     if (el('hero-headline')) el('hero-headline').textContent = 'No ' + catLabel + ' stories right now';
-    if (el('hero-deck')) el('hero-deck').textContent = 'Check back soon   the feed updates every 5 minutes.';
+    if (el('hero-deck')) el('hero-deck').textContent = 'Check back soon - the feed updates every 5 minutes.';
     if (el('hero-source')) el('hero-source').textContent = '';
     if (el('hero-time')) el('hero-time').textContent = '';
     if (el('hero-link')) el('hero-link').href = '#';
@@ -3229,7 +3238,6 @@ function updateHero(articles, cat) {
     return;
   }
 
-  // Sort: recent first, then today, then old
   var order = { 'time-recent': 0, 'time-today': 1, 'time-old': 2 };
   pool = pool.slice().sort(function(a,b){
     return (order[a.timeClass]||2) - (order[b.timeClass]||2);
@@ -3243,7 +3251,6 @@ function updateHero(articles, cat) {
   if (el('hero-time'))     el('hero-time').textContent     = (h.time||'') + (h.region ? ' ' + h.region : '');
   if (el('hero-visual-source')) el('hero-visual-source').textContent = h.source || '';
 
-  // Clear any leftover image
   var visual = el('hero-visual');
   if (visual) {
     var imgDiv = visual.querySelector('.hero-visual-img');
