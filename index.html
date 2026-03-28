@@ -1590,6 +1590,29 @@
     .hero-headline { font-size: 16px; }
     .tab-btn { font-size: 7px; padding: 5px 7px; }
   }
+
+  .ticker-wrap:hover .ticker-content { animation-play-state: paused; }
+  .ticker-content { cursor: pointer; }
+
+  .article-share {
+    display: none;
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0.7;
+    padding: 3px 6px;
+    border: 1px solid rgba(212,168,67,0.3);
+    border-radius: 3px;
+  }
+  .article-card { position: relative; }
+  .article-card:hover .article-share { display: block; }
+  .article-share:hover { opacity: 1; background: rgba(212,168,67,0.1); }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
@@ -2267,6 +2290,7 @@ function renderLiveArticles(articles, filter) {
       renderTicker(_liveArticles);
       updateStats(_liveArticles);
       updateTabCounts(_liveArticles);
+      renderCatBars(_liveArticles);
       updateTabCounts(_liveArticles);
   const list = document.getElementById('article-list');
   if (!list) return;
@@ -2592,25 +2616,55 @@ function renderSidebarSources() {
   document.getElementById('source-count').textContent = SOURCES.length + ' tracked';
 }
 
-function renderCatBars() {
-  const cats = [
-    { label: 'Narcotics / Drugs', pct: 28, color: '#3aad72' },
-    { label: 'Human Smuggling', pct: 22, color: '#d4a843' },
-    { label: 'Cargo & Trade Fraud', pct: 18, color: '#3a7bd5' },
-    { label: 'Airport Interdiction', pct: 12, color: '#c94c3a' },
-    { label: 'Wildlife Trafficking', pct: 9, color: '#2a9d8f' },
-    { label: 'Weapons', pct: 6, color: '#e07b39' },
-    { label: 'Maritime', pct: 5, color: '#9b4dca' },
-  ];
-  document.getElementById('cat-bars').innerHTML = cats.map(c => `
-    <div class="cat-row">
-      <div class="cat-meta">
-        <span class="cat-label">${c.label}</span>
-        <span class="cat-pct">${c.pct}%</span>
-      </div>
-      <div class="cat-bar-bg"><div class="cat-bar-fill" style="width:${c.pct}%;background:${c.color}"></div></div>
-    </div>
-  `).join('');
+function renderCatBars(articles) {
+  var container = document.getElementById('cat-bars');
+  if (!container) return;
+  var arts = articles || window._liveArticles || [];
+  if (!arts.length) return;
+
+  var CAT_LABELS = {
+    narco: 'Narcotics / Drugs',
+    human: 'Human Smuggling',
+    cargo: 'Cargo & Trade Fraud',
+    airport: 'Airport Interdiction',
+    wildlife: 'Wildlife Trafficking',
+    weapons: 'Weapons',
+    maritime: 'Maritime',
+    seized: 'Seizures',
+    border: 'Land Border',
+    geopolitics: 'Geopolitics'
+  };
+  var COLORS = {
+    narco: '#4ade80', human: '#facc15', cargo: '#60a5fa',
+    airport: '#f97316', wildlife: '#a78bfa', weapons: '#f87171',
+    maritime: '#22d3ee', seized: '#e879f9', border: '#94a3b8',
+    geopolitics: '#d4a843'
+  };
+
+  // Count by badge
+  var counts = {};
+  arts.forEach(function(a){ if(a.badge) counts[a.badge] = (counts[a.badge]||0)+1; });
+  var total = arts.length;
+  if (!total) return;
+
+  // Sort by count descending, take top 8
+  var sorted = Object.entries(counts)
+    .sort(function(a,b){ return b[1]-a[1]; })
+    .slice(0, 8);
+
+  container.innerHTML = sorted.map(function(entry) {
+    var badge = entry[0], count = entry[1];
+    var pct = Math.round((count / total) * 100);
+    var label = CAT_LABELS[badge] || badge;
+    var color = COLORS[badge] || '#d4a843';
+    return '<div class="cat-bar-row">'
+      + '<div class="cat-bar-label">' + label + '</div>'
+      + '<div class="cat-bar-track">'
+      + '<div class="cat-bar-fill" style="width:' + pct + '%;background:' + color + '"></div>'
+      + '</div>'
+      + '<div class="cat-bar-pct">' + pct + '%</div>'
+      + '</div>';
+  }).join('');
 }
 
 function renderHeatmap() { /* heatmap replaced by Latest Alerts */ }
