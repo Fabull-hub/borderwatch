@@ -122,6 +122,28 @@ const RSS_FEEDS = [
   { url: 'https://www.reddit.com/r/SecurityProfessionals.rss', source: 'r/SecurityProfessionals', region: 'Global', badge: 'seized' },
   { url: 'https://www.reddit.com/r/Customs.rss', source: 'r/Customs', region: 'Global', badge: 'cargo' },
   { url: 'https://www.reddit.com/r/AirportSecurity.rss', source: 'r/AirportSecurity', region: 'Global', badge: 'airport' },
+
+  // === GOVERNMENT PRESS RELEASES (confirmed RSS) ===
+  { url: 'https://www.trade.gov/rss', source: 'ITA Trade', region: 'Americas', badge: 'cargo' },
+  { url: 'https://www.cisa.gov/news-events/news/rss.xml', source: 'CISA', region: 'Americas', badge: 'seized' },
+  { url: 'https://www.cbp.gov/rss/border-security', source: 'US CBP Border Sec', region: 'Americas', badge: 'border' },
+  { url: 'https://www.cbp.gov/rss/trade/forced-labor', source: 'US CBP Forced Labor', region: 'Americas', badge: 'cargo' },
+
+  // === ENGLISH-LANGUAGE CUSTOMS AGENCIES WITH RSS ===
+  // (From your Excel + additional research)
+  { url: 'https://www.gov.uk/government/organisations/hm-revenue-customs.atom', source: 'UK HMRC', region: 'Europe', badge: 'cargo' },
+  { url: 'https://www.gov.uk/government/organisations/border-force.atom', source: 'UK Border Force', region: 'Europe', badge: 'border' },
+  { url: 'https://www.gov.uk/government/organisations/national-crime-agency.atom', source: 'UK NCA', region: 'Europe', badge: 'seized' },
+  { url: 'https://www.cbsa-asfc.gc.ca/media/releases-communiques/rss-eng.xml', source: 'Canada CBSA', region: 'Americas', badge: 'cargo' },
+  { url: 'https://www.police.govt.nz/news/rss.xml', source: 'NZ Police', region: 'Asia-Pacific', badge: 'seized' },
+  { url: 'https://www.customs.govt.nz/news/rss/', source: 'NZ Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  { url: 'https://www.customs.gov.sg/news-and-media/press-releases/rss', source: 'Singapore Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  { url: 'https://www.customs.gov.my/en/rss', source: 'Malaysia Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  { url: 'https://www.customs.go.jp/english/rss.xml', source: 'Japan Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  { url: 'https://english.customs.gov.cn/rss.xml', source: 'China GAC', region: 'Asia-Pacific', badge: 'cargo' },
+  { url: 'https://www.revenue.ie/en/news/rss.xml', source: 'Ireland Revenue', region: 'Europe', badge: 'cargo' },
+  { url: 'https://www.belastingdienst.nl/rss/nieuws.rss', source: 'Netherlands Customs', region: 'Europe', badge: 'cargo' },
+  { url: 'https://www.zoll.de/SiteGlobals/Functions/RSSFeed/EN/RSSNewsfeed_EN.xml', source: 'Germany Zoll', region: 'Europe', badge: 'cargo' },
 ];
 const BADGE_MAP = {
   narco: 'NARCOTICS', border: 'LAND BORDER', cargo: 'CARGO', airport: 'AIRPORT',
@@ -221,15 +243,34 @@ async function fetchAllFeeds() {
 async function fetchNewsAPI(key) {
   if (!key) return [];
   const queries = [
+    // Core smuggling categories
     { q: 'drug seizure smuggling arrested', badge: 'narco', label: 'NARCOTICS' },
-    { q: 'border seizure customs bust', badge: 'seized', label: 'SEIZURES' },
+    { q: 'border seizure customs bust contraband', badge: 'seized', label: 'SEIZURES' },
     { q: 'cargo smuggling container seized customs', badge: 'cargo', label: 'CARGO' },
-    { q: 'airport drugs security seized', badge: 'airport', label: 'AIRPORT' },
-    { q: 'human trafficking smuggling arrested', badge: 'human', label: 'HUMAN SMUGGLING' },
-    { q: 'weapons firearms smuggling seized', badge: 'weapons', label: 'WEAPONS' },
-    { q: 'coast guard maritime drugs intercepted', badge: 'maritime', label: 'MARITIME' },
-    { q: 'wildlife poaching ivory trafficking', badge: 'wildlife', label: 'WILDLIFE TRAFFICKING' },
+    { q: 'airport drugs security seized passenger', badge: 'airport', label: 'AIRPORT' },
+    { q: 'human trafficking smuggling migrants arrested', badge: 'human', label: 'HUMAN SMUGGLING' },
+    { q: 'weapons firearms smuggling seized illegal', badge: 'weapons', label: 'WEAPONS' },
+    { q: 'coast guard maritime drugs boat intercepted', badge: 'maritime', label: 'MARITIME' },
+    { q: 'wildlife poaching ivory trafficking seized', badge: 'wildlife', label: 'WILDLIFE TRAFFICKING' },
     { q: 'border patrol checkpoint land border arrest', badge: 'border', label: 'LAND BORDER' },
+    // Country-specific customs news (from Excel database)
+    { q: 'Algeria customs seizure contraband', badge: 'seized', label: 'SEIZURES' },
+    { q: 'Argentina AFIP aduana decomiso', badge: 'cargo', label: 'CARGO' },
+    { q: 'Australia border force seized arrested', badge: 'border', label: 'LAND BORDER' },
+    { q: 'Bahrain customs seized smuggling', badge: 'cargo', label: 'CARGO' },
+    { q: 'Bangladesh customs seizure smuggling', badge: 'cargo', label: 'CARGO' },
+    { q: 'Afghanistan customs border seizure', badge: 'border', label: 'LAND BORDER' },
+    // Regional sweeps
+    { q: 'Caribbean customs seizure smuggling drugs', badge: 'maritime', label: 'MARITIME' },
+    { q: 'Africa customs border seizure wildlife', badge: 'seized', label: 'SEIZURES' },
+    { q: 'Southeast Asia customs drugs seized', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Middle East customs contraband seized', badge: 'seized', label: 'SEIZURES' },
+    { q: 'Europe Europol customs operation seized', badge: 'seized', label: 'SEIZURES' },
+    { q: 'Latin America cartel drugs seized border', badge: 'narco', label: 'NARCOTICS' },
+    // Technology queries
+    { q: 'cargo xray scanning technology border security', badge: 'cargo', label: 'CARGO' },
+    { q: 'airport security technology scanner biometric', badge: 'airport', label: 'AIRPORT' },
+    { q: 'border security technology AI surveillance', badge: 'border', label: 'LAND BORDER' },
   ];
   const articles = [];
   await Promise.all(queries.map(async (q) => {
