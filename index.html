@@ -395,13 +395,13 @@
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 10px 14px;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 16px;
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
     text-decoration: none;
+    color: inherit;
     margin-bottom: 4px;
   }
   .article-card:hover { background: var(--bg3); border-color: var(--border2); }
@@ -427,12 +427,12 @@
   .badge-maritime { background: #001a2a; color: #4ac4f5; }
 
   .article-headline {
-    font-family: var(--font-body);
-    font-size: 15px;
+    font-family: var(--font-serif, 'Source Serif 4', Georgia, serif);
+    font-size: 14px;
     font-weight: 600;
     line-height: 1.35;
-    color: var(--text);
-    margin-bottom: 6px;
+    color: var(--text1);
+    margin-bottom: 4px;
   }
   .article-summary {
     font-family: var(--font-sans);
@@ -1320,6 +1320,60 @@
     text-transform: uppercase;
   }
   .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── Article card meta row ── */
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+  .article-region {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text3);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 1px 5px;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .article-source {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+  }
+  .article-time {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .article-time.time-recent { color: var(--green, #3aad72); }
+  .article-time.time-today  { color: var(--amber, #d4a843); }
+  .article-time.time-old    { color: var(--text3); }
+  .article-summary {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.45;
+    margin-top: 2px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
