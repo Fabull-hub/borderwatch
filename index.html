@@ -688,14 +688,15 @@
     border: 1px solid var(--border);
     color: var(--text2);
     font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
+    font-size: 9px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 7px 14px;
+    padding: 7px 10px;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
+    flex-shrink: 0;
   }
   .tab-btn:hover { border-color: var(--border2); color: var(--text); }
   .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 600; }
@@ -1469,7 +1470,15 @@
 </style>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script></head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23060b18'/><text x='16' y='22' text-anchor='middle' font-size='18' font-family='monospace' fill='%23d4a843'>B</text></svg>">
+  <meta name="description" content="BorderTrend — Real-time global intelligence on smuggling, trafficking, seizures and border security. Live feeds from 70+ official and investigative sources.">
+  <meta property="og:title" content="BorderTrend — Global Smuggling & Border Security Intelligence">
+  <meta property="og:description" content="Real-time intelligence on drug seizures, human trafficking, cargo fraud, weapons smuggling and border security from 70+ global sources.">
+  <meta property="og:url" content="https://bordertrend.com">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="BorderTrend — Border Security Intelligence">
+</head>
 <body>
 
 <!-- BREAKING NEWS TICKER -->
@@ -1503,8 +1512,6 @@
   </div>
   <div style="background:#d4a843;border-radius:4px;padding:11px 20px;font-family:Arial,sans-serif;font-size:13px;font-weight:700;color:#000;white-space:nowrap;flex-shrink:0;">Free Trial →</div>
 </div>
-        <div class="ad-slot-size">970 x 90 — Leaderboard / Billboard</div>
-        <div class="ad-slot-cta" onclick="window.open('mailto:ads@borderwatch.io','_blank')">Advertise Here</div>
       </div>
     </div>
   </div>
@@ -1563,33 +1570,33 @@
 <main class="container">
 
   <!-- STATS STRIP -->
-  <div class="stats-strip">
-    <div class="stat-cell">
-      <div class="stat-label">Stories Today</div>
-      <div class="stat-value" id="stat-stories">247</div>
-      <div class="stat-sub">▲ +34 vs yesterday</div>
+  <div class="stats-bar">
+      <div class="stat-cell">
+        <div class="stat-label">STORIES TODAY</div>
+        <div class="stat-value" id="stat-stories">--</div>
+        <div class="stat-sub" id="stat-stories-sub">loading...</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">CATEGORIES COVERED</div>
+        <div class="stat-value" id="stat-cats">--</div>
+        <div class="stat-sub" id="stat-cats-sub">across all tabs</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">MOST ACTIVE SOURCE</div>
+        <div class="stat-value" id="stat-source" style="font-size:14px;letter-spacing:0">--</div>
+        <div class="stat-sub" id="stat-source-sub">by article count</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">FRESHEST UPDATE</div>
+        <div class="stat-value" id="stat-fresh">--</div>
+        <div class="stat-sub" id="stat-fresh-sub">most recent article</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label">SOURCES MONITORED</div>
+        <div class="stat-value" id="stat-sources">71</div>
+        <div class="stat-sub">5 regions covered</div>
+      </div>
     </div>
-    <div class="stat-cell">
-      <div class="stat-label">Active Operations</div>
-      <div class="stat-value">18</div>
-      <div class="stat-sub">▲ 3 new launched</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-label">Global Seizures (30d)</div>
-      <div class="stat-value">$4.2B</div>
-      <div class="stat-sub">▲ +12% vs prior month</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-label">Alerts / Notices</div>
-      <div class="stat-value">6</div>
-      <div class="stat-sub neg">▼ 2 critical</div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-label">Sources Monitored</div>
-      <div class="stat-value" id="stat-sources">—</div>
-      <div class="stat-sub" id="stat-countries">Loading...</div>
-    </div>
-  </div>
 
   <!-- TWO-COLUMN NEWS + SIDEBAR -->
   <div class="news-grid" id="main-grid">
@@ -2080,6 +2087,7 @@ function showApiError(fallbackFn) {
 
 function renderLiveArticles(articles, filter) {
       renderTicker(_liveArticles);
+      updateStats(_liveArticles);
   const list = document.getElementById('article-list');
   if (!list) return;
   const filtered = (!filter || filter === 'all') ? articles : articles.filter(a => a.badge === filter);
@@ -2111,6 +2119,38 @@ function renderTicker(articles) {
     return '<span><a href="' + (a.url||'#') + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">'
       + (a.headline||'').replace(/[<>]/g,'').substring(0,100) + '</a></span>';
   }).join('  &bull;  ');
+}
+
+function updateStats(articles) {
+  if (!articles || !articles.length) return;
+  var el = function(id){ return document.getElementById(id); };
+
+  // Stories Today
+  var today = articles.filter(function(a){ return a.timeClass === 'time-recent' || a.timeClass === 'time-today'; }).length;
+  if (el('stat-stories')) el('stat-stories').textContent = today || articles.length;
+  if (el('stat-stories-sub')) el('stat-stories-sub').textContent = articles.length + ' total tracked';
+
+  // Categories covered (non-zero)
+  var badges = {};
+  articles.forEach(function(a){ if(a.badge) badges[a.badge] = true; });
+  var catCount = Object.keys(badges).length;
+  if (el('stat-cats')) el('stat-cats').textContent = catCount;
+  if (el('stat-cats-sub')) el('stat-cats-sub').textContent = 'of ' + Object.keys(badges).join(', ').substring(0,30);
+
+  // Most active source
+  var sources = {};
+  articles.forEach(function(a){ if(a.source) sources[a.source] = (sources[a.source]||0)+1; });
+  var topSource = Object.entries(sources).sort(function(a,b){ return b[1]-a[1]; })[0];
+  if (topSource) {
+    if (el('stat-source')) el('stat-source').textContent = topSource[0];
+    if (el('stat-source-sub')) el('stat-source-sub').textContent = topSource[1] + ' articles today';
+  }
+
+  // Freshest update
+  var recent = articles.filter(function(a){ return a.timeClass === 'time-recent'; });
+  var freshTime = recent.length ? recent[0].time : (articles[0] ? articles[0].time : '--');
+  if (el('stat-fresh')) el('stat-fresh').textContent = freshTime;
+  if (el('stat-fresh-sub')) el('stat-fresh-sub').textContent = recent.length ? 'breaking now' : 'latest article';
 }
 
 async function fetchLiveNews(category, force) {
