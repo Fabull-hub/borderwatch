@@ -82,6 +82,46 @@ const RSS_FEEDS = [
   { url: 'https://www.cbsnews.com/latest/rss/main', source: 'CBS News', region: 'Americas', badge: 'geopolitics' },
   { url: 'https://feeds.reuters.com/reuters/topNews', source: 'Reuters', region: 'Global', badge: 'geopolitics' },
 
+
+  // === TECHNOLOGY / SECURITY SCANNING / INNOVATION ===
+  { url: 'https://www.securitymagazine.com/rss/articles', source: 'Security Magazine', region: 'Global', badge: 'airport' },
+  { url: 'https://www.homelandsecuritynewswire.com/rss', source: 'Homeland Security Newswire', region: 'Americas', badge: 'seized' },
+  { url: 'https://www.hstoday.us/feed/', source: 'HS Today', region: 'Americas', badge: 'seized' },
+  { url: 'https://homelandprepnews.com/feed', source: 'Homeland Prep News', region: 'Americas', badge: 'seized' },
+  { url: 'https://www.aviationsecurityinternational.com/rss', source: 'Aviation Security Intl', region: 'Global', badge: 'airport' },
+  { url: 'https://www.screener.airport-technology.com/feed/', source: 'Airport Security Tech', region: 'Global', badge: 'airport' },
+  { url: 'https://www.cargosecurityinternational.com/rss', source: 'Cargo Security Intl', region: 'Global', badge: 'cargo' },
+
+  // === AIR CARGO INDUSTRY ===
+  { url: 'https://www.aircargonews.net/feed/', source: 'Air Cargo News', region: 'Global', badge: 'cargo' },
+  { url: 'https://aircargoweek.com/feed/', source: 'Air Cargo Week', region: 'Global', badge: 'cargo' },
+  { url: 'https://www.internationalairportreview.com/feed/', source: 'Intl Airport Review', region: 'Global', badge: 'airport' },
+  { url: 'https://www.aircargonext.com/feed/', source: 'Air Cargo Next', region: 'Global', badge: 'cargo' },
+
+  // === SPANISH LANGUAGE SOURCES ===
+  { url: 'https://www.infobae.com/rss/america/', source: 'Infobae America', region: 'Latin America', badge: 'geopolitics' },
+  { url: 'https://www.eluniversal.com.mx/rss.xml', source: 'El Universal', region: 'Latin America', badge: 'geopolitics' },
+  { url: 'https://rss.dw.com/rdf/rss-es-am', source: 'DW Espanol', region: 'Latin America', badge: 'geopolitics' },
+  { url: 'https://feeds.bbci.co.uk/mundo/rss.xml', source: 'BBC Mundo', region: 'Latin America', badge: 'geopolitics' },
+  { url: 'https://www.laopinion.com/feed/', source: 'La Opinion', region: 'Americas', badge: 'border' },
+  { url: 'https://www.elnuevoherald.com/news/local/article.rss', source: 'El Nuevo Herald', region: 'Americas', badge: 'border' },
+
+  // === INVESTIGATIVE / ANALYTICAL BLOGS ===
+  { url: 'https://justsecurity.org/feed/', source: 'Just Security', region: 'Global', badge: 'geopolitics' },
+  { url: 'https://www.longwarjournal.org/feed', source: 'Long War Journal', region: 'Global', badge: 'geopolitics' },
+  { url: 'https://globalriskinsights.com/feed/', source: 'Global Risk Insights', region: 'Global', badge: 'geopolitics' },
+  { url: 'https://www.organized-crime.de/feed', source: 'Organized Crime', region: 'Europe', badge: 'seized' },
+  { url: 'https://www.globalfinancialintegrity.org/feed/', source: 'Global Fin Integrity', region: 'Global', badge: 'seized' },
+
+  // === MSN / AGGREGATED NEWS (filtered via guessBadge) ===
+  { url: 'https://www.msn.com/en-us/news/us/rss', source: 'MSN US', region: 'Americas', badge: 'border' },
+
+  // === REDDIT via RSS (key subreddits) ===
+  { url: 'https://www.reddit.com/r/BorderSecurity.rss', source: 'r/BorderSecurity', region: 'Global', badge: 'border' },
+  { url: 'https://www.reddit.com/r/Smuggling.rss', source: 'r/Smuggling', region: 'Global', badge: 'seized' },
+  { url: 'https://www.reddit.com/r/SecurityProfessionals.rss', source: 'r/SecurityProfessionals', region: 'Global', badge: 'seized' },
+  { url: 'https://www.reddit.com/r/Customs.rss', source: 'r/Customs', region: 'Global', badge: 'cargo' },
+  { url: 'https://www.reddit.com/r/AirportSecurity.rss', source: 'r/AirportSecurity', region: 'Global', badge: 'airport' },
 ];
 const BADGE_MAP = {
   narco: 'NARCOTICS', border: 'LAND BORDER', cargo: 'CARGO', airport: 'AIRPORT',
