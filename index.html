@@ -430,6 +430,8 @@
   .badge-border { background: var(--tag-border); color: #6fd4a0; }
   .badge-human { background: var(--tag-human); color: #f5897a; }
   .badge-seized { background: var(--tag-seized); color: #f5c842; }
+  .badge-geopolitics { background: rgba(99, 102, 241, 0.25); color: #a5b4fc; border-color: rgba(99, 102, 241, 0.5); }
+
   .badge-narco { background: #1a2a00; color: #a3e05a; }
   .badge-weapons { background: #2a1a00; color: #f5a84a; }
   .badge-wildlife { background: #002a1a; color: #4af5c4; }
@@ -1548,6 +1550,7 @@
       <a class="nav-link" onclick="filterCategory('maritime')">Maritime</a>
       <a class="nav-link" onclick="filterCategory('wildlife')">Wildlife Trafficking</a>
       <a class="nav-link" onclick="filterCategory('seized')">Seizures</a>
+          <button class="tab-btn" onclick="filterCategory('geopolitics', this)">GEOPOLITICS</button>
       <a class="nav-link" onclick="showSources()">Sources Directory</a>
       <div class="search-box">
         <input type="text" class="search-input" placeholder="Search smuggling news…" id="search-input" oninput="filterSearch(this.value)">
@@ -2673,7 +2676,8 @@ function updateHero(articles, cat) {
   var CAT_LABELS = {
     all:'ALL COVERAGE', cargo:'CARGO', airport:'AIRPORT', border:'LAND BORDER',
     human:'HUMAN SMUGGLING', narco:'NARCOTICS', weapons:'WEAPONS',
-    maritime:'MARITIME', wildlife:'WILDLIFE TRAFFICKING', seized:'SEIZURES'
+    maritime:'MARITIME', wildlife:'WILDLIFE TRAFFICKING', seized:'SEIZURES',
+    geopolitics:'GEOPOLITICS'
   };
 
   var catLabel = CAT_LABELS[cat] || (cat||'').toUpperCase();
