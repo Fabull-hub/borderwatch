@@ -77,7 +77,7 @@ function parseRSS(xml, feedConfig) {
       const pubDate = item.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/)?.[1]?.trim();
       if (title && link) {
         const cleanDesc = description
-          ? description.replace(/<[^>]+>/g, '').substring(0, 200) + '...'
+          ? description.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/<[^>]+>/g, ' ').replace(/\s+/g,' ').trim().substring(0, 200)
           : 'Read full story at source.';
         articles.push({
           headline: title.replace(/<[^>]+>/g, ''),
@@ -177,7 +177,7 @@ async function fetchNewsAPI(key) {
         articles.push({
           url: a.url,
           headline: a.title,
-          summary: a.description || '',
+          summary: (a.description||'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().substring(0,200),
           source: a.source.name || 'NewsAPI',
           time: formatTime(new Date(a.publishedAt)),
           timeClass: 'time-today',
