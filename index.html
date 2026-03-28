@@ -2316,6 +2316,7 @@ function filterCategory(cat) {
   // Render from live cache
   if (window._liveArticles && window._liveArticles.length > 0) {
     renderLiveArticles(window._liveArticles, cat);
+    updateHero(_liveArticles, cat);
   } else {
     fetchLiveNews(cat, true);
   }
@@ -2345,9 +2346,9 @@ function filterSearch(query) {
 }
 
 function filterSources(filter, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderSourcesGrid(filter);
+  document.querySelectorAll('[onclick*="filterSources"]').forEach(function(el) { el.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  renderSourcesGrid(filter || 'all');
 }
 
 function showSources() {
