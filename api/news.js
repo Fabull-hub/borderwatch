@@ -57,6 +57,9 @@ const RSS_FEEDS = [
   { url: 'https://www.sipri.org/rss.xml', source: 'SIPRI', region: 'Global', badge: 'weapons' },
   { url: 'https://smallarmssurvey.org/feed', source: 'Small Arms Survey', region: 'Global', badge: 'weapons' },
   { url: 'https://www.atf.gov/press-releases/rss.xml', source: 'ATF', region: 'Americas', badge: 'weapons' },
+  { url: 'https://www.thetrace.org/feed/', source: 'The Trace', region: 'Americas', badge: 'weapons' },
+  { url: 'https://www.gunviolencearchive.org/rss', source: 'Gun Violence Archive', region: 'Americas', badge: 'weapons' },
+  { url: 'https://www.janes.com/defence-news/rss', source: 'Janes Defence', region: 'Global', badge: 'weapons' },
 
   // === MARITIME ===
   { url: 'https://gcaptain.com/feed/', source: 'gCaptain', region: 'Global', badge: 'maritime' },
@@ -417,6 +420,10 @@ async function fetchNewsAPI(key) {
     { q: 'airport drugs security seized passenger', badge: 'airport', label: 'AIRPORT' },
     { q: 'human trafficking smuggling migrants arrested', badge: 'human', label: 'HUMAN SMUGGLING' },
     { q: 'weapons firearms smuggling seized illegal', badge: 'weapons', label: 'WEAPONS' },
+    { q: 'illegal weapons seized firearms smuggling border', badge: 'weapons', label: 'WEAPONS' },
+    { q: 'guns smuggled arrested trafficking illegal arms', badge: 'weapons', label: 'WEAPONS' },
+    { q: 'weapons cache seized police military grade', badge: 'weapons', label: 'WEAPONS' },
+
     { q: 'coast guard maritime drugs boat intercepted', badge: 'maritime', label: 'MARITIME' },
     { q: 'wildlife poaching ivory trafficking seized', badge: 'wildlife', label: 'WILDLIFE TRAFFICKING' },
     { q: 'border patrol checkpoint land border arrest', badge: 'border', label: 'LAND BORDER' },
