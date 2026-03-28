@@ -73,6 +73,7 @@ const BADGE_MAP = {
   narco: 'NARCOTICS', border: 'BORDER', cargo: 'CARGO',
   airport: 'AIRPORT', human: 'HUMAN SMUGGLING', seized: 'SEIZURES',
   weapons: 'WEAPONS', wildlife: 'WILDLIFE', maritime: 'MARITIME',
+  geopolitics: 'GEOPOLITICS',
 };
 
 function parseRSS(xml, feedConfig) {
@@ -132,6 +133,8 @@ function formatTime(date) {
 
 function guessBadge(text) {
   const t = (text||'').toLowerCase();
+  // Geopolitics — check FIRST so off-topic news gets routed here
+  if (t.match(/iran|houthi|sanction|nato|geopolit|missile.strike|military.operation|airstrike|diplomatic|ceasefire|war.crime|coup|insurgent|rebel.group|conflict.zone|civil.war|united.nations.resolution|g7|g20|trade.war|tariff.dispute|semiconductor.ban/)) return 'geopolitics';
   if (t.match(/drug|cocaine|fentanyl|heroin|meth|narc|opium|cannabis|marijuana/)) return 'narco';
   if (t.match(/human.traffick|smuggl.*person|migrant.*smuggl|people.smuggl|forced.labour|forced labor/)) return 'human';
   if (t.match(/weapon|firearm|gun|arms.traffick|ammunition|explosive|rifle|pistol/)) return 'weapons';
@@ -181,6 +184,7 @@ async function fetchNewsAPI(key) {
     { q: 'coast guard drugs',  badge: 'maritime', label: 'MARITIME',           region: 'Global' },
     { q: 'wildlife poaching',  badge: 'wildlife', label: 'WILDLIFE TRAFFICKING',region: 'Global'},
     { q: 'border patrol',      badge: 'border',   label: 'LAND BORDER',        region: 'Global' },
+    { q: 'sanctions trade route conflict smuggling', badge: 'geopolitics', label: 'GEOPOLITICS', region: 'Global' },
   ];
   const articles = [];
   await Promise.all(queries.map(async (q) => {
