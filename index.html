@@ -1423,28 +1423,7 @@
   <div class="ticker-label">■ BREAKING</div>
   <div style="overflow:hidden;flex:1">
     <div class="ticker-content" id="ticker">
-      <span>Turkish coast guard intercepts vessel carrying 87 migrants in Aegean Sea</span>
-      <span>US CBP seizes 3.2 tonnes of fentanyl at San Diego port of entry — record haul</span>
-      <span>INTERPOL Operation Thunderball: 49 arrests across 11 African nations</span>
-      <span>Rotterdam port scanners detect $120M cocaine shipment hidden in banana cargo</span>
-      <span>IOM reports 45,000 crossings via Darién Gap in January 2026 alone</span>
-      <span>Dubai airport security nabs passenger with 14kg gold hidden in body belt</span>
-      <span>EU Frontex activates RAPID deployment at Moldova-Romania border</span>
-      <span>Myanmar jade smuggling networks linked to new military finance report — Global Witness</span>
-      <span>Hong Kong customs seizes endangered species worth HK$2.3M at express cargo terminal</span>
-      <span>WCO confirms global counterfeit goods seizures up 18% in 2025 vs prior year</span>
-      <!-- duplicate for seamless loop -->
-      <span>Turkish coast guard intercepts vessel carrying 87 migrants in Aegean Sea</span>
-      <span>US CBP seizes 3.2 tonnes of fentanyl at San Diego port of entry — record haul</span>
-      <span>INTERPOL Operation Thunderball: 49 arrests across 11 African nations</span>
-      <span>Rotterdam port scanners detect $120M cocaine shipment hidden in banana cargo</span>
-      <span>IOM reports 45,000 crossings via Darién Gap in January 2026 alone</span>
-      <span>Dubai airport security nabs passenger with 14kg gold hidden in body belt</span>
-      <span>EU Frontex activates RAPID deployment at Moldova-Romania border</span>
-      <span>Myanmar jade smuggling networks linked to new military finance report — Global Witness</span>
-      <span>Hong Kong customs seizes endangered species worth HK$2.3M at express cargo terminal</span>
-      <span>WCO confirms global counterfeit goods seizures up 18% in 2025 vs prior year</span>
-    </div>
+      </div>
   </div>
 </div>
 
@@ -2042,6 +2021,7 @@ function showApiError(fallbackFn) {
 }
 
 function renderLiveArticles(articles, filter) {
+      renderTicker(_liveArticles);
   const list = document.getElementById('article-list');
   if (!list) return;
   const filtered = (!filter || filter === 'all') ? articles : articles.filter(a => a.badge === filter);
@@ -2062,6 +2042,17 @@ function renderLiveArticles(articles, filter) {
     </div>
     <div class="article-time-bar ${a.timeClass}"></div>
   </a>`).join('');
+}
+
+function renderTicker(articles) {
+  var el = document.getElementById('ticker');
+  if (!el || !articles || !articles.length) return;
+  // Pick top 10 most recent articles for ticker
+  var items = articles.slice(0, 10);
+  el.innerHTML = items.map(function(a) {
+    return '<span><a href="' + (a.url||'#') + '" target="_blank" rel="noopener" style="color:inherit;text-decoration:none">'
+      + (a.headline||'').replace(/[<>]/g,'').substring(0,100) + '</a></span>';
+  }).join('  &bull;  ');
 }
 
 async function fetchLiveNews(category, force) {
