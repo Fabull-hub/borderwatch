@@ -1979,7 +1979,7 @@ function renderLiveArticles(articles, filter) {
     <div>
       <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
       <div class="article-headline">${a.headline}</div>
-      <div class="article-summary">${a.summary}</div>
+      <div class="article-summary">${cleanText(a.summary).substring(0,160)}</div>
       <div class="article-footer">
         <span class="article-region">${a.region}</span>
         <span>${a.source}</span>
@@ -2050,7 +2050,7 @@ function renderArticlesFromData(articles, filter) {
       <div>
         <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
         <div class="article-headline">${a.headline}</div>
-        <div class="article-summary">${a.summary}</div>
+        <div class="article-summary">${cleanText(a.summary).substring(0,160)}</div>
         <div class="article-footer">
           <span class="article-region">${a.region}</span>
           <span>${a.source}</span>
