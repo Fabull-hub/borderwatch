@@ -328,16 +328,14 @@
     align-items: center;
     justify-content: center;
     font-family: var(--font-mono);
-    font-size: clamp(14px, 3.5vw, 48px);
+    font-size: clamp(18px, 5vw, 64px);
     font-weight: 500;
     color: rgba(212, 168, 67, 0.25);
     text-transform: uppercase;
     letter-spacing: -0.02em;
     text-align: center;
-    padding: 8px 12px;
-    white-space: normal;
-    word-break: break-word;
-    line-height: 1.1;
+    padding: 12px 16px;
+    white-space: nowrap;
     overflow: hidden;
     position: relative;
     z-index: 2;
@@ -2694,18 +2692,7 @@ function updateHero(articles, cat) {
 
   var badge = h.badge || cat || 'all';
   var label = h.badgeLabel || badge.toUpperCase();
-  if (el('hero-visual-label')) {
-    // Break long two-word labels onto two lines
-    var displayLabel = label;
-    if (label === 'HUMAN SMUGGLING') displayLabel = 'HUMAN
-SMUGGLING';
-    if (label === 'WILDLIFE TRAFFICKING') displayLabel = 'WILDLIFE
-TRAFFICKING';
-    if (label === 'LAND BORDER') displayLabel = 'LAND
-BORDER';
-    el('hero-visual-label').style.whiteSpace = displayLabel.includes('\n') ? 'pre' : 'nowrap';
-    el('hero-visual-label').textContent = displayLabel;
-  }
+  if (el('hero-visual-label')) el('hero-visual-label').textContent = label;
 
   // Category images — top half is text, bottom half is this image
   var HERO_IMAGES = {
