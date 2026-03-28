@@ -212,6 +212,48 @@ const RSS_FEEDS = [
   // Mexico investigative
   { url: 'https://www.elfinanciero.com.mx/rss/economia.xml', source: 'El Financiero MX', region: 'Latin America', badge: 'cargo' },
   { url: 'https://www.milenio.com/rss', source: 'Milenio MX', region: 'Latin America', badge: 'narco' },
+
+  // === N-Z COUNTRY AGENCIES ===
+  // Netherlands - confirmed RSS via government.nl
+  { url: 'https://www.government.nl/rss/latest-items', source: 'Netherlands Gov', region: 'Europe', badge: 'cargo' },
+  { url: 'https://www.douane.nl/en/rss', source: 'Dutch Customs', region: 'Europe', badge: 'cargo' },
+  // New Zealand
+  { url: 'https://www.customs.govt.nz/news/rss/', source: 'NZ Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  { url: 'https://www.police.govt.nz/news/rss.xml', source: 'NZ Police', region: 'Asia-Pacific', badge: 'seized' },
+  // Norway
+  { url: 'https://www.toll.no/en/rss/', source: 'Norway Toll', region: 'Europe', badge: 'cargo' },
+  // Panama (major drug transit hub)
+  { url: 'https://www.sna.gob.pa/rss', source: 'Panama Aduanas', region: 'Americas', badge: 'cargo' },
+  // Peru
+  { url: 'https://www.sunat.gob.pe/rss.xml', source: 'Peru SUNAT', region: 'Latin America', badge: 'cargo' },
+  // Philippines
+  { url: 'https://customs.gov.ph/feed/', source: 'Philippines Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  // Russia
+  { url: 'https://english.customs.ru/rss/', source: 'Russia FCS', region: 'Europe', badge: 'cargo' },
+  // South Africa
+  { url: 'https://www.sars.gov.za/rss/media-releases.xml', source: 'South Africa SARS', region: 'Africa', badge: 'seized' },
+  // Spain
+  { url: 'https://www.agenciatributaria.gob.es/rss/noticias.xml', source: 'Spain AEAT', region: 'Europe', badge: 'cargo' },
+  { url: 'https://www.interior.gob.es/prensa/rss.xml', source: 'Spain Interior', region: 'Europe', badge: 'seized' },
+  // Sweden
+  { url: 'https://www.tullverket.se/en/startpage/pressreleases.rss', source: 'Sweden Tullverket', region: 'Europe', badge: 'cargo' },
+  // Switzerland
+  { url: 'https://www.bazg.admin.ch/bazg/en/home.rss', source: 'Switzerland BAZG', region: 'Europe', badge: 'cargo' },
+  // Turkey
+  { url: 'https://www.gtb.gov.tr/rss', source: 'Turkey GTB', region: 'Europe', badge: 'cargo' },
+  // UK (additional feeds)
+  { url: 'https://www.gov.uk/government/organisations/her-majestys-revenue-and-customs.atom', source: 'UK HMRC', region: 'Europe', badge: 'cargo' },
+  // Ukraine
+  { url: 'https://customs.gov.ua/en/rss', source: 'Ukraine Customs', region: 'Europe', badge: 'cargo' },
+  // Vietnam
+  { url: 'https://www.customs.gov.vn/en/rss.xml', source: 'Vietnam Customs', region: 'Asia-Pacific', badge: 'cargo' },
+  // International Trade blogs (confirmed RSS)
+  { url: 'https://www.internationaltradecompliance.com/feed/', source: 'Intl Trade Compliance', region: 'Global', badge: 'cargo' },
+  { url: 'https://www.trade.gov/tradeology', source: 'ITA Tradeology', region: 'Americas', badge: 'cargo' },
+  // Additional Latin America investigative
+  { url: 'https://ojo-publico.com/feed', source: 'Ojo Publico Peru', region: 'Latin America', badge: 'seized' },
+  { url: 'https://www.connectas.org/feed/', source: 'Connectas', region: 'Latin America', badge: 'seized' },
+  { url: 'https://www.seguridadjusticiaypaz.org.mx/feed', source: 'Seguridad Justicia MX', region: 'Latin America', badge: 'narco' },
 ];
 const BADGE_MAP = {
   narco: 'NARCOTICS', border: 'LAND BORDER', cargo: 'CARGO', airport: 'AIRPORT',
@@ -374,6 +416,31 @@ async function fetchNewsAPI(key) {
     { q: 'Kenya customs seized drugs wildlife', badge: 'seized', label: 'SEIZURES' },
     { q: 'Korea customs seized drugs smuggling', badge: 'cargo', label: 'CARGO' },
     { q: 'Mexico SAT aduanas decomiso contrabando', badge: 'cargo', label: 'CARGO' },
+
+    // N-Z country customs news
+    { q: 'Netherlands Dutch customs seized drugs smuggling', badge: 'cargo', label: 'CARGO' },
+    { q: 'New Zealand customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Nigeria customs seizure smuggling arrested', badge: 'cargo', label: 'CARGO' },
+    { q: 'Norway customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Pakistan customs seized drugs border', badge: 'border', label: 'LAND BORDER' },
+    { q: 'Panama drugs seized maritime coast guard', badge: 'maritime', label: 'MARITIME' },
+    { q: 'Peru customs seized drugs trafficking', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Philippines customs drugs seized arrested', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Poland customs seized drugs trafficking', badge: 'cargo', label: 'CARGO' },
+    { q: 'Portugal customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Romania customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Russia customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Saudi Arabia customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Spain Guardia Civil aduanas decomiso droga', badge: 'seized', label: 'SEIZURES' },
+    { q: 'Sweden tullverket customs seized drugs', badge: 'cargo', label: 'CARGO' },
+    { q: 'Switzerland customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'Thailand customs seized drugs border', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Turkey customs seized drugs border', badge: 'cargo', label: 'CARGO' },
+    { q: 'UAE Dubai customs seized drugs trafficking', badge: 'cargo', label: 'CARGO' },
+    { q: 'Ukraine customs border seized drugs war', badge: 'border', label: 'LAND BORDER' },
+    { q: 'Venezuela drugs seized border trafficking', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Vietnam customs seized drugs arrested', badge: 'narco', label: 'NARCOTICS' },
+    { q: 'Zambia Zimbabwe customs seized drugs wildlife', badge: 'wildlife', label: 'WILDLIFE TRAFFICKING' },
   ];
   const articles = [];
   await Promise.all(queries.map(async (q) => {
