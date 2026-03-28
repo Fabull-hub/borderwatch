@@ -1967,27 +1967,43 @@ function showApiError(fallbackFn) {
   document.getElementById('section-sub').textContent += ' · Cached data';
 }
 
-function renderLiveArticles(articles, filter) {
-  const list = document.getElementById('article-list');
+function renderLiveArticles(articles, category) {
+  var list = document.getElementById('article-list');
   if (!list) return;
-  const filtered = (!filter || filter === 'all') ? articles : articles.filter(a => a.badge === filter);
-  if (filtered.length === 0) {
-    list.innerHTML = '<div style="padding:32px;text-align:center;font-family:var(--font-mono);font-size:12px;color:var(--text3)">No live articles found for this category</div>';
+
+  var BADGE_LABELS = { seized:'SEIZURES', narco:'NARCOTICS', maritime:'MARITIME',
+    human:'HUMAN SMUGGLING', border:'LAND BORDER', cargo:'CARGO', airport:'AIRPORT',
+    wildlife:'WILDLIFE TRAFFICKING', weapons:'WEAPONS' };
+
+  var filtered = (category && category !== 'all')
+    ? articles.filter(function(a) { return a.badge === category; })
+    : articles;
+
+  // Show "no articles" message if category has nothing — do NOT fall back to all
+  if (!filtered.length) {
+    list.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--text3);font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;">'
+      + 'NO ARTICLES FOUND FOR THIS CATEGORY<br><span style="font-size:9px;margin-top:8px;display:block;">The feed updates every 5 minutes</span>'
+      + '</div>';
     return;
   }
-  list.innerHTML = filtered.map(a => `<a class="article-card" href="${a.url}" target="_blank" rel="noopener">
-    <div>
-      <div><span class="article-badge ${badgeClass(a.badge)}">${a.badgeLabel}</span></div>
-      <div class="article-headline">${a.headline}</div>
-      <div class="article-summary">${a.summary}</div>
-      <div class="article-footer">
-        <span class="article-region">${a.region}</span>
-        <span>${a.source}</span>
-        <span>${a.time}</span>
-      </div>
-    </div>
-    <div class="article-time-bar ${a.timeClass}"></div>
-  </a>`).join('');
+
+  list.innerHTML = filtered.map(function(a) {
+    var badge = a.badge || 'seized';
+    var label = a.badgeLabel || BADGE_LABELS[badge] || badge.toUpperCase();
+    var headline = (a.headline||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    var summary = (a.summary||'').replace(/<[^>]+>/g,'').substring(0,200);
+    return '<a class="article-card" href="'+(a.url||'#')+'" target="_blank" rel="noopener">'
+      +'<div>'
+      +'<div class="article-badge badge-'+badge+'">'+label+'</div>'
+      +'<div class="article-headline">'+headline+'</div>'
+      +'<div class="article-summary">'+summary+(summary.length>=200?'&hellip;':'')+'</div>'
+      +'</div>'
+      +'<div class="article-meta">'
+      +'<span class="article-region">'+(a.region||'')+'</span>'
+      +'<span class="article-source">'+(a.source||'')+'</span>'
+      +'<span class="article-time '+(a.timeClass||'time-old')+'">'+(a.time||'')+'</span>'
+      +'</div></a>';
+  }).join('');
 }
 
 async function fetchLiveNews(category, force) {
@@ -2360,9 +2376,12 @@ function filterSearch(query) {
 }
 
 function filterSources(filter, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderSourcesGrid(filter);
+  // Safe null check on btn
+  document.querySelectorAll('[onclick*="filterSources"]').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  if (btn) btn.classList.add('active');
+  renderSourcesGrid(filter || 'all');
 }
 
 function showSources() {
