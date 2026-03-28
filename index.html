@@ -2300,25 +2300,29 @@ function renderSourcesGrid(filter) {
 
 function filterCategory(cat) {
   currentCategory = cat;
-  // Update active nav tab
-  document.querySelectorAll('.nav-link').forEach(function(el) { el.classList.remove('active'); });
-  var links = document.querySelectorAll('.nav-link');
-  for (var i=0; i<links.length; i++) {
-    var oc = links[i].getAttribute('onclick') || '';
-    if (oc.indexOf("'"+cat+"'") !== -1) { links[i].classList.add('active'); break; }
-  }
-  // Hide map panel, show articles
+
+  // Hide map, show articles
   var mapPanel = document.getElementById('map-panel');
   var articleList = document.getElementById('article-list');
   if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
   if (articleList) articleList.style.display = '';
-  var sectionSub = document.getElementById('section-sub');
-  if (sectionSub) sectionSub.textContent = 'Live Feed · All Categories';
-  // Render filtered articles
-  if (window._liveData && window._liveData.articles) {
+
+  // Update active nav tab
+  document.querySelectorAll('.nav-link').forEach(function(el) { el.classList.remove('active'); });
+  document.querySelectorAll('.nav-link').forEach(function(el) {
+    var oc = el.getAttribute('onclick') || '';
+    if (oc.indexOf("'" + cat + "'") !== -1) el.classList.add('active');
+  });
+
+  // Update section subtitle
+  var sub = document.getElementById('section-sub');
+  if (sub) sub.textContent = 'Live Feed · All Categories';
+
+  // Render filtered articles from cache
+  if (window._liveArticles && window._liveArticles.length > 0) {
     renderLiveArticles(window._liveArticles, cat);
   } else {
-    fetchLiveNews(cat);
+    fetchLiveNews(cat, true);
   }
 }
 
@@ -2555,13 +2559,11 @@ function showMap() {
 }
 
 // Patch filterCategory to hide map when switching back to news
-const _origFilterCategory = filterCategory;
 filterCategory = function(cat) {
   const mapPanel = document.getElementById('map-panel');
   const articleList = document.getElementById('article-list');
   if (mapPanel) { mapPanel.classList.remove('active'); mapPanel.style.display = 'none'; }
   if (articleList) articleList.style.display = '';
-  _origFilterCategory(cat);
 };
 
 
