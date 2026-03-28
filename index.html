@@ -2611,53 +2611,25 @@ function updateTabCounts(articles) {
   });
 }
 
-async function fetchLiveNews(category, force) {
-  const now = Date.now();
-  if (!force && _liveArticles.length > 0 && (now - _lastFetch) < CACHE_TTL) {
-    renderLiveArticles(_liveArticles, category); return;
-      updateHero(_liveArticles, category);
-  }
-  if (_isLoading) return;
-  _isLoading = true;
-  showSkeleton();
+async function fetchLiveNews(category, background) {
+  window._lastFetch = Date.now();
   try {
-    const res = await fetch('/api/news?category=' + (category || 'all') + '&_t=' + now);
+    var ts = Date.now();
+    var url = '/api/news?category=' + (category || 'all') + '&t=' + ts;
+    var res = await fetch(url, { cache: 'no-store', headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache' } });
     if (!res.ok) throw new Error('API ' + res.status);
-    const data = await res.json();
-    if (data.ok && data.articles && data.articles.length > 0) {
-      _liveArticles = data.articles;
-      _lastFetch = now;
-
-      //    Stories Today counter   
-      const statEl = document.getElementById('stat-stories');
-      if (statEl) statEl.textContent = data.total || data.articles.length;
-
-      //    Auto hero rotation   
-      if (data.hero) {
-        const h = data.hero;
-        const el = id => document.getElementById(id);
-        if (el('hero-headline')) el('hero-headline').textContent = h.headline;
-        if (el('hero-deck'))     el('hero-deck').textContent     = h.deck;
-        if (el('hero-link'))     el('hero-link').href            = h.url;
-        if (el('hero-source'))   el('hero-source').textContent   = h.source;
-        if (el('hero-time'))     el('hero-time').textContent     = h.time + '   ' + h.region;
-        if (el('hero-badge')) {
-          el('hero-badge').textContent  = h.badgeLabel;
-          el('hero-badge').className    = 'article-badge badge-' + h.badge;
-        }
-        if (el('hero-visual-label')) {
-          el('hero-visual-label').textContent = h.badgeLabel;
-        }
-      }
-
-      window._liveArticles = data.articles;
-      window._lastFetch = Date.now();
-      renderLiveArticles(data.articles, category);
-    } else { throw new Error('empty'); }
+    var data = await res.json();
+    if (!data.ok || !data.articles) throw new Error('Bad response');
+    window._liveArticles = data.articles;
+    renderLiveArticles(data.articles, currentCategory || 'all');
+    updateHero(data.articles, currentCategory || 'all');
+    renderTicker(data.articles);
+    updateStats(data.articles);
+    updateTabCounts(data.articles);
+    renderCatBars(data.articles);
   } catch(e) {
-    console.warn('BorderTrend API fallback:', e.message);
-    renderArticles(category || 'all');
-  } finally { _isLoading = false; }
+    console.warn('fetchLiveNews error:', e.message);
+  }
 }
 
 function renderArticlesFromData(articles, filter) {
