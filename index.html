@@ -2016,9 +2016,9 @@
             <div class="hero-visual-rule"></div>
             <div class="hero-visual-source" id="hero-visual-source"></div>
           </div>
-          <div class="hero-visual-img" id="hero-visual-img"></div>
+          <div class="hero-visual-img" id="hero-visual-img" style="background-image:url('https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Geopolitics.jpg');opacity:1"></div>
         </div>
-        <div class="hero-content">
+        <div class="hero-content" style="opacity:0">
           <div>
             <div class="hero-tag" id="hero-tag">
               <span class="article-badge badge-seized" id="hero-badge">SEIZURES</span>
@@ -2635,7 +2635,7 @@ async function fetchLiveNews(category, force) {
   const now = Date.now();
   if (!force && _liveArticles.length > 0 && (now - _lastFetch) < CACHE_TTL) {
     renderLiveArticles(_liveArticles, category); return;
-      updateHero(_liveArticles, category);
+      // hero updates after API responds
   }
   if (_isLoading) return;
   _isLoading = true;
