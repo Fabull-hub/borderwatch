@@ -3230,10 +3230,49 @@ function updateHero(articles, cat) {
     wildlife: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Wildlife%20Trafficking.jpg',
     seized: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Seizures.png',
     geopolitics: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Geopolitics.jpg'
+  };
+  var catLabel = CAT_LABELS[cat] || (cat||'').toUpperCase();
+  var el = function(id){ return document.getElementById(id); };
+
+  // Update label
+  var labelEl = el('hero-visual-label');
+  if (labelEl) {
+    labelEl.textContent = catLabel;
+    var len = catLabel.length;
+    labelEl.style.fontSize = len<=7?'42px':len<=12?'32px':len<=18?'24px':'18px';
   }
+  if (el('hero-badge')) {
+    el('hero-badge').textContent = catLabel;
+    el('hero-badge').className = 'article-badge badge-'+(cat||'seized');
+  }
+
+  // Set image
+  var imgEl = el('hero-visual-img');
+  if (imgEl) {
+    var imgUrl = CAT_IMAGES[cat] || '';
+    imgEl.style.backgroundImage = imgUrl ? 'url('+imgUrl+')' : 'none';
+    imgEl.style.opacity = imgUrl ? '1' : '0';
+  }
+
+  // Filter articles for this category
+  var pool = (cat==='all') ? articles : articles.filter(function(a){ return a.badge===cat; });
+
+  if (!pool.length) {
+    if (el('hero-headline')) el('hero-headline').textContent = 'No '+catLabel+' stories right now';
+    if (el('hero-deck')) el('hero-deck').textContent = 'Check back soon - the feed updates every 5 minutes.';
+    if (el('hero-source')) el('hero-source').textContent = '';
+    if (el('hero-time')) el('hero-time').textContent = '';
+    if (el('hero-link')) el('hero-link').href = '#';
+    if (el('hero-visual-source')) el('hero-visual-source').textContent = '';
+    return;
+  }
+
+  // Sort newest first then rotate every 30 seconds
+  var ORDER = {'time-recent':0,'time-today':1,'time-old':2};
   pool = pool.slice().sort(function(a,b){ return (ORDER[a.timeClass]||2)-(ORDER[b.timeClass]||2); });
   var idx = Math.floor(Date.now()/30000) % Math.min(pool.length, 5);
   var h = pool[idx];
+
   if (el('hero-headline')) el('hero-headline').textContent = cleanText(h.headline);
   if (el('hero-deck')) el('hero-deck').textContent = cleanText(h.summary).substring(0,280);
   if (el('hero-link')) el('hero-link').href = h.url||'#';
