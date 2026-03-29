@@ -316,12 +316,13 @@
   .hero-visual-img {
     width: 100%;
     height: 55%;
+    min-height: 160px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     opacity: 0;
-    transition: opacity 0.6s;
     flex-shrink: 0;
+    transition: opacity 0.6s;
   }
   .hero-visual-text-area {
     display: flex;
@@ -2672,6 +2673,7 @@ async function fetchLiveNews(category, force) {
       window._liveArticles = data.articles;
       window._lastFetch = Date.now();
       renderLiveArticles(data.articles, category);
+    updateHero(data.articles, currentCategory || 'all');
     } else { throw new Error('empty'); }
   } catch(e) {
     console.warn('BorderTrend API fallback:', e.message);
@@ -3220,56 +3222,36 @@ function cleanText(str) {
 
 //    HERO UPDATER   
 function updateHero(articles, cat) {
-  var CAT_LABELS = { all:'ALL COVERAGE', cargo:'CARGO', airport:'AIRPORT', border:'LAND BORDER', human:'HUMAN SMUGGLING', narco:'NARCOTICS', weapons:'WEAPONS', maritime:'MARITIME', wildlife:'WILDLIFE TRAFFICKING', seized:'SEIZURES', geopolitics:'GEOPOLITICS' };
-  var CAT_IMAGES = {
-    all: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/All%20coverage.png',
-    cargo: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Land%20Border.jpg',
-    airport: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Airport.jpg',
-    border: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Land%20Border.jpg',
-    human: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Human%20Smuggling.jpg',
-    narco: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Narcotics.jpg',
-    weapons: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Weapons.jpg',
-    maritime: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Maritime.jpg',
-    wildlife: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Wildlife%20Trafficking.jpg',
-    seized: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Seizures.png',
-    geopolitics: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Geopolitics.jpg'
-  };
-  var catLabel = CAT_LABELS[cat] || (cat || '').toUpperCase();
-  var getEl = function(id) { return document.getElementById(id); };
-  var labelEl = getEl('hero-visual-label');
-  if (labelEl) {
-    labelEl.textContent = catLabel;
-    var len = catLabel.length;
-    labelEl.style.fontSize = len <= 7 ? '42px' : len <= 12 ? '32px' : len <= 18 ? '24px' : '18px';
-  }
-  var badgeEl = getEl('hero-badge');
-  if (badgeEl) { badgeEl.textContent = catLabel; badgeEl.className = 'article-badge badge-' + (cat || 'seized'); }
-  var imgEl = getEl('hero-visual-img');
-  if (imgEl) {
-    var imgUrl = CAT_IMAGES[cat] || '';
-    imgEl.style.backgroundImage = imgUrl ? 'url(' + imgUrl + ')' : 'none';
-    imgEl.style.opacity = imgUrl ? '1' : '0';
-  }
-  var pool = (cat === 'all') ? articles : articles.filter(function(a) { return a.badge === cat; });
+  var LABELS = { all:'ALL COVERAGE', cargo:'CARGO', airport:'AIRPORT', border:'LAND BORDER', human:'HUMAN SMUGGLING', narco:'NARCOTICS', weapons:'WEAPONS', maritime:'MARITIME', wildlife:'WILDLIFE TRAFFICKING', seized:'SEIZURES', geopolitics:'GEOPOLITICS' };
+  var IMGS = { all:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/All%20coverage.png', cargo:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Land%20Border.jpg', airport:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Airport.jpg', border:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Land%20Border.jpg', human:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Human%20Smuggling.jpg', narco:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Narcotics.jpg', weapons:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Weapons.jpg', maritime:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Maritime.jpg', wildlife:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Wildlife%20Trafficking.jpg', seized:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Seizures.png', geopolitics:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Geopolitics.jpg' };
+  var lbl = LABELS[cat] || (cat||'').toUpperCase();
+  var g = function(id){ return document.getElementById(id); };
+  var le = g('hero-visual-label');
+  if (le) { le.textContent = lbl; var ln = lbl.length; le.style.fontSize = ln<=7?'42px':ln<=12?'32px':ln<=18?'24px':'18px'; }
+  var be = g('hero-badge');
+  if (be) { be.textContent = lbl; be.className = 'article-badge badge-'+(cat||'seized'); }
+  var ie = g('hero-visual-img');
+  if (ie) { var iu = IMGS[cat]||''; ie.style.backgroundImage = iu?'url('+iu+')':'none'; ie.style.opacity = iu?'1':'0'; }
+  var pool = cat==='all' ? articles : articles.filter(function(a){return a.badge===cat;});
   if (!pool.length) {
-    var hn = getEl('hero-headline'); if (hn) hn.textContent = 'No ' + catLabel + ' stories right now';
-    var hd = getEl('hero-deck'); if (hd) hd.textContent = 'Check back soon - the feed updates every 5 minutes.';
-    var hs = getEl('hero-source'); if (hs) hs.textContent = '';
-    var ht = getEl('hero-time'); if (ht) ht.textContent = '';
-    var hl = getEl('hero-link'); if (hl) hl.href = '#';
-    var hvs = getEl('hero-visual-source'); if (hvs) hvs.textContent = '';
+    var he=g('hero-headline'); if(he) he.textContent='No '+lbl+' stories right now';
+    var de=g('hero-deck'); if(de) de.textContent='Check back soon - the feed updates every 5 minutes.';
+    var se=g('hero-source'); if(se) se.textContent='';
+    var te=g('hero-time'); if(te) te.textContent='';
+    var ae=g('hero-link'); if(ae) ae.href='#';
+    var ve=g('hero-visual-source'); if(ve) ve.textContent='';
     return;
   }
-  var ORDER = { 'time-recent': 0, 'time-today': 1, 'time-old': 2 };
-  pool = pool.slice().sort(function(a, b) { return (ORDER[a.timeClass] || 2) - (ORDER[b.timeClass] || 2); });
-  var idx = Math.floor(Date.now() / 30000) % Math.min(pool.length, 5);
-  var h = pool[idx];
-  var hn2 = getEl('hero-headline'); if (hn2) hn2.textContent = cleanText(h.headline);
-  var hd2 = getEl('hero-deck'); if (hd2) hd2.textContent = cleanText(h.summary).substring(0, 280);
-  var hl2 = getEl('hero-link'); if (hl2) hl2.href = h.url || '#';
-  var hs2 = getEl('hero-source'); if (hs2) hs2.textContent = h.source || '';
-  var ht2 = getEl('hero-time'); if (ht2) ht2.textContent = (h.time || '') + (h.region ? ' ' + h.region : '');
-  var hvs2 = getEl('hero-visual-source'); if (hvs2) hvs2.textContent = h.source || '';
+  var O={'time-recent':0,'time-today':1,'time-old':2};
+  pool=pool.slice().sort(function(a,b){return (O[a.timeClass]||2)-(O[b.timeClass]||2);});
+  var ix=Math.floor(Date.now()/30000)%Math.min(pool.length,5);
+  var h=pool[ix];
+  var he2=g('hero-headline'); if(he2) he2.textContent=cleanText(h.headline);
+  var de2=g('hero-deck'); if(de2) de2.textContent=cleanText(h.summary).substring(0,280);
+  var ae2=g('hero-link'); if(ae2) ae2.href=h.url||'#';
+  var se2=g('hero-source'); if(se2) se2.textContent=h.source||'';
+  var te2=g('hero-time'); if(te2) te2.textContent=(h.time||'')+(h.region?' '+h.region:'');
+  var ve2=g('hero-visual-source'); if(ve2) ve2.textContent=h.source||'';
 }
 
 //     INIT                                                                     
