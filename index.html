@@ -356,7 +356,7 @@
     width: 100%;
     padding: 0 12px;
   }
-  .hero-content {
+  .hero-content { opacity: 0; transition: opacity 0.4s;
     padding: 28px;
     display: flex;
     flex-direction: column;
@@ -2673,6 +2673,7 @@ async function fetchLiveNews(category, force) {
       window._liveArticles = data.articles;
       window._lastFetch = Date.now();
       renderLiveArticles(data.articles, category);
+    var hc = document.querySelector('.hero-content'); if (hc) hc.style.opacity = '1';
     updateHero(data.articles, currentCategory || 'all');
     } else { throw new Error('empty'); }
   } catch(e) {
