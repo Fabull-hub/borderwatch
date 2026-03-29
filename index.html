@@ -318,6 +318,19 @@
       linear-gradient(160deg, #0a1628 0%, #0d0a1a 40%, #0a1a0d 100%);
     gap: 0;
   }
+  .hero-visual-img {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.35;
+    border-radius: inherit;
+    z-index: 1;
+    transition: opacity 0.5s, background-image 0.3s;
+  }
+  .hero-visual > * { position: relative; z-index: 2; }
+
   .hero-visual-art {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -597,6 +610,7 @@
     border-radius: 2px;
     overflow: hidden;
   }
+  .cat-bar-track { height: 4px; background: var(--bg4); border-radius: 2px; overflow: hidden; }
   .cat-bar-fill {
     height: 100%;
     border-radius: 2px;
@@ -1993,6 +2007,7 @@
       <!-- HERO STORY -->
       <div class="hero-card" id="hero-block">
         <div class="hero-visual" id="hero-visual">
+          <div class="hero-visual-img" id="hero-visual-img"></div>
           <div class="hero-live-badge">LIVE</div>
           <div class="hero-visual-label" id="hero-visual-label">ALL COVERAGE</div>
           <div class="hero-visual-rule"></div>
@@ -3202,8 +3217,15 @@ function cleanText(str) {
 //    HERO UPDATER   
 function updateHero(articles, cat) {
   var CAT_LABELS = { all:'ALL COVERAGE', cargo:'CARGO', airport:'AIRPORT', border:'LAND BORDER', human:'HUMAN SMUGGLING', narco:'NARCOTICS', weapons:'WEAPONS', maritime:'MARITIME', wildlife:'WILDLIFE TRAFFICKING', seized:'SEIZURES', geopolitics:'GEOPOLITICS' };
+  var CAT_IMAGES = {
+    all: '', cargo: '', airport: '', border: '',
+    human: '', narco: '', weapons: '', maritime: '',
+    wildlife: '', seized: '', geopolitics: ''
+  };
   var catLabel = CAT_LABELS[cat] || (cat||'').toUpperCase();
   var el = function(id){ return document.getElementById(id); };
+
+  // Set category label
   var labelEl = el('hero-visual-label');
   if (labelEl) {
     labelEl.textContent = catLabel;
@@ -3211,6 +3233,15 @@ function updateHero(articles, cat) {
     labelEl.style.fontSize = len<=7?'42px':len<=12?'32px':len<=18?'24px':'18px';
   }
   if (el('hero-badge')) { el('hero-badge').textContent = catLabel; el('hero-badge').className = 'article-badge badge-'+(cat||'seized'); }
+
+  // Set background image if defined for this category
+  var imgEl = el('hero-visual-img');
+  if (imgEl) {
+    var imgUrl = CAT_IMAGES[cat] || CAT_IMAGES['all'] || '';
+    imgEl.style.backgroundImage = imgUrl ? 'url(' + imgUrl + ')' : 'none';
+    imgEl.style.opacity = imgUrl ? '0.35' : '0';
+  }
+
   var pool = (cat==='all') ? articles : articles.filter(function(a){ return a.badge===cat; });
   if (!pool.length) {
     if (el('hero-headline')) el('hero-headline').textContent = 'No '+catLabel+' stories right now';
@@ -3221,6 +3252,7 @@ function updateHero(articles, cat) {
     if (el('hero-visual-source')) el('hero-visual-source').textContent = '';
     return;
   }
+
   var ORDER = {'time-recent':0,'time-today':1,'time-old':2};
   pool = pool.slice().sort(function(a,b){ return (ORDER[a.timeClass]||2)-(ORDER[b.timeClass]||2); });
   var idx = Math.floor(Date.now()/30000) % Math.min(pool.length, 5);
