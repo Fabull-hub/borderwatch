@@ -319,17 +319,20 @@
     gap: 0;
   }
   .hero-visual-img {
-    position: absolute;
-    inset: 0;
+    position: absolute !important;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.35;
+    opacity: 0;
     border-radius: inherit;
     z-index: 1;
-    transition: opacity 0.5s, background-image 0.3s;
+    pointer-events: none;
+    display: block;
+    transition: opacity 0.5s;
   }
-  .hero-visual > * { position: relative; z-index: 2; }
+  .hero-visual > *:not(#hero-visual-img) { position: relative; z-index: 2; }
 
   .hero-visual-art {
     position: absolute;
