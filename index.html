@@ -1757,8 +1757,8 @@
   .article-card:hover .article-share-li { display: block; }
 </style>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23060b18'/><text x='16' y='22' text-anchor='middle' font-size='18' font-family='monospace' fill='%23d4a843'>B</text></svg>">
+  
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23060b18'/><text x='16' y='22' text-anchor='middle' font-size='18' font-family='monospace' fill='%23d4a843'>B</text></svg>">
   <meta name="description" content="BorderTrend — Real-time global intelligence on smuggling, trafficking, seizures and border security. Live feeds from 70+ official and investigative sources.">
   <meta property="og:title" content="BorderTrend — Global Smuggling & Border Security Intelligence">
   <meta property="og:description" content="Real-time intelligence on drug seizures, human trafficking, cargo fraud, weapons smuggling and border security from 70+ global sources.">
@@ -1980,7 +1980,7 @@
       <div class="stat-cell">
         <div class="stat-label">SOURCES MONITORED</div>
         <div class="stat-value" id="stat-sources">71</div>
-        <div class="stat-sub">5 regions covered</div>
+        <div class="stat-sub"><span id="stat-regions">5</span> regions covered</div>
       </div>
     </div>
 
@@ -3131,7 +3131,7 @@ function jitter(coord) {
   var mapPanel = document.getElementById('map-panel');
   var sectionSub = document.getElementById('section-sub');
   if (mapPanel) { mapPanel.classList.add('active'); mapPanel.style.display = 'block'; }
-  if (sectionSub) sectionSub.textContent = 'Live Incident Map   All Regions';
+  if (sectionSub) sectionSub.textContent = 'Live Feed
 
   // Initialise and plot
 
@@ -3280,56 +3280,3 @@ function handleNewsletterSignup(e) {
   }
 }
 </script>
-
-  <!-- ABOUT MODAL -->
-  <div id="modal-about" style="display:none;position:fixed;inset:0;background:rgba(6,11,24,0.92);z-index:9999;overflow-y:auto;padding:40px 20px">
-    <div style="max-width:640px;margin:0 auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:40px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-        <div style="font-family:var(--font-mono);font-size:11px;color:var(--accent);letter-spacing:0.15em">ABOUT BORDERTREND</div>
-        <button onclick="document.getElementById('modal-about').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:0">&times;</button>
-      </div>
-      <h2 style="font-family:var(--font-serif);font-size:24px;color:var(--text1);margin-bottom:16px">Global Smuggling &amp; Border Security Intelligence</h2>
-      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px">BorderTrend is a real-time intelligence platform aggregating open-source reporting on smuggling, trafficking, border security, and related enforcement activity from over 70 official, investigative, and media sources worldwide.</p>
-      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:16px">Our mission is to make border security intelligence accessible to researchers, journalists, law enforcement professionals, policy makers, and trade compliance practitioners.</p>
-      <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:24px">All content is sourced from publicly available RSS feeds and news APIs. BorderTrend does not produce original reporting and links directly to original sources.</p>
-      <div style="border-top:1px solid var(--border);padding-top:20px">
-        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:8px">CONTACT</div>
-        <a href="#" onclick="event.preventDefault();document.getElementById('modal-privacy').style.display='block'">Privacy Policy</a>.</p>
-    </div>
-  </div>
-
-<!-- ABOUT MODAL -->
-<div id="modal-about" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;overflow-y:auto">
-  <div style="max-width:700px;margin:60px auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:48px;position:relative">
-    <button onclick="document.getElementById('modal-about').style.display='none'" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">x</button>
-    <div style="font-family:var(--font-mono);font-size:9px;color:var(--accent);letter-spacing:0.15em;margin-bottom:8px">ABOUT BORDERTREND</div>
-    <h2 style="font-family:var(--font-serif);font-size:28px;color:var(--text1);margin:0 0 24px">Global Smuggling & Border Security Intelligence</h2>
-    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px">BorderTrend is a real-time intelligence aggregator tracking global smuggling, trafficking, and border security developments. We monitor 70+ official, investigative, and news sources across 5 regions to surface the stories that matter to professionals in customs, law enforcement, trade compliance, and border security.</p>
-    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px">Our platform covers narcotics seizures, human trafficking operations, cargo fraud, weapons interdictions, maritime smuggling, wildlife trafficking, and geopolitical developments affecting global trade corridors.</p>
-    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:32px">BorderTrend aggregates publicly available information from government agencies, international organisations, investigative media, and NGOs. We do not produce original intelligence or endorse any political position.</p>
-    <div style="border-top:1px solid var(--border);padding-top:24px">
-      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:8px">CONTACT</div>
-      <a href="mailto:fivestarmediamanagement@hotmail.com" style="color:var(--accent);font-family:var(--font-mono);font-size:11px">fivestarmediamanagement@hotmail.com</a>
-    </div>
-  </div>
-</div>
-
-<!-- PRIVACY MODAL -->
-<div id="modal-privacy" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;overflow-y:auto">
-  <div style="max-width:700px;margin:60px auto;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:48px;position:relative">
-    <button onclick="document.getElementById('modal-privacy').style.display='none'" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">x</button>
-    <div style="font-family:var(--font-mono);font-size:9px;color:var(--accent);letter-spacing:0.15em;margin-bottom:8px">PRIVACY POLICY</div>
-    <h2 style="font-family:var(--font-serif);font-size:28px;color:var(--text1);margin:0 0 24px">Your Privacy</h2>
-    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px"><strong style="color:var(--text1)">Data we collect:</strong> BorderTrend does not collect personal data, require registration, or track individual users. We do not use cookies beyond what is technically necessary to serve the site.</p>
-    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px"><strong style="color:var(--text1)">Third-party content:</strong> This site displays advertisements from third-party providers and aggregates content from external news sources. Those providers may have their own privacy practices which we do not control.</p>
-    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px"><strong style="color:var(--text1)">Analytics:</strong> We may use anonymous, aggregate analytics to understand site traffic. No personally identifiable information is stored or shared.</p>
-    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:16px"><strong style="color:var(--text1)">GDPR / CCPA:</strong> If you are located in the European Union or California and have questions about your data rights, contact us at the email below. As we collect no personal data, there is nothing to request deletion of.</p>
-    <p style="font-family:var(--font-sans);font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:32px"><strong style="color:var(--text1)">Updates:</strong> This policy may be updated periodically. Continued use of the site constitutes acceptance of the current policy.</p>
-    <div style="border-top:1px solid var(--border);padding-top:24px">
-      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text3);letter-spacing:0.1em;margin-bottom:8px">CONTACT</div>
-      <a href="mailto:fivestarmediamanagement@hotmail.com" style="color:var(--accent);font-family:var(--font-mono);font-size:11px">fivestarmediamanagement@hotmail.com</a>
-    </div>
-  </div>
-</div>
-</body>
-</html>
