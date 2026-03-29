@@ -3201,35 +3201,19 @@ function cleanText(str) {
 
 //    HERO UPDATER   
 function updateHero(articles, cat) {
-  var CAT_LABELS = {
-    all:'ALL COVERAGE', cargo:'CARGO', airport:'AIRPORT', border:'LAND BORDER',
-    human:'HUMAN SMUGGLING', narco:'NARCOTICS', weapons:'WEAPONS',
-    maritime:'MARITIME', wildlife:'WILDLIFE TRAFFICKING', seized:'SEIZURES',
-    geopolitics:'GEOPOLITICS'
-  };
+  var CAT_LABELS = { all:'ALL COVERAGE', cargo:'CARGO', airport:'AIRPORT', border:'LAND BORDER', human:'HUMAN SMUGGLING', narco:'NARCOTICS', weapons:'WEAPONS', maritime:'MARITIME', wildlife:'WILDLIFE TRAFFICKING', seized:'SEIZURES', geopolitics:'GEOPOLITICS' };
   var catLabel = CAT_LABELS[cat] || (cat||'').toUpperCase();
   var el = function(id){ return document.getElementById(id); };
-
-  // Update visual panel label + scale font to fit
   var labelEl = el('hero-visual-label');
   if (labelEl) {
     labelEl.textContent = catLabel;
-    // Scale font: short labels big, long labels smaller
     var len = catLabel.length;
-    var size = len <= 7 ? '42px' : len <= 12 ? '32px' : len <= 18 ? '24px' : '18px';
-    labelEl.style.fontSize = size;
+    labelEl.style.fontSize = len<=7?'42px':len<=12?'32px':len<=18?'24px':'18px';
   }
-
-  if (el('hero-badge')) {
-    el('hero-badge').textContent = catLabel;
-    el('hero-badge').className = 'article-badge badge-' + (cat||'seized');
-  }
-
-  // Filter to ONLY this category
-  var pool = (cat === 'all') ? articles : articles.filter(function(a){ return a.badge === cat; });
-
+  if (el('hero-badge')) { el('hero-badge').textContent = catLabel; el('hero-badge').className = 'article-badge badge-'+(cat||'seized'); }
+  var pool = (cat==='all') ? articles : articles.filter(function(a){ return a.badge===cat; });
   if (!pool.length) {
-    if (el('hero-headline')) el('hero-headline').textContent = 'No ' + catLabel + ' stories right now';
+    if (el('hero-headline')) el('hero-headline').textContent = 'No '+catLabel+' stories right now';
     if (el('hero-deck')) el('hero-deck').textContent = 'Check back soon - the feed updates every 5 minutes.';
     if (el('hero-source')) el('hero-source').textContent = '';
     if (el('hero-time')) el('hero-time').textContent = '';
@@ -3237,26 +3221,16 @@ function updateHero(articles, cat) {
     if (el('hero-visual-source')) el('hero-visual-source').textContent = '';
     return;
   }
-
-  var order = { 'time-recent': 0, 'time-today': 1, 'time-old': 2 };
-  pool = pool.slice().sort(function(a,b){
-    return (order[a.timeClass]||2) - (order[b.timeClass]||2);
-  });
-  var h = pool[0];
-
+  var ORDER = {'time-recent':0,'time-today':1,'time-old':2};
+  pool = pool.slice().sort(function(a,b){ return (ORDER[a.timeClass]||2)-(ORDER[b.timeClass]||2); });
+  var idx = Math.floor(Date.now()/30000) % Math.min(pool.length, 5);
+  var h = pool[idx];
   if (el('hero-headline')) el('hero-headline').textContent = cleanText(h.headline);
-  if (el('hero-deck'))     el('hero-deck').textContent     = cleanText(h.summary).substring(0,280);
-  if (el('hero-link'))     el('hero-link').href            = h.url || '#';
-  if (el('hero-source'))   el('hero-source').textContent   = h.source || '';
-  if (el('hero-time'))     el('hero-time').textContent     = (h.time||'') + (h.region ? ' ' + h.region : '');
-  if (el('hero-visual-source')) el('hero-visual-source').textContent = h.source || '';
-
-  var visual = el('hero-visual');
-  if (visual) {
-    var imgDiv = visual.querySelector('.hero-visual-img');
-    if (imgDiv) imgDiv.remove();
-    visual.style.backgroundImage = '';
-  }
+  if (el('hero-deck')) el('hero-deck').textContent = cleanText(h.summary).substring(0,280);
+  if (el('hero-link')) el('hero-link').href = h.url||'#';
+  if (el('hero-source')) el('hero-source').textContent = h.source||'';
+  if (el('hero-time')) el('hero-time').textContent = (h.time||'')+(h.region?' '+h.region:'');
+  if (el('hero-visual-source')) el('hero-visual-source').textContent = h.source||'';
 }
 
 //     INIT                                                                     
