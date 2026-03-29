@@ -77,6 +77,12 @@ const RSS_FEEDS = [
   // REDDIT
   { url: 'https://www.reddit.com/r/BorderSecurity.rss', source: 'r/BorderSecurity', region: 'Global', badge: 'border' },
   { url: 'https://www.reddit.com/r/Smuggling.rss', source: 'r/Smuggling', region: 'Global', badge: 'seized' },
+
+  // === ADDITIONAL WEAPONS FEEDS ===
+  { url: 'https://www.sipri.org/rss.xml', source: 'SIPRI', region: 'Global', badge: 'weapons' },
+  { url: 'https://smallarmssurvey.org/feed', source: 'Small Arms Survey', region: 'Global', badge: 'weapons' },
+  { url: 'https://www.gunpolicy.org/firearms/rss', source: 'Gun Policy', region: 'Global', badge: 'weapons' },
+  { url: 'https://theTrace.org/feed/', source: 'The Trace', region: 'Americas', badge: 'weapons' },
 ];
 
 const BADGE_MAP = {
@@ -162,6 +168,11 @@ async function fetchNewsAPI(key) {
     { q:'Asia customs drugs seized trafficking', badge:'narco' },
     { q:'Africa customs seized wildlife smuggling', badge:'wildlife' },
     { q:'cargo xray scanning border security technology', badge:'cargo' },
+
+    { q:'weapons smuggling seized illegal firearms trafficking', badge:'weapons', label:'WEAPONS' },
+    { q:'gun smuggling border seized illegal arms trafficking', badge:'weapons', label:'WEAPONS' },
+    { q:'arms trafficking weapons seized customs bust', badge:'weapons', label:'WEAPONS' },
+    { q:'SIPRI arms trade weapons proliferation illicit', badge:'weapons', label:'WEAPONS' },
   ];
   const articles = [];
   await Promise.all(queries.map(async (q) => {
