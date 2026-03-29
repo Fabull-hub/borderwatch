@@ -3218,20 +3218,18 @@ function cleanText(str) {
 function updateHero(articles, cat) {
   var CAT_LABELS = { all:'ALL COVERAGE', cargo:'CARGO', airport:'AIRPORT', border:'LAND BORDER', human:'HUMAN SMUGGLING', narco:'NARCOTICS', weapons:'WEAPONS', maritime:'MARITIME', wildlife:'WILDLIFE TRAFFICKING', seized:'SEIZURES', geopolitics:'GEOPOLITICS' };
   var CAT_IMAGES = {
-    all: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/All coverage.png',
-    cargo: '',
-    airport: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Airport.jpg',
-    border: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Land Border.jpg',
-    human: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Human Smuggling.jpg',
-    narco: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Narcotics.jpg',
-    weapons: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Weapons.jpg',
-    maritime: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Maritime.jpg',
-    wildlife: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Wildlife Trafficking.jpg',
-    seized: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Seizures.png',
-    geopolitics: 'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Geopolitics.jpg'
+    all:        'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/All%20coverage.png',
+    cargo:      'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Land%20Border.jpg',
+    airport:    'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Airport.jpg',
+    border:     'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Land%20Border.jpg',
+    human:      'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Human%20Smuggling.jpg',
+    narco:      'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Narcotics.jpg',
+    weapons:    'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Weapons.jpg',
+    maritime:   'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Maritime.jpg',
+    wildlife:   'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Wildlife%20Trafficking.jpg',
+    seized:     'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Seizures.png',
+    geopolitics:'https://raw.githubusercontent.com/Fabull-hub/borderwatch/main/Geopolitics.jpg'
   }
-  var catLabel = CAT_LABELS[cat] || (cat||'').toUpperCase();
-  var el = function(id){ return document.getElementById(id); };
 
   // Set category label
   var labelEl = el('hero-visual-label');
