@@ -311,24 +311,27 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 0;
     background: linear-gradient(160deg, #0a1628 0%, #0d0a1a 40%, #0a1a0d 100%);
-    gap: 0;
   }
   .hero-visual-img {
     width: 100%;
-    flex: 1;
+    height: 55%;
     background-size: cover;
-    background-position: center top;
+    background-position: center;
     background-repeat: no-repeat;
     opacity: 0;
-    display: block;
     transition: opacity 0.6s;
-    min-height: 160px;
+    flex-shrink: 0;
   }
-  .hero-visual-text-area { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 20px; flex: 1; width: 100%; }
+  .hero-visual-text-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px 16px;
+    flex: 1;
+    width: 100%;
+  }
 
   .hero-visual-art {
     position: absolute;
@@ -3234,7 +3237,6 @@ function updateHero(articles, cat) {
   var catLabel = CAT_LABELS[cat] || (cat||'').toUpperCase();
   var el = function(id){ return document.getElementById(id); };
 
-  // Update label
   var labelEl = el('hero-visual-label');
   if (labelEl) {
     labelEl.textContent = catLabel;
@@ -3246,7 +3248,6 @@ function updateHero(articles, cat) {
     el('hero-badge').className = 'article-badge badge-'+(cat||'seized');
   }
 
-  // Set image
   var imgEl = el('hero-visual-img');
   if (imgEl) {
     var imgUrl = CAT_IMAGES[cat] || '';
@@ -3254,7 +3255,6 @@ function updateHero(articles, cat) {
     imgEl.style.opacity = imgUrl ? '1' : '0';
   }
 
-  // Filter articles for this category
   var pool = (cat==='all') ? articles : articles.filter(function(a){ return a.badge===cat; });
 
   if (!pool.length) {
@@ -3267,7 +3267,6 @@ function updateHero(articles, cat) {
     return;
   }
 
-  // Sort newest first then rotate every 30 seconds
   var ORDER = {'time-recent':0,'time-today':1,'time-old':2};
   pool = pool.slice().sort(function(a,b){ return (ORDER[a.timeClass]||2)-(ORDER[b.timeClass]||2); });
   var idx = Math.floor(Date.now()/30000) % Math.min(pool.length, 5);
